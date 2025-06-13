@@ -66,6 +66,9 @@ test.describe('Accessibility Features', () => {
   });
 
   test('should have proper color contrast', async ({ page }) => {
+    // Wait for components to be visible and styled
+    await expect(page.locator('editor-app')).toBeVisible();
+
     // Get computed styles for key elements
     const editorApp = page.locator('editor-app');
     const backgroundColor = await editorApp.evaluate(el =>
@@ -78,6 +81,15 @@ test.describe('Accessibility Features', () => {
     // Basic check that colors are set (not transparent or initial)
     expect(backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
     expect(backgroundColor).not.toBe('transparent');
+    expect(backgroundColor).not.toBe('');
+
+    // Should have a proper background color set
+    expect(backgroundColor).toMatch(/^rgb/);
+
+    // Text color should also be set
+    expect(color).not.toBe('rgba(0, 0, 0, 0)');
+    expect(color).not.toBe('transparent');
+    expect(color).toMatch(/^rgb/);
   });
 
   test('should announce dynamic content changes', async ({ page }) => {

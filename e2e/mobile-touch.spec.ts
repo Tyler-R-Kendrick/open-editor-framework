@@ -1,4 +1,11 @@
 import { test, expect } from '@playwright/test';
+import {
+  waitForWebComponents,
+  touchDragAndDrop,
+  pinchToZoom,
+  ensureComponentVisible,
+  ensureComponentVisibleByName
+} from './utils/test-helpers';
 
 test.describe('Touch and Mobile Interactions', () => {
   test.beforeEach(async ({ page }) => {
@@ -21,28 +28,42 @@ test.describe('Touch and Mobile Interactions', () => {
 
     // Should have some responsive behavior
     expect(gridTemplate).toBeTruthy();
-  });
+  }); test('should support touch gestures for drag and drop', async ({ page }) => {
+    // Check if touch is supported in this browser context
+    const hasTouch = await page.evaluate(() => 'ontouchstart' in window || navigator.maxTouchPoints > 0);
 
-  test('should support touch gestures for drag and drop', async ({ page }) => {
+    if (!hasTouch) {
+      test.skip();
+      return;
+    }
+
+    // Ensure components are visible on mobile
+    await ensureComponentVisibleByName(page, 'component-palette');
+
     const palette = page.locator('component-palette');
-    const canvas = page.locator('editor-canvas');
 
+    // On mobile, palette should now be visible
     await expect(palette).toBeVisible();
-    await expect(canvas).toBeVisible();
 
-    // Find draggable item
-    const draggableItem = palette.locator('[draggable="true"], .draggable-item, .component-item').first();
+    // Find draggable item while on palette tab
+    const draggableItem = palette.locator('[draggable="true"], .draggable-item, .component-card').first();
+    await expect(draggableItem).toBeVisible();
 
-    if (await draggableItem.count() > 0) {
-      const itemBox = await draggableItem.boundingBox();
+    // Get draggable item bounding box while on palette tab
+    const itemBox = await draggableItem.boundingBox();
+
+    if (itemBox) {
+      // Switch to canvas tab and get canvas bounding box
+      await ensureComponentVisibleByName(page, 'editor-canvas');
+      const canvas = page.locator('editor-canvas');
+      await expect(canvas).toBeVisible();
+
       const canvasBox = await canvas.boundingBox();
 
-      if (itemBox && canvasBox) {
-        // Simulate touch drag
-        await page.mouse.move(itemBox.x + itemBox.width / 2, itemBox.y + itemBox.height / 2);
-        await page.mouse.down();
-        await page.mouse.move(canvasBox.x + canvasBox.width / 2, canvasBox.y + canvasBox.height / 2);
-        await page.mouse.up();
+      if (canvasBox) {
+        // Perform touch drag and drop using coordinates
+        await page.touchscreen.tap(itemBox.x + itemBox.width / 2, itemBox.y + itemBox.height / 2);
+        await page.touchscreen.tap(canvasBox.x + canvasBox.width / 2, canvasBox.y + canvasBox.height / 2);
 
         // Wait for any animations
         await page.waitForTimeout(500);

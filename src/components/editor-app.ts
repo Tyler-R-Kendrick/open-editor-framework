@@ -19,6 +19,8 @@ export class EditorApp extends LitElement {
       width: 100vw;
       overflow: hidden;
       touch-action: manipulation;
+      background-color: #f8fafc;
+      color: #1e293b;
       --editor-bg: #f8fafc;
       --editor-border: #e2e8f0;
       --editor-text: #1e293b;
