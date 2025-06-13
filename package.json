@@ -16,6 +16,11 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:report": "playwright show-report",
     "type-check": "tsc --noEmit"
   },
   "keywords": [
@@ -32,12 +37,13 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "lit": "^3.1.0",
     "@lit/context": "^1.1.0",
     "@lit/reactive-element": "^2.0.4",
-    "@lit/task": "^1.0.0"
+    "@lit/task": "^1.0.0",
+    "lit": "^3.1.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.53.0",
     "@types/node": "^20.10.5",
     "@typescript-eslint/eslint-plugin": "^6.17.0",
     "@typescript-eslint/parser": "^6.17.0",
