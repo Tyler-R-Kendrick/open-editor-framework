@@ -6,16 +6,38 @@ test.describe('Component Palette', () => {
   });
 
   test('should display component palette', async ({ page }) => {
+    // Check if we're on mobile - if so, click the palette tab first
+    const isMobile = page.viewportSize()!.width <= 768;
+
+    if (isMobile) {
+      const paletteTab = page.locator('.mobile-tab:has-text("Components")');
+      if (await paletteTab.count() > 0) {
+        await paletteTab.click();
+        await page.waitForTimeout(300);
+      }
+    }
+
     const palette = page.locator('component-palette');
     await expect(palette).toBeVisible();
   });
 
   test('should show available components', async ({ page }) => {
+    // Check if we're on mobile - if so, click the palette tab first
+    const isMobile = page.viewportSize()!.width <= 768;
+
+    if (isMobile) {
+      const paletteTab = page.locator('.mobile-tab:has-text("Components")');
+      if (await paletteTab.count() > 0) {
+        await paletteTab.click();
+        await page.waitForTimeout(300);
+      }
+    }
+
     const palette = page.locator('component-palette');
 
     // Look for component items/categories
-    const components = palette.locator('.component-item, .palette-item, .draggable-item');
-    const categories = palette.locator('.category, .component-category');
+    const components = palette.locator('.component-card, .component-item, .palette-item, .draggable-item');
+    const categories = palette.locator('.category-section, .category, .component-category');
 
     // Should have either components or categories visible
     const componentCount = await components.count();

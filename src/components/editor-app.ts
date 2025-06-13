@@ -18,6 +18,7 @@ export class EditorApp extends LitElement {
       height: 100vh;
       width: 100vw;
       overflow: hidden;
+      touch-action: manipulation;
       --editor-bg: #f8fafc;
       --editor-border: #e2e8f0;
       --editor-text: #1e293b;
@@ -69,14 +70,32 @@ export class EditorApp extends LitElement {
       .editor-container {
         grid-template-areas: 
           'toolbar'
-          'canvas'
+          'mobile-content'
           'mobile-tabs';
         grid-template-columns: 1fr;
         grid-template-rows: 60px 1fr 60px;
       }
 
+      .canvas-area {
+        grid-area: mobile-content;
+      }
+
       .palette-area,
       .controls-area {
+        grid-area: mobile-content;
+        display: none;
+      }
+
+      .palette-area.mobile-active,
+      .controls-area.mobile-active {
+        display: block;
+      }
+
+      .canvas-area.mobile-active {
+        display: block;
+      }
+
+      .canvas-area:not(.mobile-active) {
         display: none;
       }
 
@@ -89,21 +108,22 @@ export class EditorApp extends LitElement {
         align-items: center;
       }
 
-      .mobile-tab {
-        flex: 1;
-        height: 100%;
-        border: none;
-        background: transparent;
-        color: var(--editor-secondary);
-        font-size: 14px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
-      }
+    .mobile-tab {
+      flex: 1;
+      height: 100%;
+      border: none;
+      background: transparent;
+      color: var(--editor-secondary);
+      font-size: 14px;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
 
       .mobile-tab:hover,
       .mobile-tab.active {
@@ -147,7 +167,7 @@ export class EditorApp extends LitElement {
     super.connectedCallback();
     this.checkMobileLayout();
     window.addEventListener('resize', this.handleResize);
-    
+
     // Listen for theme preference changes
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     mediaQuery.addEventListener('change', this.handleThemeChange);
@@ -175,7 +195,7 @@ export class EditorApp extends LitElement {
 
   private handleMobileTabClick(tab: 'palette' | 'canvas' | 'controls') {
     this.activeMobileTab = tab;
-    
+
     // Provide haptic feedback on supported devices
     if ('vibrate' in navigator) {
       navigator.vibrate(10);
@@ -192,21 +212,21 @@ export class EditorApp extends LitElement {
           </editor-toolbar>
         </div>
 
-        <div class="palette-area">
+        <div class="palette-area ${this.isMobile && this.activeMobileTab === 'palette' ? 'mobile-active' : ''}">
           <component-palette 
             .theme=${this.theme}
             aria-label="Component Library">
           </component-palette>
         </div>
 
-        <div class="canvas-area">
+        <div class="canvas-area ${!this.isMobile || this.activeMobileTab === 'canvas' ? 'mobile-active' : ''}">
           <editor-canvas 
             .theme=${this.theme}
             aria-label="Design Canvas">
           </editor-canvas>
         </div>
 
-        <div class="controls-area">
+        <div class="controls-area ${this.isMobile && this.activeMobileTab === 'controls' ? 'mobile-active' : ''}">
           <control-panel 
             .theme=${this.theme}
             aria-label="Properties Panel">

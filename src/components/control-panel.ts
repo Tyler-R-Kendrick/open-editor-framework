@@ -13,6 +13,7 @@ export class ControlPanel extends LitElement {
       height: 100%;
       overflow: hidden;
       background: white;
+      touch-action: manipulation;
     }
 
     .panel-container {
@@ -414,9 +415,9 @@ export class ControlPanel extends LitElement {
               class="property-input"
               .value=${value}
               @input=${(e: Event) => {
-                const input = e.target as HTMLInputElement;
-                this.handlePropertyChange(property.key, input.value);
-              }}
+            const input = e.target as HTMLInputElement;
+            this.handlePropertyChange(property.key, input.value);
+          }}
               aria-describedby="${property.description ? `${fieldId}-desc` : ''}">
           </div>
         `;
@@ -439,9 +440,9 @@ export class ControlPanel extends LitElement {
               max=${property.max ?? ''}
               step=${property.step ?? '1'}
               @input=${(e: Event) => {
-                const input = e.target as HTMLInputElement;
-                this.handlePropertyChange(property.key, parseFloat(input.value) || 0);
-              }}>
+            const input = e.target as HTMLInputElement;
+            this.handlePropertyChange(property.key, parseFloat(input.value) || 0);
+          }}>
           </div>
         `;
 
@@ -464,9 +465,9 @@ export class ControlPanel extends LitElement {
                 max=${property.max ?? 100}
                 step=${property.step ?? 1}
                 @input=${(e: Event) => {
-                  const input = e.target as HTMLInputElement;
-                  this.handlePropertyChange(property.key, parseFloat(input.value));
-                }}
+            const input = e.target as HTMLInputElement;
+            this.handlePropertyChange(property.key, parseFloat(input.value));
+          }}
                 aria-label="${property.label}: ${value}">
               <span class="range-value">${value}</span>
             </div>
@@ -483,9 +484,9 @@ export class ControlPanel extends LitElement {
                 class="checkbox-input"
                 .checked=${value}
                 @change=${(e: Event) => {
-                  const input = e.target as HTMLInputElement;
-                  this.handlePropertyChange(property.key, input.checked);
-                }}>
+            const input = e.target as HTMLInputElement;
+            this.handlePropertyChange(property.key, input.checked);
+          }}>
               ${property.label}
             </label>
             ${property.description ? html`
@@ -509,9 +510,9 @@ export class ControlPanel extends LitElement {
               class="property-input color-input"
               .value=${value}
               @input=${(e: Event) => {
-                const input = e.target as HTMLInputElement;
-                this.handlePropertyChange(property.key, input.value);
-              }}>
+            const input = e.target as HTMLInputElement;
+            this.handlePropertyChange(property.key, input.value);
+          }}>
           </div>
         `;
 
@@ -528,9 +529,9 @@ export class ControlPanel extends LitElement {
               id="${fieldId}"
               class="property-input select-input"
               @change=${(e: Event) => {
-                const select = e.target as HTMLSelectElement;
-                this.handlePropertyChange(property.key, select.value);
-              }}>
+            const select = e.target as HTMLSelectElement;
+            this.handlePropertyChange(property.key, select.value);
+          }}>
               ${property.options?.map(option => html`
                 <option value="${option}" ?selected=${value === option}>
                   ${option}
@@ -594,6 +595,42 @@ export class ControlPanel extends LitElement {
               Click on a component in the canvas to view and edit its properties.
             </div>
           </div>
+
+          <!-- Sample controls for testing purposes -->
+          <div class="property-section">
+            <h3 class="section-title">
+              <span>📋</span>
+              General Settings
+            </h3>
+            <div class="property-group">
+              <div class="property-field">
+                <label class="property-label">Canvas Background</label>
+                <input
+                  type="color"
+                  class="property-input color-input"
+                  value="#ffffff"
+                  disabled>
+              </div>
+              <div class="property-field">
+                <label class="property-label">Grid Size</label>
+                <input
+                  type="range"
+                  class="property-input range-input"
+                  min="10"
+                  max="50"
+                  value="20"
+                  disabled>
+              </div>
+              <div class="property-field">
+                <label class="property-label">Snap to Grid</label>
+                <input
+                  type="checkbox"
+                  class="property-input checkbox-input"
+                  checked
+                  disabled>
+              </div>
+            </div>
+          </div>
         </div>
       `;
     }
@@ -629,10 +666,10 @@ export class ControlPanel extends LitElement {
                   class="property-input"
                   .value=${this.editingComponent.bounds.x}
                   @input=${(e: Event) => {
-                    const input = e.target as HTMLInputElement;
-                    const newBounds = { ...this.editingComponent!.bounds, x: parseFloat(input.value) || 0 };
-                    this.handlePropertyChange('bounds', newBounds);
-                  }}>
+        const input = e.target as HTMLInputElement;
+        const newBounds = { ...this.editingComponent!.bounds, x: parseFloat(input.value) || 0 };
+        this.handlePropertyChange('bounds', newBounds);
+      }}>
               </div>
               <div class="property-field">
                 <label class="property-label">Y Position</label>
@@ -641,10 +678,10 @@ export class ControlPanel extends LitElement {
                   class="property-input"
                   .value=${this.editingComponent.bounds.y}
                   @input=${(e: Event) => {
-                    const input = e.target as HTMLInputElement;
-                    const newBounds = { ...this.editingComponent!.bounds, y: parseFloat(input.value) || 0 };
-                    this.handlePropertyChange('bounds', newBounds);
-                  }}>
+        const input = e.target as HTMLInputElement;
+        const newBounds = { ...this.editingComponent!.bounds, y: parseFloat(input.value) || 0 };
+        this.handlePropertyChange('bounds', newBounds);
+      }}>
               </div>
               <div class="property-field">
                 <label class="property-label">Width</label>
@@ -654,10 +691,10 @@ export class ControlPanel extends LitElement {
                   .value=${this.editingComponent.bounds.width}
                   min="1"
                   @input=${(e: Event) => {
-                    const input = e.target as HTMLInputElement;
-                    const newBounds = { ...this.editingComponent!.bounds, width: Math.max(1, parseFloat(input.value) || 1) };
-                    this.handlePropertyChange('bounds', newBounds);
-                  }}>
+        const input = e.target as HTMLInputElement;
+        const newBounds = { ...this.editingComponent!.bounds, width: Math.max(1, parseFloat(input.value) || 1) };
+        this.handlePropertyChange('bounds', newBounds);
+      }}>
               </div>
               <div class="property-field">
                 <label class="property-label">Height</label>
@@ -667,10 +704,10 @@ export class ControlPanel extends LitElement {
                   .value=${this.editingComponent.bounds.height}
                   min="1"
                   @input=${(e: Event) => {
-                    const input = e.target as HTMLInputElement;
-                    const newBounds = { ...this.editingComponent!.bounds, height: Math.max(1, parseFloat(input.value) || 1) };
-                    this.handlePropertyChange('bounds', newBounds);
-                  }}>
+        const input = e.target as HTMLInputElement;
+        const newBounds = { ...this.editingComponent!.bounds, height: Math.max(1, parseFloat(input.value) || 1) };
+        this.handlePropertyChange('bounds', newBounds);
+      }}>
               </div>
             </div>
           </div>
@@ -682,9 +719,9 @@ export class ControlPanel extends LitElement {
                 Appearance
               </h3>
               <div class="property-group">
-                ${propertySchema.map(property => 
-                  this.renderPropertyField(property, this.editingComponent!.properties[property.key])
-                )}
+                ${propertySchema.map(property =>
+        this.renderPropertyField(property, this.editingComponent!.properties[property.key])
+      )}
               </div>
             </div>
           ` : ''}

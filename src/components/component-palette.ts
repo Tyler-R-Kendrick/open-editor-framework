@@ -13,6 +13,7 @@ export class ComponentPalette extends LitElement {
       height: 100%;
       overflow: hidden;
       background: white;
+      touch-action: manipulation;
     }
 
     .palette-container {
@@ -91,6 +92,7 @@ export class ComponentPalette extends LitElement {
       border-radius: 8px;
       background: white;
       cursor: grab;
+      touch-action: none;
       transition: all 0.2s ease;
       user-select: none;
       min-height: 80px;
@@ -344,7 +346,7 @@ export class ComponentPalette extends LitElement {
     if (!this.searchQuery.trim()) {
       return this.componentDefinitions;
     }
-    
+
     const query = this.searchQuery.toLowerCase().trim();
     return this.componentDefinitions.filter(component =>
       component.name.toLowerCase().includes(query) ||
@@ -355,7 +357,7 @@ export class ComponentPalette extends LitElement {
 
   private get categorizedComponents() {
     const categories = new Map<string, ComponentDefinition[]>();
-    
+
     this.filteredComponents.forEach(component => {
       const category = component.category;
       if (!categories.has(category)) {
@@ -363,7 +365,7 @@ export class ComponentPalette extends LitElement {
       }
       categories.get(category)!.push(component);
     });
-    
+
     return Array.from(categories.entries()).sort(([a], [b]) => a.localeCompare(b));
   }
 
@@ -374,22 +376,22 @@ export class ComponentPalette extends LitElement {
 
   private handleDragStart = (e: DragEvent | TouchEvent, component: ComponentDefinition) => {
     this.isDragging = true;
-    
+
     // Create drag data
     const dragData = {
       type: 'component',
       componentType: component.type,
       definition: component
     };
-    
+
     if (e instanceof DragEvent) {
       e.dataTransfer!.setData('application/json', JSON.stringify(dragData));
       e.dataTransfer!.effectAllowed = 'copy';
     }
-    
+
     // Create visual drag ghost
     this.createDragGhost(component, e);
-    
+
     // Dispatch custom event for canvas to handle
     this.dispatchEvent(new CustomEvent('component-drag-start', {
       detail: dragData,
@@ -399,27 +401,27 @@ export class ComponentPalette extends LitElement {
 
   private handleTouchStart = (e: TouchEvent, component: ComponentDefinition) => {
     e.preventDefault();
-    
+
     const touch = e.touches[0];
     if (!touch) return;
-    
+
     // Add touch move listeners
     document.addEventListener('touchmove', this.handleTouchMove);
     document.addEventListener('touchend', this.handleTouchEnd);
-    
+
     this.handleDragStart(e, component);
   };
 
   private handleTouchMove = (e: TouchEvent) => {
     if (!this.isDragging) return;
-    
+
     e.preventDefault();
     const touch = e.touches[0];
     if (!touch) return;
-    
+
     // Update drag ghost position
     this.updateDragGhostPosition(touch.clientX, touch.clientY);
-    
+
     // Check if over canvas drop zone
     const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
     if (elementBelow?.closest('editor-canvas')) {
@@ -433,17 +435,17 @@ export class ComponentPalette extends LitElement {
 
   private handleTouchEnd = (e: TouchEvent) => {
     e.preventDefault();
-    
+
     document.removeEventListener('touchmove', this.handleTouchMove);
     document.removeEventListener('touchend', this.handleTouchEnd);
-    
+
     if (!this.isDragging) return;
-    
+
     const touch = e.changedTouches[0];
     if (!touch) return;
-    
+
     const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-    
+
     if (elementBelow?.closest('editor-canvas')) {
       // Complete the drop
       this.dispatchEvent(new CustomEvent('component-drop', {
@@ -451,7 +453,7 @@ export class ComponentPalette extends LitElement {
         bubbles: true
       }));
     }
-    
+
     this.cleanup();
   };
 
@@ -462,12 +464,12 @@ export class ComponentPalette extends LitElement {
       <div style="font-size: 20px; margin-bottom: 4px;">${component.icon}</div>
       <div style="font-size: 11px; font-weight: 500;">${component.name}</div>
     `;
-    
+
     document.body.appendChild(ghost);
-    
+
     const startX = e instanceof DragEvent ? e.clientX : e.touches[0].clientX;
     const startY = e instanceof DragEvent ? e.clientY : e.touches[0].clientY;
-    
+
     this.updateDragGhostPosition(startX, startY);
   }
 
@@ -490,13 +492,13 @@ export class ComponentPalette extends LitElement {
   private handleKeyDown = (e: KeyboardEvent, component: ComponentDefinition) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      
+
       // Simulate drop on canvas center
       this.dispatchEvent(new CustomEvent('component-keyboard-add', {
         detail: { component },
         bubbles: true
       }));
-      
+
       // Provide screen reader feedback
       this.announceToScreenReader(`Added ${component.name} component to canvas`);
     }
@@ -512,7 +514,7 @@ export class ComponentPalette extends LitElement {
     announcement.style.height = '1px';
     announcement.style.overflow = 'hidden';
     announcement.textContent = message;
-    
+
     document.body.appendChild(announcement);
     setTimeout(() => {
       document.body.removeChild(announcement);

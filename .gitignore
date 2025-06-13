@@ -5,6 +5,7 @@
 
 # Playwright test results
 test-results/
+playwright-report/
 
 # User-specific files
 *.rsuser

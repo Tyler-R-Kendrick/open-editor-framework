@@ -10,7 +10,7 @@
     /* Enable smooth scrolling */
     scroll-behavior: smooth;
   }
-  
+
   body {
     /* Prevent rubber band scrolling on iOS */
     overflow: hidden;
@@ -23,21 +23,24 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    /* Ensure proper background color for contrast */
+    background-color: #ffffff;
+    color: #1e293b;
   }
-  
+
   /* Focus styles for accessibility */
   *:focus {
     outline: 2px solid theme('colors.primary.500');
     outline-offset: 2px;
   }
-  
+
   /* Custom focus styles for interactive elements */
   button:focus,
   [role="button"]:focus,
   [tabindex]:focus {
     @apply ring-2 ring-primary-500 ring-offset-2;
   }
-  
+
   /* Improve touch target sizes for accessibility */
   button,
   [role="button"],
@@ -50,69 +53,79 @@
 }
 
 @layer components {
+
   /* Component-specific utility classes */
   .touch-action-none {
     touch-action: none;
   }
-  
+
   .touch-action-pan-x {
     touch-action: pan-x;
   }
-  
+
   .touch-action-pan-y {
     touch-action: pan-y;
   }
-  
+
   .drag-handle {
     cursor: grab;
   }
-  
+
   .drag-handle:active {
     cursor: grabbing;
   }
-  
+
   /* Scrollbar styling */
   .custom-scrollbar::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
-  
+
   .custom-scrollbar::-webkit-scrollbar-track {
     @apply bg-gray-100;
   }
-  
+
   .custom-scrollbar::-webkit-scrollbar-thumb {
     @apply bg-gray-300 rounded-lg;
   }
-  
+
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     @apply bg-gray-400;
   }
 }
 
 @layer utilities {
+
   /* Animation utilities */
   .animate-touch-feedback {
     animation: touchFeedback 0.1s ease-out;
   }
-  
+
   @keyframes touchFeedback {
-    0% { transform: scale(1); }
-    50% { transform: scale(0.95); }
-    100% { transform: scale(1); }
+    0% {
+      transform: scale(1);
+    }
+
+    50% {
+      transform: scale(0.95);
+    }
+
+    100% {
+      transform: scale(1);
+    }
   }
-  
+
   /* High contrast mode support */
   @media (prefers-contrast: high) {
     .border-light {
       @apply border-black;
     }
-    
+
     .text-muted {
       @apply text-black;
     }
   }
-  
+
   /* Reduced motion support */
   @media (prefers-reduced-motion: reduce) {
     * {

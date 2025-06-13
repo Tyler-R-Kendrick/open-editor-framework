@@ -6,14 +6,36 @@ test.describe('Control Panel', () => {
   });
 
   test('should display control panel', async ({ page }) => {
+    // Check if we're on mobile - if so, click the properties tab first
+    const isMobile = page.viewportSize()!.width <= 768;
+
+    if (isMobile) {
+      const propertiesTab = page.locator('.mobile-tab:has-text("Properties")');
+      if (await propertiesTab.count() > 0) {
+        await propertiesTab.click();
+        await page.waitForTimeout(300);
+      }
+    }
+
     const controlPanel = page.locator('control-panel');
     await expect(controlPanel).toBeVisible();
   });
 
   test('should show property controls when component is selected', async ({ page }) => {
+    // Check if we're on mobile - if so, click the properties tab first
+    const isMobile = page.viewportSize()!.width <= 768;
+
+    if (isMobile) {
+      const propertiesTab = page.locator('.mobile-tab:has-text("Properties")');
+      if (await propertiesTab.count() > 0) {
+        await propertiesTab.click();
+        await page.waitForTimeout(300);
+      }
+    }
+
     const controlPanel = page.locator('control-panel');
 
-    // Look for property sections or form controls
+    // Look for property sections or form controls (including our sample controls)
     const propertyControls = controlPanel.locator('.property, .control-group, .form-control, input, select, textarea');
 
     // Should have some form of controls visible

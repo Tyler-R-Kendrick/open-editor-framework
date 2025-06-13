@@ -11,27 +11,74 @@ test.describe('Editor App - Basic Functionality', () => {
   });
 
   test('should display all main editor components', async ({ page }) => {
-    // Check for main components
+    const isMobile = page.viewportSize()!.width <= 768;
+
+    // Check for main components - on mobile, test by switching tabs
     await expect(page.locator('editor-toolbar')).toBeVisible();
-    await expect(page.locator('component-palette')).toBeVisible();
-    await expect(page.locator('editor-canvas')).toBeVisible();
-    await expect(page.locator('control-panel')).toBeVisible();
+
+    if (isMobile) {
+      // Test mobile tabs navigation
+      const paletteTab = page.locator('.mobile-tab:has-text("Components")');
+      if (await paletteTab.count() > 0) {
+        await paletteTab.click();
+        await page.waitForTimeout(300);
+        await expect(page.locator('component-palette')).toBeVisible();
+      }
+
+      const canvasTab = page.locator('.mobile-tab:has-text("Canvas")');
+      if (await canvasTab.count() > 0) {
+        await canvasTab.click();
+        await page.waitForTimeout(300);
+        await expect(page.locator('editor-canvas')).toBeVisible();
+      }
+
+      const propertiesTab = page.locator('.mobile-tab:has-text("Properties")');
+      if (await propertiesTab.count() > 0) {
+        await propertiesTab.click();
+        await page.waitForTimeout(300);
+        await expect(page.locator('control-panel')).toBeVisible();
+      }
+    } else {
+      // On desktop, all should be visible simultaneously
+      await expect(page.locator('component-palette')).toBeVisible();
+      await expect(page.locator('editor-canvas')).toBeVisible();
+      await expect(page.locator('control-panel')).toBeVisible();
+    }
   });
 
   test('should have correct layout structure', async ({ page }) => {
+    const isMobile = page.viewportSize()!.width <= 768;
+
     const editorContainer = page.locator('.editor-container');
     await expect(editorContainer).toBeVisible();
 
     // Check grid areas are properly set
     const toolbar = page.locator('.toolbar-area');
-    const palette = page.locator('.palette-area');
-    const canvas = page.locator('.canvas-area');
-    const controls = page.locator('.controls-area');
-
     await expect(toolbar).toBeVisible();
-    await expect(palette).toBeVisible();
-    await expect(canvas).toBeVisible();
-    await expect(controls).toBeVisible();
+
+    if (isMobile) {
+      // On mobile, check for mobile tabs
+      const mobileTabs = page.locator('.mobile-tabs');
+      await expect(mobileTabs).toBeVisible();
+
+      // Check that we can navigate between mobile panels
+      const paletteTab = page.locator('.mobile-tab:has-text("Components")');
+      if (await paletteTab.count() > 0) {
+        await paletteTab.click();
+        await page.waitForTimeout(300);
+        const palette = page.locator('.palette-area');
+        await expect(palette).toBeVisible();
+      }
+    } else {
+      // On desktop, all areas should be visible
+      const palette = page.locator('.palette-area');
+      const canvas = page.locator('.canvas-area');
+      const controls = page.locator('.controls-area');
+
+      await expect(palette).toBeVisible();
+      await expect(canvas).toBeVisible();
+      await expect(controls).toBeVisible();
+    }
   });
 
   test('should be responsive on mobile viewport', async ({ page }) => {

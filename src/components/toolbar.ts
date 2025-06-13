@@ -14,6 +14,7 @@ export class EditorToolbar extends LitElement {
       height: 100%;
       background: white;
       border-bottom: 1px solid var(--editor-border, #e2e8f0);
+      touch-action: manipulation;
     }
 
     .toolbar-container {
@@ -59,6 +60,7 @@ export class EditorToolbar extends LitElement {
       font-size: 13px;
       font-weight: 500;
       cursor: pointer;
+      touch-action: manipulation;
       transition: all 0.2s ease;
       min-height: 36px;
       text-decoration: none;
@@ -218,8 +220,19 @@ export class EditorToolbar extends LitElement {
         display: none;
       }
 
-      .toolbar-section.center {
+      /* Show undo/redo buttons on mobile, hide other center items */
+      .toolbar-section.center .zoom-controls {
         display: none;
+      }
+
+      .toolbar-section.center .toolbar-divider {
+        display: none;
+      }
+
+      /* Ensure undo/redo buttons are visible */
+      .toolbar-section.center button[title*="Undo"],
+      .toolbar-section.center button[title*="Redo"] {
+        display: flex;
       }
     }
 
