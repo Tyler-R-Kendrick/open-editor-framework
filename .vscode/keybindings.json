@@ -1,0 +1,89 @@
+[
+  // Quick tasks
+  {
+    "key": "ctrl+shift+d",
+    "command": "workbench.action.tasks.runTask",
+    "args": "npm: dev"
+  },
+  {
+    "key": "ctrl+shift+b",
+    "command": "workbench.action.tasks.runTask",
+    "args": "npm: build"
+  },
+  {
+    "key": "ctrl+shift+t",
+    "command": "workbench.action.tasks.runTask",
+    "args": "npm: test"
+  },
+  {
+    "key": "ctrl+shift+l",
+    "command": "workbench.action.tasks.runTask",
+    "args": "npm: lint"
+  },
+  {
+    "key": "ctrl+shift+f",
+    "command": "workbench.action.tasks.runTask",
+    "args": "npm: format"
+  },
+  // Quick open browser for development
+  {
+    "key": "ctrl+shift+o",
+    "command": "simpleBrowser.show",
+    "args": "http://localhost:3000"
+  },
+  // Toggle terminal
+  {
+    "key": "ctrl+`",
+    "command": "workbench.action.terminal.toggleTerminal"
+  },
+  // Quick file navigation
+  {
+    "key": "ctrl+shift+e",
+    "command": "workbench.view.explorer"
+  },
+  {
+    "key": "ctrl+shift+g",
+    "command": "workbench.view.scm"
+  },
+  {
+    "key": "ctrl+shift+x",
+    "command": "workbench.view.extensions"
+  },
+  // Debug shortcuts
+  {
+    "key": "f6",
+    "command": "workbench.action.debug.start"
+  },
+  {
+    "key": "shift+f6",
+    "command": "workbench.action.debug.stop"
+  },
+  // TypeScript specific
+  {
+    "key": "f12",
+    "command": "editor.action.revealDefinition",
+    "when": "editorHasDefinitionProvider && editorTextFocus"
+  },
+  {
+    "key": "shift+f12",
+    "command": "editor.action.goToReferences",
+    "when": "editorHasReferenceProvider && editorTextFocus"
+  },
+  {
+    "key": "ctrl+shift+r",
+    "command": "editor.action.rename",
+    "when": "editorHasRenameProvider && editorTextFocus"
+  },
+  // Quick fix
+  {
+    "key": "ctrl+.",
+    "command": "editor.action.quickFix",
+    "when": "editorTextFocus"
+  },
+  // Organize imports
+  {
+    "key": "ctrl+shift+i",
+    "command": "editor.action.organizeImports",
+    "when": "editorTextFocus"
+  }
+]

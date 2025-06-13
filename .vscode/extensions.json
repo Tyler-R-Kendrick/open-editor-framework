@@ -1,0 +1,39 @@
+{
+  "recommendations": [
+    // Essential for TypeScript development
+    "ms-vscode.vscode-typescript-next",
+    // Code formatting and linting
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    // Web Components and Lit development
+    "runem.lit-plugin",
+    "bierner.lit-html",
+    // CSS and Tailwind
+    "bradlc.vscode-tailwindcss",
+    "vunguyentuan.vscode-css-variables",
+    // Testing
+    "zixuanchen.vitest-explorer",
+    // Git integration
+    "eamodio.gitlens",
+    // Debugging and browser tools
+    "ms-vscode.vscode-js-debug",
+    "firefox-devtools.vscode-firefox-debug",
+    // Utilities
+    "christian-kohler.path-intellisense",
+    "christian-kohler.npm-intellisense",
+    "ms-vscode.vscode-json",
+    "redhat.vscode-yaml",
+    // PWA and web development
+    "ms-vscode.vscode-browser-preview",
+    "ritwickdey.liveserver",
+    // Accessibility
+    "deque-systems.vscode-axe-linter",
+    // Icons and themes
+    "vscode-icons-team.vscode-icons",
+    "pkief.material-icon-theme"
+  ],
+  "unwantedRecommendations": [
+    "ms-vscode.vscode-typescript",
+    "hookyqr.beautify"
+  ]
+}
