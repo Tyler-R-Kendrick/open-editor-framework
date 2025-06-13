@@ -1,9 +1,9 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import './editor-canvas';
-import './component-palette';
-import './control-panel';
-import './toolbar';
+import './editor-canvas/index.js';
+import './component-palette/index.js';
+import './control-panel/index.js';
+import './toolbar/index.js';
 import { EditorTheme } from '../types/editor-types';
 
 /**

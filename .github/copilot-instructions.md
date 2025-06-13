@@ -12,3 +12,24 @@ Coding standards, domain knowledge, and preferences that AI should follow.
 - Use Tailwind CSS for styling.
 - Make sure to support mobile and desktop interactions; especially for drag-and-drop, resizing, touch-and-hold, etc...
 - Ensure components are accessible and follow WAI-ARIA standards at a minimum.
+- Keep components small and focused on a single responsibility.
+
+### Structure
+- Use a modular structure with components in separate files.
+- Give each component its own directory.
+- Separate styles into a `styles.css` file within the component directory.
+- Separate javaScript/typescript logic into a `component.ts` file within the component directory.
+- Separate component markup into a `component.tsx` file within the component directory.
+- Use a `README.md` file in each component directory to document usage and API.
+- Make each component self-contained with its own styles and logic.
+- Use descriptive names for components, styles, and files.
+- Make them compatible with CSF3 (Component Story Format 3) for Storybook.
+- Install and use storybook if its not already installed.
+
+## Tests
+
+- Use Playwright for end-to-end testing.
+- Write tests for all components
+- Ensure tests cover both mobile and desktop interactions.
+- Use Playwright's built-in accessibility checks.
+

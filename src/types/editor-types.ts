@@ -10,7 +10,7 @@ export interface Size {
   height: number;
 }
 
-export interface Bounds extends Point, Size {}
+export interface Bounds extends Point, Size { }
 
 export interface EditorComponent {
   id: string;
@@ -18,6 +18,7 @@ export interface EditorComponent {
   name: string;
   bounds: Bounds;
   properties: Record<string, any>;
+  zIndex?: number;
   children?: EditorComponent[];
   parent?: string;
 }
