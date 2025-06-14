@@ -17,9 +17,7 @@ Coding standards, domain knowledge, and preferences that AI should follow.
 ### Structure
 - Use a modular structure with components in separate files.
 - Give each component its own directory.
-- Separate styles into a `styles.css` file within the component directory.
-- Separate javaScript/typescript logic into a `component.ts` file within the component directory.
-- Separate component markup into a `component.tsx` file within the component directory.
+- put component logic, markup, and styles in the same "component.ts" file.
 - Use a `README.md` file in each component directory to document usage and API.
 - Make each component self-contained with its own styles and logic.
 - Use descriptive names for components, styles, and files.

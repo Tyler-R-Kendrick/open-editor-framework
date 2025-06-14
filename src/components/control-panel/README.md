@@ -85,9 +85,7 @@ The component uses CSS custom properties for theming:
 
 The component follows the modular structure:
 
-- `component.ts`: Main component logic and state management
-- `component.tsx`: Template and rendering logic
-- `styles.css`: Component-specific styles
+- `component.ts`: Main component logic, state management, and embedded styles
 - `index.ts`: Public exports
 - `README.md`: Documentation
 - `*.stories.ts`: Storybook stories (coming soon)
