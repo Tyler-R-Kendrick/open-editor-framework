@@ -52,6 +52,16 @@ The palette includes these component categories:
 - **Layout**: Container
 - **Forms**: Input
 
+## Structure
+
+The component follows the modular structure:
+
+- `component.ts`: Main component logic, state management, and template
+- `component-palette.styles.ts`: Component-specific styles with drag-and-drop interactions and theme support
+- `index.ts`: Public exports
+- `README.md`: Documentation
+- `component-palette.stories.ts`: Storybook stories
+
 ## Styling
 
 Uses CSS custom properties for theming:

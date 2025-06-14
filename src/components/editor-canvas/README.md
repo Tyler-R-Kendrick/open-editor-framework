@@ -56,6 +56,16 @@ import { EditorCanvas } from './editor-canvas/component.js';
 - **Pinch**: Zoom canvas
 - **Two-finger pan**: Pan canvas
 
+## Structure
+
+The component follows the modular structure:
+
+- `component.ts`: Main component logic, canvas rendering, touch/mouse interactions
+- `editor-canvas.styles.ts`: Component-specific styles with canvas layout and theme support
+- `index.ts`: Public exports
+- `README.md`: Documentation
+- `editor-canvas.stories.ts`: Storybook stories
+
 ## Accessibility
 
 - Full keyboard navigation support

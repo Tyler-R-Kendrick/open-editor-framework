@@ -86,6 +86,16 @@ On mobile devices (≤768px):
 - High contrast mode support
 - Proper focus management and visual indicators
 
+## Structure
+
+The component follows the modular structure:
+
+- `component.ts`: Main component logic, state management, and template
+- `toolbar.styles.ts`: Component-specific styles with responsive design and theme support
+- `index.ts`: Public exports
+- `README.md`: Documentation
+- `toolbar.stories.ts`: Storybook stories
+
 ## Styling
 
 Uses CSS custom properties for theming:

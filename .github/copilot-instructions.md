@@ -15,14 +15,22 @@ Coding standards, domain knowledge, and preferences that AI should follow.
 - Keep components small and focused on a single responsibility.
 
 ### Structure
+
 - Use a modular structure with components in separate files.
 - Give each component its own directory.
 - put component logic, markup, and styles in the same "component.ts" file.
 - Use a `README.md` file in each component directory to document usage and API.
 - Make each component self-contained with its own styles and logic.
+- Use `<component-name>.styles.ts` for styles if they are complex or need to be shared.
 - Use descriptive names for components, styles, and files.
 - Make them compatible with CSF3 (Component Story Format 3) for Storybook.
 - Install and use storybook if its not already installed.
+
+## Component Behaviors
+
+- Store shared behaviors in a "behaviors" directory as a sibling to "components".
+- Use behaviors to encapsulate common functionality like drag-and-drop, resizing, etc.
+
 
 ## Tests
 

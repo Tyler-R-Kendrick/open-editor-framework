@@ -1,112 +1,7 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { EditorTheme, Point, CanvasState, EditorComponent, TouchGesture } from '../../types/editor-types';
-
-// Import styles
-const componentStyles = css`
-:host {
-  display: block;
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-  background: #ffffff;
-  touch-action: manipulation;
-}
-
-.canvas-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  cursor: crosshair;
-}
-
-.canvas-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  pointer-events: auto;
-}
-
-.canvas-background {
-  background-image: 
-    radial-gradient(circle, #e2e8f0 1px, transparent 1px);
-  background-size: 20px 20px;
-  background-position: 0 0, 10px 10px;
-}
-
-.canvas-overlay {
-  pointer-events: none;
-  z-index: 10;
-}
-
-.selection-indicator {
-  position: absolute;
-  border: 2px solid var(--editor-primary, #3b82f6);
-  background: transparent;
-  pointer-events: none;
-  z-index: 20;
-}
-
-.resize-handle {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background: var(--editor-primary, #3b82f6);
-  border: 1px solid white;
-  cursor: se-resize;
-  z-index: 30;
-}
-
-.canvas-info {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-family: monospace;
-  pointer-events: none;
-  z-index: 40;
-}
-
-/* Touch-specific styles */
-@media (pointer: coarse) {
-  .resize-handle {
-    width: 16px;
-    height: 16px;
-  }
-  
-  .canvas-container {
-    touch-action: none;
-  }
-}
-
-/* High contrast mode */
-@media (prefers-contrast: high) {
-  :host {
-    border: 2px solid black;
-  }
-  
-  .selection-indicator {
-    border-color: black;
-    border-width: 3px;
-  }
-}
-
-/* Dark theme */
-:host([theme="dark"]) {
-  background: #1e293b;
-}
-
-:host([theme="dark"]) .canvas-background {
-  background-image: 
-    radial-gradient(circle, #475569 1px, transparent 1px);
-}
-`;
+import { editorCanvasStyles } from './editor-canvas.styles.js';
 
 /**
  * HTML5 Canvas-based editor component with touch and accessibility support
@@ -119,7 +14,7 @@ const componentStyles = css`
  */
 @customElement('editor-canvas')
 export class EditorCanvas extends LitElement {
-  static styles = componentStyles;
+  static styles = editorCanvasStyles;
 
   @property() theme: EditorTheme = 'light';
 
