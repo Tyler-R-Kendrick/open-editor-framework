@@ -1,0 +1,106 @@
+{
+  "templates": [
+    {
+      "id": "text",
+      "name": "Text",
+      "icon": "📝",
+      "description": "Text component for labels and content",
+      "category": "Basic",
+      "template": {
+        "type": "text",
+        "defaultSize": {
+          "width": 200,
+          "height": 40
+        },
+        "properties": {
+          "text": "Sample Text",
+          "fontSize": 16,
+          "fontFamily": "Arial",
+          "color": "#000000"
+        }
+      }
+    },
+    {
+      "id": "button",
+      "name": "Button",
+      "icon": "🔘",
+      "description": "Interactive button component",
+      "category": "Basic",
+      "template": {
+        "type": "button",
+        "defaultSize": {
+          "width": 120,
+          "height": 40
+        },
+        "properties": {
+          "text": "Button",
+          "backgroundColor": "#3b82f6",
+          "color": "#ffffff",
+          "borderRadius": 6
+        }
+      }
+    },
+    {
+      "id": "image",
+      "name": "Image",
+      "icon": "🖼️",
+      "description": "Image component for media content",
+      "category": "Media",
+      "template": {
+        "type": "image",
+        "defaultSize": {
+          "width": 200,
+          "height": 150
+        },
+        "properties": {
+          "src": "",
+          "alt": "Image description"
+        }
+      }
+    },
+    {
+      "id": "container",
+      "name": "Container",
+      "icon": "📦",
+      "description": "Container for grouping components",
+      "category": "Layout",
+      "template": {
+        "type": "container",
+        "defaultSize": {
+          "width": 300,
+          "height": 200
+        },
+        "properties": {
+          "backgroundColor": "#f8fafc",
+          "borderColor": "#e2e8f0",
+          "borderWidth": 1
+        }
+      }
+    },
+    {
+      "id": "input",
+      "name": "Input",
+      "icon": "📝",
+      "description": "Text input field",
+      "category": "Form",
+      "template": {
+        "type": "input",
+        "defaultSize": {
+          "width": 200,
+          "height": 40
+        },
+        "properties": {
+          "placeholder": "Enter text...",
+          "type": "text"
+        }
+      }
+    }
+  ],
+  "categories": [
+    "All",
+    "Basic",
+    "Layout",
+    "Form",
+    "Media"
+  ]
+}

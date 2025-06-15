@@ -1,108 +1,12 @@
 import React, { useState } from 'react';
 import { EditorTheme } from '../../types/editor-types';
+import { useComponentTemplates, ComponentTemplate } from '../../behaviors/useComponentTemplates';
 
 interface ComponentPaletteProps {
   theme: EditorTheme;
   'aria-label'?: string;
+  templateUrl?: string; // Optional custom template URL
 }
-
-interface ComponentTemplate {
-  id: string;
-  name: string;
-  icon: string;
-  description: string;
-  category: string;
-  template: {
-    type: string;
-    defaultSize: { width: number; height: number };
-    properties: Record<string, any>;
-  };
-}
-
-const componentTemplates: ComponentTemplate[] = [
-  {
-    id: 'text',
-    name: 'Text',
-    icon: '📝',
-    description: 'Text component for labels and content',
-    category: 'Basic',
-    template: {
-      type: 'text',
-      defaultSize: { width: 200, height: 40 },
-      properties: {
-        text: 'Sample Text',
-        fontSize: 16,
-        fontFamily: 'Arial',
-        color: '#000000'
-      }
-    }
-  },
-  {
-    id: 'button',
-    name: 'Button',
-    icon: '🔘',
-    description: 'Interactive button component',
-    category: 'Basic',
-    template: {
-      type: 'button',
-      defaultSize: { width: 120, height: 40 },
-      properties: {
-        text: 'Button',
-        backgroundColor: '#3b82f6',
-        color: '#ffffff',
-        borderRadius: 6
-      }
-    }
-  },
-  {
-    id: 'image',
-    name: 'Image',
-    icon: '🖼️',
-    description: 'Image component for media content',
-    category: 'Media',
-    template: {
-      type: 'image',
-      defaultSize: { width: 200, height: 150 },
-      properties: {
-        src: '',
-        alt: 'Image description'
-      }
-    }
-  },
-  {
-    id: 'container',
-    name: 'Container',
-    icon: '📦',
-    description: 'Container for grouping components',
-    category: 'Layout',
-    template: {
-      type: 'container',
-      defaultSize: { width: 300, height: 200 },
-      properties: {
-        backgroundColor: '#f8fafc',
-        borderColor: '#e2e8f0',
-        borderWidth: 1
-      }
-    }
-  },
-  {
-    id: 'input',
-    name: 'Input',
-    icon: '📝',
-    description: 'Text input field',
-    category: 'Form',
-    template: {
-      type: 'input',
-      defaultSize: { width: 200, height: 40 },
-      properties: {
-        placeholder: 'Enter text...',
-        type: 'text'
-      }
-    }
-  }
-];
-
-const categories = ['All', 'Basic', 'Layout', 'Form', 'Media'];
 
 /**
  * Component palette with drag-and-drop component templates
@@ -112,8 +16,14 @@ const categories = ['All', 'Basic', 'Layout', 'Form', 'Media'];
  * - Drag-and-drop to canvas
  * - Touch-friendly interface
  * - Keyboard navigation support
+ * - External JSON template loading
  */
-export const ComponentPalette: React.FC<ComponentPaletteProps> = ({ theme, 'aria-label': ariaLabel }) => {
+export const ComponentPalette: React.FC<ComponentPaletteProps> = ({
+  theme,
+  'aria-label': ariaLabel,
+  templateUrl
+}) => {
+  const { templates: componentTemplates, categories, loading, error, reload } = useComponentTemplates(templateUrl);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -212,141 +122,197 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({ theme, 'aria
         />
       </div>
 
-      {/* Categories */}
-      <div
-        style={{
-          padding: '12px 16px',
-          borderBottom: `1px solid ${theme === 'dark' ? '#4b5563' : '#e2e8f0'}`
-        }}
-      >
+      {/* Loading and Error States */}
+      {loading && (
         <div
           style={{
-            display: 'flex',
-            gap: '8px',
-            overflowX: 'auto',
-            paddingBottom: '4px'
+            padding: '32px 16px',
+            textAlign: 'center',
+            color: theme === 'dark' ? '#9ca3af' : '#6b7280'
           }}
         >
-          {categories.map(category => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              style={categoryButtonStyle(selectedCategory === category)}
-              onMouseEnter={(e) => {
-                if (selectedCategory !== category) {
-                  e.currentTarget.style.background = theme === 'dark' ? '#6b7280' : '#e5e7eb';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (selectedCategory !== category) {
-                  e.currentTarget.style.background = theme === 'dark' ? '#4b5563' : '#f3f4f6';
-                }
-              }}
-            >
-              {category}
-            </button>
-          ))}
+          <div style={{ fontSize: '32px', marginBottom: '16px' }}>⏳</div>
+          <p>Loading component templates...</p>
         </div>
-      </div>
+      )}
 
-      {/* Component list */}
-      <div
-        style={{
-          flex: 1,
-          overflow: 'auto',
-          padding: '16px'
-        }}
-      >
-        {filteredComponents.length === 0 ? (
-          <div
+      {error && !loading && (
+        <div
+          style={{
+            padding: '16px',
+            margin: '16px',
+            borderRadius: '8px',
+            background: theme === 'dark' ? '#7f1d1d' : '#fef2f2',
+            border: `1px solid ${theme === 'dark' ? '#dc2626' : '#fecaca'}`,
+            color: theme === 'dark' ? '#fca5a5' : '#dc2626'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <span style={{ fontSize: '16px' }}>⚠️</span>
+            <strong>Failed to load templates</strong>
+          </div>
+          <p style={{ margin: '0 0 12px 0', fontSize: '14px' }}>
+            {error}
+          </p>
+          <button
+            onClick={reload}
             style={{
-              textAlign: 'center',
-              padding: '32px 16px',
-              color: theme === 'dark' ? '#9ca3af' : '#6b7280'
+              padding: '6px 12px',
+              borderRadius: '4px',
+              border: 'none',
+              background: theme === 'dark' ? '#dc2626' : '#dc2626',
+              color: 'white',
+              fontSize: '12px',
+              cursor: 'pointer'
             }}
           >
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔍</div>
-            <p>No components found</p>
-            <p style={{ fontSize: '14px', marginTop: '8px' }}>
-              Try adjusting your search or category filter
-            </p>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {filteredComponents.map(component => (
-              <div
-                key={component.id}
-                draggable
-                onDragStart={(e) => handleDragStart(e, component)}
-                onClick={() => handleComponentClick(component)}
-                style={componentItemStyle}
+            Retry
+          </button>
+          <p style={{ margin: '8px 0 0 0', fontSize: '12px', opacity: 0.8 }}>
+            Using default templates as fallback
+          </p>
+        </div>
+      )}
+
+      {/* Categories */}
+      {!loading && (
+        <div
+          style={{
+            padding: '12px 16px',
+            borderBottom: `1px solid ${theme === 'dark' ? '#4b5563' : '#e2e8f0'}`
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              gap: '8px',
+              overflowX: 'auto',
+              paddingBottom: '4px'
+            }}
+          >
+            {categories.map(category => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                style={categoryButtonStyle(selectedCategory === category)}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+                  if (selectedCategory !== category) {
+                    e.currentTarget.style.background = theme === 'dark' ? '#6b7280' : '#e5e7eb';
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-                role="button"
-                tabIndex={0}
-                aria-label={`Add ${component.name} component`}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleComponentClick(component);
+                  if (selectedCategory !== category) {
+                    e.currentTarget.style.background = theme === 'dark' ? '#4b5563' : '#f3f4f6';
                   }
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div
-                    style={{
-                      fontSize: '24px',
-                      minWidth: '32px',
-                      textAlign: 'center'
-                    }}
-                    aria-hidden="true"
-                  >
-                    {component.icon}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div
-                      style={{
-                        fontWeight: '500',
-                        marginBottom: '4px',
-                        color: theme === 'dark' ? '#f8fafc' : '#1e293b'
-                      }}
-                    >
-                      {component.name}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: '12px',
-                        color: theme === 'dark' ? '#9ca3af' : '#6b7280',
-                        lineHeight: '1.4'
-                      }}
-                    >
-                      {component.description}
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      padding: '4px 8px',
-                      borderRadius: '4px',
-                      background: theme === 'dark' ? '#6b7280' : '#f1f5f9',
-                      color: theme === 'dark' ? '#d1d5db' : '#64748b',
-                      fontSize: '11px',
-                      fontWeight: '500'
-                    }}
-                  >
-                    {component.category}
-                  </div>
-                </div>
-              </div>
+                {category}
+              </button>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Component list */}
+      {!loading && (
+        <div
+          style={{
+            flex: 1,
+            overflow: 'auto',
+            padding: '16px'
+          }}
+        >
+          {filteredComponents.length === 0 ? (
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '32px 16px',
+                color: theme === 'dark' ? '#9ca3af' : '#6b7280'
+              }}
+            >
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔍</div>
+              <p>No components found</p>
+              <p style={{ fontSize: '14px', marginTop: '8px' }}>
+                Try adjusting your search or category filter
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {filteredComponents.map(component => (
+                <div
+                  key={component.id}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, component)}
+                  onClick={() => handleComponentClick(component)}
+                  style={componentItemStyle}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Add ${component.name} component`}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleComponentClick(component);
+                    }
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div
+                      style={{
+                        fontSize: '24px',
+                        minWidth: '32px',
+                        textAlign: 'center'
+                      }}
+                      aria-hidden="true"
+                    >
+                      {component.icon}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div
+                        style={{
+                          fontWeight: '500',
+                          marginBottom: '4px',
+                          color: theme === 'dark' ? '#f8fafc' : '#1e293b'
+                        }}
+                      >
+                        {component.name}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: '12px',
+                          color: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                          lineHeight: '1.4'
+                        }}
+                      >
+                        {component.description}
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        background: theme === 'dark' ? '#6b7280' : '#f1f5f9',
+                        color: theme === 'dark' ? '#d1d5db' : '#64748b',
+                        fontSize: '11px',
+                        fontWeight: '500'
+                      }}
+                    >
+                      {component.category}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Instructions */}
       <div
