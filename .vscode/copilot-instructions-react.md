@@ -42,6 +42,28 @@ Coding standards, domain knowledge, and preferences that AI should follow.
 - Use custom hooks to encapsulate common functionality like drag-and-drop, resizing, etc.
 - Create reusable hooks for complex state management.
 
+## Styling
+
+- Use Tailwind CSS classes when possible for consistent styling.
+- For dynamic theming, use inline styles with theme-based values.
+- Support both light and dark themes.
+- Ensure responsive design for mobile and desktop.
+- Use CSS-in-JS patterns when complex styling is needed.
+
+## State Management
+
+- Use useState for local component state.
+- Use useReducer for complex state logic.
+- Use Context API for global state when needed.
+- Implement proper state updates with immutable patterns.
+
+## Performance
+
+- Use useCallback for event handlers to prevent unnecessary re-renders.
+- Use useMemo for expensive calculations.
+- Implement proper cleanup for timers, listeners, and subscriptions.
+- Use React.memo for pure components when appropriate.
+
 ## Tests
 
 - Use Playwright for end-to-end testing.
@@ -50,3 +72,11 @@ Coding standards, domain knowledge, and preferences that AI should follow.
 - Use Playwright's built-in accessibility checks.
 - Test component props, events, and user interactions.
 
+## Accessibility
+
+- Use semantic HTML elements.
+- Implement proper ARIA attributes.
+- Ensure keyboard navigation works correctly.
+- Support screen readers with proper labeling.
+- Handle focus management appropriately.
+- Test with accessibility tools.

@@ -1,5 +1,7 @@
+import React from 'react';
+import { createRoot } from 'react-dom/client';
 import './styles/global.css';
-import './components/editor-app';
+import { EditorApp } from './components/editor-app/component';
 
 // Register service worker for PWA functionality
 if ('serviceWorker' in navigator) {
@@ -12,3 +14,15 @@ if ('serviceWorker' in navigator) {
     }
   });
 }
+
+const container = document.getElementById('root');
+if (!container) {
+  throw new Error('Root element not found');
+}
+
+const root = createRoot(container);
+root.render(
+  <React.StrictMode>
+    <EditorApp />
+  </React.StrictMode>
+);

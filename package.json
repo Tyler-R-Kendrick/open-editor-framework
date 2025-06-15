@@ -1,7 +1,7 @@
 {
   "name": "open-editor-framework",
   "version": "1.0.0",
-  "description": "A generic HTML5 based web component editor as a reusable control with canvas, component pane, and editor control pane",
+  "description": "A generic HTML5 based React editor as a reusable control with canvas, component pane, and editor control pane",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -11,7 +11,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "serve": "vite preview --port 3000",
-    "lint": "eslint . --ext .ts,.js --fix",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "format": "prettier --write .",
     "test": "vitest",
     "test:ui": "vitest --ui",
@@ -26,7 +26,7 @@
     "build-storybook": "storybook build"
   },
   "keywords": [
-    "web-components",
+    "react",
     "editor",
     "canvas",
     "pwa",
@@ -34,15 +34,13 @@
     "touch",
     "mobile",
     "typescript",
-    "lit"
+    "tsx"
   ],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@lit/context": "^1.1.0",
-    "@lit/reactive-element": "^2.0.4",
-    "@lit/task": "^1.0.0",
-    "lit": "^3.1.0"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.6",
@@ -50,17 +48,23 @@
     "@storybook/addon-actions": "^8.6.14",
     "@storybook/addon-controls": "^8.6.14",
     "@storybook/addon-essentials": "^8.6.14",
-    "@storybook/web-components": "^8.6.14",
-    "@storybook/web-components-vite": "^8.6.14",
+    "@storybook/react": "^8.6.14",
+    "@storybook/react-vite": "^8.6.14",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20.10.5",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
     "@typescript-eslint/eslint-plugin": "^6.17.0",
     "@typescript-eslint/parser": "^6.17.0",
+    "@vitejs/plugin-react": "^4.2.1",
     "@vitest/ui": "^1.1.3",
     "autoprefixer": "^10.4.16",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-lit": "^1.11.0",
-    "eslint-plugin-wc": "^2.0.4",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "jsdom": "^23.2.0",
     "postcss": "^8.4.32",
     "prettier": "^3.1.1",

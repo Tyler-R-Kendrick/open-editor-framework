@@ -8,26 +8,33 @@ export default {
   extends: [
     'eslint:recommended',
     '@typescript-eslint/recommended',
-    'plugin:lit/recommended',
-    'plugin:wc/best-practice',
+    'plugin:react/recommended',
+    'plugin:react-hooks/recommended',
     'prettier'
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 'latest',
-    sourceType: 'module'
+    sourceType: 'module',
+    ecmaFeatures: {
+      jsx: true
+    }
   },
-  plugins: ['@typescript-eslint', 'lit', 'wc'],
+  plugins: ['@typescript-eslint', 'react', 'react-hooks'],
+  settings: {
+    react: {
+      version: '18.2'
+    }
+  },
   rules: {
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'warn',
-    'lit/no-legacy-template-syntax': 'error',
-    'lit/no-template-bind': 'error',
-    'lit/no-useless-template-literals': 'error',
-    'wc/guard-super-call': 'error',
-    'wc/no-constructor-attributes': 'error'
+    'react/react-in-jsx-scope': 'off',
+    'react/prop-types': 'off',
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn'
   },
   ignorePatterns: ['dist/', 'node_modules/']
 };

@@ -1,6 +1,6 @@
 # Open Editor Framework
 
-A generic HTML5-based web component editor built as a PWA (Progressive Web App) with comprehensive accessibility and mobile touch support. This framework provides a reusable canvas-based editor with component palette and property panel.
+A generic HTML5-based React editor built as a PWA (Progressive Web App) with comprehensive accessibility and mobile touch support. This framework provides a reusable canvas-based editor with component palette and property panel.
 
 ## ✨ Features
 
@@ -20,7 +20,7 @@ A generic HTML5-based web component editor built as a PWA (Progressive Web App) 
 
 ### Technical Features
 - **TypeScript** - Full type safety and excellent developer experience
-- **Lit Web Components** - Modern, efficient web components with reactive properties
+- **React 18** - Modern React with hooks and functional components
 - **Tailwind CSS** - Utility-first styling with consistent design system
 - **Vite Build System** - Fast development server and optimized builds
 - **Comprehensive Testing** - Unit tests with Vitest and accessibility testing
