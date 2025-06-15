@@ -192,9 +192,9 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({ theme, onThemeChan
 
       {/* Zoom controls */}
       <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-        <span 
-          style={{ 
-            fontSize: '14px', 
+        <span
+          style={{
+            fontSize: '14px',
             color: theme === 'dark' ? '#d1d5db' : '#6b7280',
             whiteSpace: 'nowrap'
           }}

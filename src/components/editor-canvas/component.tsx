@@ -44,18 +44,18 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
 
     const ctx = canvas.getContext('2d');
     ctxRef.current = ctx;
-    
+
     const resizeCanvas = () => {
       const rect = container.getBoundingClientRect();
-      
+
       // Set up canvas for high DPI displays
       const devicePixelRatio = window.devicePixelRatio || 1;
-      
+
       canvas.width = rect.width * devicePixelRatio;
       canvas.height = rect.height * devicePixelRatio;
       canvas.style.width = rect.width + 'px';
       canvas.style.height = rect.height + 'px';
-      
+
       if (ctx) {
         ctx.scale(devicePixelRatio, devicePixelRatio);
       }
@@ -63,7 +63,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
 
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
-    
+
     return () => {
       window.removeEventListener('resize', resizeCanvas);
     };
@@ -136,16 +136,16 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
       ctx.setLineDash([5, 5]);
       ctx.strokeRect(bounds.x - 2, bounds.y - 2, bounds.width + 4, bounds.height + 4);
       ctx.setLineDash([]);
-      
+
       // Render resize handles
       const handleSize = 8;
       ctx.fillStyle = '#3b82f6';
-      
+
       // Corner handles
-      ctx.fillRect(bounds.x - handleSize/2, bounds.y - handleSize/2, handleSize, handleSize);
-      ctx.fillRect(bounds.x + bounds.width - handleSize/2, bounds.y - handleSize/2, handleSize, handleSize);
-      ctx.fillRect(bounds.x - handleSize/2, bounds.y + bounds.height - handleSize/2, handleSize, handleSize);
-      ctx.fillRect(bounds.x + bounds.width - handleSize/2, bounds.y + bounds.height - handleSize/2, handleSize, handleSize);
+      ctx.fillRect(bounds.x - handleSize / 2, bounds.y - handleSize / 2, handleSize, handleSize);
+      ctx.fillRect(bounds.x + bounds.width - handleSize / 2, bounds.y - handleSize / 2, handleSize, handleSize);
+      ctx.fillRect(bounds.x - handleSize / 2, bounds.y + bounds.height - handleSize / 2, handleSize, handleSize);
+      ctx.fillRect(bounds.x + bounds.width - handleSize / 2, bounds.y + bounds.height - handleSize / 2, handleSize, handleSize);
     }
   }, [canvasState.selectedComponents]);
 
@@ -168,14 +168,14 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
     ctx.strokeStyle = theme === 'dark' ? '#374151' : '#f1f5f9';
     ctx.lineWidth = 1;
     const gridSize = 20;
-    
+
     for (let x = 0; x < width; x += gridSize) {
       ctx.beginPath();
       ctx.moveTo(x, 0);
       ctx.lineTo(x, height);
       ctx.stroke();
     }
-    
+
     for (let y = 0; y < height; y += gridSize) {
       ctx.beginPath();
       ctx.moveTo(0, y);
@@ -219,17 +219,17 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
     const y = (e.clientY - rect.top - canvasState.pan.y) / canvasState.zoom;
 
     // Check if clicking on a component
-    const clickedComponent = components.find(component => 
-      x >= component.bounds.x && 
+    const clickedComponent = components.find(component =>
+      x >= component.bounds.x &&
       x <= component.bounds.x + component.bounds.width &&
-      y >= component.bounds.y && 
+      y >= component.bounds.y &&
       y <= component.bounds.y + component.bounds.height
     );
 
     if (clickedComponent) {
       setCanvasState(prev => ({
         ...prev,
-        selectedComponents: e.shiftKey 
+        selectedComponents: e.shiftKey
           ? [...prev.selectedComponents, clickedComponent.id]
           : [clickedComponent.id]
       }));
@@ -241,7 +241,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDragging) return;
-    
+
     // Handle dragging logic here
     // This would update component positions based on mouse movement
   }, [isDragging]);
@@ -254,17 +254,17 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
   const handleTouchStart = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     const touch = e.touches[0];
     touchStartTimeRef.current = Date.now();
-    
+
     // Handle multi-touch gestures
     if (e.touches.length === 2) {
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
-      
+
       const distance = Math.sqrt(
         Math.pow(touch2.clientX - touch1.clientX, 2) +
         Math.pow(touch2.clientY - touch1.clientY, 2)
       );
-      
+
       setLastTouch({
         startDistance: distance,
         startZoom: canvasState.zoom,
@@ -286,31 +286,31 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
 
   const handleTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
-    
+
     if (e.touches.length === 2 && lastTouch) {
       // Handle pinch-to-zoom
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
-      
+
       const distance = Math.sqrt(
         Math.pow(touch2.clientX - touch1.clientX, 2) +
         Math.pow(touch2.clientY - touch1.clientY, 2)
       );
-      
+
       const scale = distance / lastTouch.startDistance;
       const newZoom = Math.max(0.1, Math.min(5, lastTouch.startZoom * scale));
-      
+
       setCanvasState(prev => ({ ...prev, zoom: newZoom }));
     } else if (e.touches.length === 1) {
       // Handle single-touch pan
       const touch = e.touches[0];
       const canvas = canvasRef.current;
       if (!canvas) return;
-      
+
       const rect = canvas.getBoundingClientRect();
       const x = touch.clientX - rect.left;
       const y = touch.clientY - rect.top;
-      
+
       // Update pan if dragging
       // Implementation would go here
     }
@@ -326,7 +326,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
   // Initialize canvas and start render loop
   useEffect(() => {
     const cleanup = initializeCanvas();
-    
+
     const startRenderLoop = () => {
       const render = () => {
         renderCanvas();
@@ -334,9 +334,9 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
       };
       render();
     };
-    
+
     startRenderLoop();
-    
+
     return () => {
       if (animationIdRef.current) {
         cancelAnimationFrame(animationIdRef.current);
@@ -388,7 +388,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
   }, [components.length, theme]);
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className="canvas-container"
       style={{
@@ -418,9 +418,9 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
         }}
         aria-label="Interactive design canvas"
       />
-      
+
       {/* Canvas controls overlay */}
-      <div 
+      <div
         style={{
           position: 'absolute',
           bottom: '16px',
@@ -447,7 +447,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
         >
           −
         </button>
-        <span 
+        <span
           style={{
             padding: '8px 12px',
             color: theme === 'dark' ? '#f8fafc' : '#1e293b',

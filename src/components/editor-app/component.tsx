@@ -64,13 +64,13 @@ export const EditorApp: React.FC = () => {
   };
 
   return (
-    <div 
-      className="editor-container" 
-      role="application" 
+    <div
+      className="editor-container"
+      role="application"
       aria-label="React Component Editor"
       style={{
         display: 'grid',
-        gridTemplateAreas: isMobile 
+        gridTemplateAreas: isMobile
           ? `'toolbar' 'mobile-content' 'mobile-tabs'`
           : `'toolbar toolbar toolbar' 'palette canvas controls'`,
         gridTemplateColumns: isMobile ? '1fr' : '280px 1fr 320px',
@@ -83,7 +83,7 @@ export const EditorApp: React.FC = () => {
         color: theme === 'dark' ? '#f8fafc' : '#1e293b'
       }}
     >
-      <div 
+      <div
         className="toolbar-area"
         style={{
           gridArea: 'toolbar',
@@ -91,13 +91,13 @@ export const EditorApp: React.FC = () => {
           background: theme === 'dark' ? '#374151' : 'white'
         }}
       >
-        <EditorToolbar 
+        <EditorToolbar
           theme={theme}
           onThemeChange={handleThemeToggle}
         />
       </div>
 
-      <div 
+      <div
         className={`palette-area ${isMobile && activeMobileTab === 'palette' ? 'mobile-active' : ''}`}
         style={{
           gridArea: isMobile ? 'mobile-content' : 'palette',
@@ -107,13 +107,13 @@ export const EditorApp: React.FC = () => {
           display: isMobile && activeMobileTab !== 'palette' ? 'none' : 'block'
         }}
       >
-        <ComponentPalette 
+        <ComponentPalette
           theme={theme}
           aria-label="Component Library"
         />
       </div>
 
-      <div 
+      <div
         className={`canvas-area ${!isMobile || activeMobileTab === 'canvas' ? 'mobile-active' : ''}`}
         style={{
           gridArea: isMobile ? 'mobile-content' : 'canvas',
@@ -123,13 +123,13 @@ export const EditorApp: React.FC = () => {
           display: isMobile && activeMobileTab !== 'canvas' ? 'none' : 'block'
         }}
       >
-        <EditorCanvas 
+        <EditorCanvas
           theme={theme}
           aria-label="Design Canvas"
         />
       </div>
 
-      <div 
+      <div
         className={`controls-area ${isMobile && activeMobileTab === 'controls' ? 'mobile-active' : ''}`}
         style={{
           gridArea: isMobile ? 'mobile-content' : 'controls',
@@ -139,16 +139,16 @@ export const EditorApp: React.FC = () => {
           display: isMobile && activeMobileTab !== 'controls' ? 'none' : 'block'
         }}
       >
-        <ControlPanel 
+        <ControlPanel
           theme={theme}
           aria-label="Properties Panel"
         />
       </div>
 
       {isMobile && (
-        <div 
-          className="mobile-tabs" 
-          role="tablist" 
+        <div
+          className="mobile-tabs"
+          role="tablist"
           aria-label="Editor Sections"
           style={{
             gridArea: 'mobile-tabs',
@@ -159,7 +159,7 @@ export const EditorApp: React.FC = () => {
             alignItems: 'center'
           }}
         >
-          <button 
+          <button
             className={`mobile-tab ${activeMobileTab === 'palette' ? 'active' : ''}`}
             role="tab"
             aria-selected={activeMobileTab === 'palette'}
@@ -186,7 +186,7 @@ export const EditorApp: React.FC = () => {
             <span aria-hidden="true">🎨</span>
             Components
           </button>
-          <button 
+          <button
             className={`mobile-tab ${activeMobileTab === 'canvas' ? 'active' : ''}`}
             role="tab"
             aria-selected={activeMobileTab === 'canvas'}
@@ -213,7 +213,7 @@ export const EditorApp: React.FC = () => {
             <span aria-hidden="true">🎯</span>
             Canvas
           </button>
-          <button 
+          <button
             className={`mobile-tab ${activeMobileTab === 'controls' ? 'active' : ''}`}
             role="tab"
             aria-selected={activeMobileTab === 'controls'}

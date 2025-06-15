@@ -120,7 +120,7 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({ theme, 'aria
   const filteredComponents = componentTemplates.filter(component => {
     const matchesCategory = selectedCategory === 'All' || component.category === selectedCategory;
     const matchesSearch = component.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         component.description.toLowerCase().includes(searchTerm.toLowerCase());
+      component.description.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -138,10 +138,10 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({ theme, 'aria
     padding: '8px 12px',
     border: 'none',
     borderRadius: '6px',
-    background: isActive 
+    background: isActive
       ? (theme === 'dark' ? '#3b82f6' : '#3b82f6')
       : (theme === 'dark' ? '#4b5563' : '#f3f4f6'),
-    color: isActive 
+    color: isActive
       ? '#ffffff'
       : (theme === 'dark' ? '#d1d5db' : '#374151'),
     cursor: 'pointer',

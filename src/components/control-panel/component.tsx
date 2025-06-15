@@ -90,7 +90,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, 'aria-label':
   ]);
 
   const handlePropertyChange = (key: string, value: any) => {
-    setProperties(prev => prev.map(prop => 
+    setProperties(prev => prev.map(prop =>
       prop.key === key ? { ...prop, value } : prop
     ));
     console.log(`Property changed: ${key} = ${value}`);
@@ -215,9 +215,9 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, 'aria-label':
                 accentColor: '#3b82f6'
               }}
             />
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
               marginTop: '4px',
               fontSize: '12px',
               color: theme === 'dark' ? '#9ca3af' : '#6b7280'
