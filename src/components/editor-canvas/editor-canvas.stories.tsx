@@ -1,19 +1,19 @@
-import type { Meta, StoryObj } from '@storybook/web-components';
-import { html } from 'lit';
-import { EditorCanvas } from './index.js';
+import type { Meta, StoryObj } from '@storybook/react';
+import { EditorCanvas } from './component';
 
-// Ensure component is registered
-customElements.get('editor-canvas') || customElements.define('editor-canvas', EditorCanvas);
-
-const meta: Meta<EditorCanvas> = {
+const meta: Meta<typeof EditorCanvas> = {
   title: 'Components/EditorCanvas',
-  component: 'editor-canvas',
+  component: EditorCanvas,
   tags: ['autodocs'],
   argTypes: {
     theme: {
       control: { type: 'select' },
       options: ['light', 'dark'],
       description: 'Visual theme for the editor canvas',
+    },
+    'aria-label': {
+      control: { type: 'text' },
+      description: 'Accessibility label for the canvas',
     },
   },
   parameters: {
@@ -26,39 +26,44 @@ const meta: Meta<EditorCanvas> = {
 };
 
 export default meta;
-type Story = StoryObj<EditorCanvas>;
+type Story = StoryObj<typeof EditorCanvas>;
 
 export const Default: Story = {
   args: {
     theme: 'light',
   },
-  render: (args) => html`
-    <div style="height: 600px; width: 800px; border: 1px solid #e2e8f0;">
-      <editor-canvas .theme=${args.theme}></editor-canvas>
+  render: (args) => (
+    <div style={{ height: '600px', width: '800px', border: '1px solid #e2e8f0' }}>
+      <EditorCanvas {...args} />
     </div>
-  `,
+  ),
 };
 
 export const DarkTheme: Story = {
   args: {
     theme: 'dark',
   },
-  render: (args) => html`
-    <div style="height: 600px; width: 800px; border: 1px solid #475569; background: #1e293b;">
-      <editor-canvas .theme=${args.theme}></editor-canvas>
+  render: (args) => (
+    <div style={{
+      height: '600px',
+      width: '800px',
+      border: '1px solid #475569',
+      background: '#1e293b'
+    }}>
+      <EditorCanvas {...args} />
     </div>
-  `,
+  ),
 };
 
 export const MobileView: Story = {
   args: {
     theme: 'light',
   },
-  render: (args) => html`
-    <div style="height: 700px; width: 375px; border: 1px solid #e2e8f0;">
-      <editor-canvas .theme=${args.theme}></editor-canvas>
+  render: (args) => (
+    <div style={{ height: '700px', width: '375px', border: '1px solid #e2e8f0' }}>
+      <EditorCanvas {...args} />
     </div>
-  `,
+  ),
   parameters: {
     viewport: {
       defaultViewport: 'mobile1',
@@ -75,11 +80,11 @@ export const TabletView: Story = {
   args: {
     theme: 'light',
   },
-  render: (args) => html`
-    <div style="height: 800px; width: 768px; border: 1px solid #e2e8f0;">
-      <editor-canvas .theme=${args.theme}></editor-canvas>
+  render: (args) => (
+    <div style={{ height: '800px', width: '768px', border: '1px solid #e2e8f0' }}>
+      <EditorCanvas {...args} />
     </div>
-  `,
+  ),
   parameters: {
     viewport: {
       defaultViewport: 'tablet',
@@ -90,4 +95,16 @@ export const TabletView: Story = {
       },
     },
   },
+};
+
+export const WithCustomLabel: Story = {
+  args: {
+    theme: 'light',
+    'aria-label': 'Design Canvas - Create and edit UI components',
+  },
+  render: (args) => (
+    <div style={{ height: '600px', width: '800px', border: '1px solid #e2e8f0' }}>
+      <EditorCanvas {...args} />
+    </div>
+  ),
 };

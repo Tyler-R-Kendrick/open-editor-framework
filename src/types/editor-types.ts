@@ -54,6 +54,8 @@ export interface TouchGesture {
   scale?: number;
   velocity?: Point;
   duration: number;
+  startDistance?: number; // For pinch gestures
+  startZoom?: number; // For zoom scaling
 }
 
 export interface CanvasState {
