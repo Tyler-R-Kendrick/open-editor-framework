@@ -12,7 +12,6 @@
     "bradlc.vscode-tailwindcss",
     "vunguyentuan.vscode-css-variables",
     // Testing
-    "zixuanchen.vitest-explorer",
     // Git integration
     "eamodio.gitlens",
     // Debugging and browser tools

@@ -41,45 +41,6 @@
       "urlFilter": "http://localhost:3000/*"
     },
     {
-      "name": "Debug Tests",
-      "type": "node",
-      "request": "launch",
-      "program": "${workspaceFolder}/node_modules/vitest/vitest.mjs",
-      "args": [
-        "run",
-        "--reporter=verbose"
-      ],
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
-      "env": {
-        "NODE_ENV": "test"
-      }
-    },
-    {
-      "name": "Debug Current Test File",
-      "type": "node",
-      "request": "launch",
-      "program": "${workspaceFolder}/node_modules/vitest/vitest.mjs",
-      "args": [
-        "run",
-        "${relativeFile}",
-        "--reporter=verbose"
-      ],
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
-      "env": {
-        "NODE_ENV": "test"
-      }
-    },
-    {
       "name": "Launch in Simple Browser (Codespaces)",
       "type": "node",
       "request": "launch",

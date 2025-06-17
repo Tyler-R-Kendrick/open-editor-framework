@@ -23,7 +23,7 @@ A generic HTML5-based React editor built as a PWA (Progressive Web App) with com
 - **React 18** - Modern React with hooks and functional components
 - **Tailwind CSS** - Utility-first styling with consistent design system
 - **Vite Build System** - Fast development server and optimized builds
-- **Comprehensive Testing** - Unit tests with Vitest and accessibility testing
+- **Comprehensive Testing** - Unit tests with Jest and accessibility testing
 
 ## 🚀 Quick Start
 
@@ -157,7 +157,6 @@ npm run preview      # Preview production build
 npm run lint         # Run ESLint
 npm run format       # Format code with Prettier
 npm run test         # Run unit tests
-npm run test:ui      # Run tests with UI
 npm run test:coverage # Run tests with coverage
 npm run type-check   # TypeScript type checking
 ```
@@ -220,8 +219,6 @@ The editor supports light and dark themes with CSS custom properties:
 ### Unit Tests
 ```bash
 npm run test          # Run all tests
-npm run test:watch    # Run tests in watch mode
-npm run test:ui       # Run tests with Vitest UI
 ```
 
 ### Accessibility Testing
@@ -278,7 +275,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Lit](https://lit.dev) - For the excellent web components framework
 - [Tailwind CSS](https://tailwindcss.com) - For the utility-first CSS framework
 - [Vite](https://vitejs.dev) - For the blazing fast build tool
-- [Vitest](https://vitest.dev) - For the fast unit testing framework
+- [Jest](https://jestjs.io) - For the fast unit testing framework
 
 ## 📞 Support
 
