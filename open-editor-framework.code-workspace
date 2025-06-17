@@ -23,7 +23,6 @@
       "dbaeumer.vscode-eslint",
       "runem.lit-plugin",
       "bradlc.vscode-tailwindcss",
-      "zixuanchen.vitest-explorer"
     ]
   }
 }

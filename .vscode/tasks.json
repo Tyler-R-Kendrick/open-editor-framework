@@ -52,40 +52,7 @@
       "script": "test",
       "group": "test",
       "label": "npm: test",
-      "detail": "Run unit tests",
-      "problemMatcher": {
-        "owner": "vitest",
-        "pattern": {
-          "regexp": "^(.*):(\\d+):(\\d+)\\s+(.*)$",
-          "file": 1,
-          "line": 2,
-          "column": 3,
-          "message": 4
-        }
-      }
-    },
-    {
-      "type": "npm",
-      "script": "test:ui",
-      "group": "test",
-      "label": "npm: test:ui",
-      "detail": "Run tests with UI",
-      "isBackground": true,
-      "problemMatcher": {
-        "owner": "vitest",
-        "pattern": {
-          "regexp": "^(.*):(\\d+):(\\d+)\\s+(.*)$",
-          "file": 1,
-          "line": 2,
-          "column": 3,
-          "message": 4
-        },
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": "Vitest UI",
-          "endsPattern": "Local:\\s+http://localhost:"
-        }
-      }
+      "detail": "Run unit tests"
     },
     {
       "type": "npm",
@@ -213,6 +180,6 @@
         "showReuseMessage": true,
         "clear": false
       }
-    },
+    }
   ]
 }

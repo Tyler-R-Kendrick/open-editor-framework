@@ -5,8 +5,6 @@
 
 dist/
 
-# Playwright test results
-test-results/
 
 # User-specific files
 *.rsuser
