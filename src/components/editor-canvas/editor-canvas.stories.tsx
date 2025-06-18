@@ -19,7 +19,7 @@ const meta: Meta<typeof EditorCanvas> = {
   parameters: {
     docs: {
       description: {
-        component: 'An HTML5 Canvas-based editor component for rendering and manipulating UI components. Supports touch interactions, keyboard shortcuts, and accessibility features.',
+        component: 'An HTML5 Canvas-based editor panel for rendering and manipulating UI components. Supports touch interactions, keyboard shortcuts, and accessibility features.',
       },
     },
   },

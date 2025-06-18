@@ -13,7 +13,7 @@ interface EditorCanvasProps {
 }
 
 /**
- * HTML5 Canvas-based editor component with touch and accessibility support
+ * HTML5 Canvas-based editor panel with touch and accessibility support
  * Features:
  * - Touch-optimized interactions (pan, zoom, tap, long press)
  * - Keyboard accessibility and shortcuts
