@@ -9,12 +9,14 @@ const config = {
   ],
   framework: {
     name: '@storybook/react-vite',
-    options: {},
+    options: {}
   },
   staticDirs: ['../public'],
   typescript: {
-    check: true,
+    check: true
   },
-  docs: {},
+  docs: {
+    autodocs: true
+  }
 };
 export default config;
