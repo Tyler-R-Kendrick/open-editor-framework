@@ -5,7 +5,10 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig({
   plugins: [
     react(),
-    VitePWA({
+    ...(process.env.STORYBOOK
+      ? []
+      : [
+          VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
@@ -55,7 +58,8 @@ export default defineConfig({
           }
         ]
       }
-    })
+          })
+        ])
   ],
   build: {
     target: 'es2022',

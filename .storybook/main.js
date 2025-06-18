@@ -16,5 +16,11 @@ const config = {
     check: true,
   },
   docs: {},
+  viteFinal(config) {
+    config.plugins = (config.plugins || []).filter(
+      (plugin) => !plugin.name?.startsWith('vite-plugin-pwa')
+    );
+    return config;
+  },
 };
 export default config;
