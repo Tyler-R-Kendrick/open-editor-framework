@@ -114,6 +114,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({ theme, onThemeChan
 
         <ActionButton
           aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
+          title={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
           onPress={toggleTheme}
         >
           {theme === 'light' ? <Moon /> : <Light />}
