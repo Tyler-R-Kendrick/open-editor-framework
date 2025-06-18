@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { EditorTheme } from '../../types/editor-types';
-import { useComponentTemplates, ComponentTemplate } from '../../behaviors/useComponentTemplates';
+import { useComponentTemplates } from '../../behaviors/useComponentTemplates';
+import { MarketplaceComponent } from '../../types/component-base';
 
 interface ComponentPaletteProps {
   theme: EditorTheme;
@@ -34,12 +35,12 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({
     return matchesCategory && matchesSearch;
   });
 
-  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, component: ComponentTemplate) => {
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, component: MarketplaceComponent) => {
     e.dataTransfer.setData('application/json', JSON.stringify(component.template));
     e.dataTransfer.effectAllowed = 'copy';
   };
 
-  const handleComponentClick = (component: ComponentTemplate) => {
+  const handleComponentClick = (component: MarketplaceComponent) => {
     // For touch devices, clicking will add the component to the canvas
     console.log('Add component to canvas:', component);
   };

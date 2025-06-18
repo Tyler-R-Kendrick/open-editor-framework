@@ -1,3 +1,4 @@
+import type { BaseComponent } from "./component-base";
 export type EditorTheme = 'light' | 'dark';
 
 export interface Point {
@@ -62,8 +63,8 @@ export interface CanvasState {
   zoom: number;
   pan: Point;
   selectedComponents: string[];
-  clipboard: EditorComponent[];
-  history: EditorComponent[][];
+  clipboard: BaseComponent[];
+  history: BaseComponent[][];
   historyIndex: number;
 }
 

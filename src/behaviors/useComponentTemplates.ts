@@ -1,25 +1,16 @@
 import { useState, useEffect } from 'react';
-
-export interface ComponentTemplate {
-  id: string;
-  name: string;
-  icon: string;
-  description: string;
-  category: string;
-  template: {
-    type: string;
-    defaultSize: { width: number; height: number };
-    properties: Record<string, any>;
-  };
-}
+import {
+  MarketplaceComponent,
+  MarketplaceComponentOptions,
+} from '../types/component-base';
 
 export interface ComponentTemplatesData {
-  templates: ComponentTemplate[];
+  templates: MarketplaceComponentOptions[];
   categories: string[];
 }
 
 interface UseComponentTemplatesResult {
-  templates: ComponentTemplate[];
+  templates: MarketplaceComponent[];
   categories: string[];
   loading: boolean;
   error: string | null;
@@ -27,41 +18,37 @@ interface UseComponentTemplatesResult {
 }
 
 // Default fallback templates in case loading fails
-const defaultTemplates: ComponentTemplate[] = [
-  {
+const defaultTemplates: MarketplaceComponent[] = [
+  new MarketplaceComponent({
     id: 'text',
     name: 'Text',
     icon: '📝',
     description: 'Text component for labels and content',
     category: 'Basic',
-    template: {
-      type: 'text',
-      defaultSize: { width: 200, height: 40 },
-      properties: {
-        text: 'Sample Text',
-        fontSize: 16,
-        fontFamily: 'Arial',
-        color: '#000000'
-      }
-    }
-  },
-  {
+    type: 'text',
+    defaultSize: { width: 200, height: 40 },
+    properties: {
+      text: 'Sample Text',
+      fontSize: 16,
+      fontFamily: 'Arial',
+      color: '#000000',
+    },
+  }),
+  new MarketplaceComponent({
     id: 'button',
     name: 'Button',
     icon: '🔘',
     description: 'Interactive button component',
     category: 'Basic',
-    template: {
-      type: 'button',
-      defaultSize: { width: 120, height: 40 },
-      properties: {
-        text: 'Button',
-        backgroundColor: '#3b82f6',
-        color: '#ffffff',
-        borderRadius: 6
-      }
-    }
-  }
+    type: 'button',
+    defaultSize: { width: 120, height: 40 },
+    properties: {
+      text: 'Button',
+      backgroundColor: '#3b82f6',
+      color: '#ffffff',
+      borderRadius: 6,
+    },
+  }),
 ];
 
 const defaultCategories = ['All', 'Basic', 'Layout', 'Form', 'Media'];
@@ -76,7 +63,7 @@ const defaultCategories = ['All', 'Basic', 'Layout', 'Form', 'Media'];
 export const useComponentTemplates = (
   templateUrl: string = '/assets/component-templates.json'
 ): UseComponentTemplatesResult => {
-  const [templates, setTemplates] = useState<ComponentTemplate[]>(defaultTemplates);
+  const [templates, setTemplates] = useState<MarketplaceComponent[]>(defaultTemplates);
   const [categories, setCategories] = useState<string[]>(defaultCategories);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -105,12 +92,15 @@ export const useComponentTemplates = (
 
       // Validate each template has required fields
       for (const template of data.templates) {
-        if (!template.id || !template.name || !template.template) {
-          throw new Error(`Invalid template structure: template missing required fields (id, name, template)`);
+        if (!template.id || !template.name || !template.type) {
+          throw new Error(
+            `Invalid template structure: template missing required fields (id, name, type)`
+          );
         }
       }
 
-      setTemplates(data.templates);
+      const mapped = data.templates.map((t) => new MarketplaceComponent(t));
+      setTemplates(mapped);
       setCategories(data.categories);
     } catch (err) {
       console.warn('Failed to load external component templates, using defaults:', err);

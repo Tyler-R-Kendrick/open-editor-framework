@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { EditorTheme, CanvasState, EditorComponent } from '../../types/editor-types';
+import { EditorTheme, CanvasState } from '../../types/editor-types';
+import { BaseComponent } from '../../types/component-base';
 
 interface PinchState {
   startDistance: number;
@@ -37,7 +38,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
     historyIndex: -1
   });
 
-  const [components, setComponents] = useState<EditorComponent[]>([]);
+  const [components, setComponents] = useState<BaseComponent[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [, setIsResizing] = useState(false);
   const [lastTouch, setLastTouch] = useState<PinchState | null>(null);
@@ -74,7 +75,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
     };
   }, []);
 
-  const renderComponent = useCallback((component: EditorComponent) => {
+  const renderComponent = useCallback((component: BaseComponent) => {
     const ctx = ctxRef.current;
     if (!ctx) return;
 
@@ -365,7 +366,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
   useEffect(() => {
     if (components.length === 0) {
       setComponents([
-        {
+        new BaseComponent({
           id: '1',
           type: 'text',
           name: 'Text',
@@ -373,10 +374,10 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
           properties: {
             text: 'Sample Text Component',
             fontSize: 16,
-            color: theme === 'dark' ? '#f8fafc' : '#1e293b'
-          }
-        },
-        {
+            color: theme === 'dark' ? '#f8fafc' : '#1e293b',
+          },
+        }),
+        new BaseComponent({
           id: '2',
           type: 'button',
           name: 'Button',
@@ -384,16 +385,16 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
           properties: {
             text: 'Button',
             backgroundColor: '#3b82f6',
-            color: '#ffffff'
-          }
-        },
-        {
+            color: '#ffffff',
+          },
+        }),
+        new BaseComponent({
           id: '3',
           type: 'image',
           name: 'Image',
           bounds: { x: 100, y: 150, width: 150, height: 100 },
-          properties: {}
-        }
+          properties: {},
+        }),
       ]);
     }
   }, [components.length, theme]);
