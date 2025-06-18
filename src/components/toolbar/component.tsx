@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { EditorTheme } from '../../types/editor-types';
-import { Flex, ButtonGroup, Button, View } from '@adobe/react-spectrum';
+import { Flex, ButtonGroup, Button } from '@adobe/react-spectrum';
 import { useMessageFormatter } from '@react-aria/i18n';
 import messages from '../../i18n/toolbarMessages';
 
@@ -87,22 +87,23 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
         justifyContent="space-between"
       >
         <ButtonGroup>
-          <Button onPress={handleNew} aria-label={formatMessage('new')}>
+          <Button variant="primary" onPress={handleNew} aria-label={formatMessage('new')}>
             {formatMessage('new')}
           </Button>
-          <Button onPress={handleSave} aria-label={formatMessage('save')}>
+          <Button variant="primary" onPress={handleSave} aria-label={formatMessage('save')}>
             {formatMessage('save')}
           </Button>
-          <Button onPress={handleLoad} aria-label={formatMessage('load')}>
+          <Button variant="primary" onPress={handleLoad} aria-label={formatMessage('load')}>
             {formatMessage('load')}
           </Button>
-          <Button onPress={handleExport} aria-label={formatMessage('export')}>
+          <Button variant="primary" onPress={handleExport} aria-label={formatMessage('export')}>
             {formatMessage('export')}
           </Button>
         </ButtonGroup>
 
         <ButtonGroup>
           <Button
+            variant="secondary"
             onPress={handleUndo}
             isDisabled={!canUndo}
             aria-label={formatMessage('undo')}
@@ -110,6 +111,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
             {formatMessage('undo')}
           </Button>
           <Button
+            variant="secondary"
             onPress={handleRedo}
             isDisabled={!canRedo}
             aria-label={formatMessage('redo')}
@@ -121,18 +123,21 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
         <Flex gap="size-100" alignItems="center">
           <span>{zoomLevel}%</span>
           <Button
+            variant="secondary"
             onPress={() => setZoomLevel((prev) => Math.max(10, prev - 10))}
             aria-label={formatMessage('zoomOut')}
           >
             −
           </Button>
           <Button
+            variant="secondary"
             onPress={() => setZoomLevel((prev) => Math.min(500, prev + 10))}
             aria-label={formatMessage('zoomIn')}
           >
             +
           </Button>
           <Button
+            variant="secondary"
             onPress={() => setZoomLevel(100)}
             aria-label={formatMessage('resetZoom')}
           >
@@ -142,6 +147,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
 
         <ButtonGroup>
           <Button
+            variant="primary"
             onPress={toggleTheme}
             aria-label={
               theme === 'light' ? formatMessage('dark') : formatMessage('light')
