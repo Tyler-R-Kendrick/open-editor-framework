@@ -139,16 +139,17 @@ interface ComponentDefinition {
 
 ```
 src/
-├── components/          # Lit web components
-│   ├── editor-app.ts   # Main application
-│   ├── editor-canvas.ts # Canvas editor
-│   ├── component-palette.ts
-│   ├── control-panel.ts
-│   └── toolbar.ts
-├── types/              # TypeScript type definitions
-├── utils/              # Utility functions and helpers
-├── styles/             # Global CSS and Tailwind
-└── main.ts            # Application entry point
+├── components/          # React components
+│   ├── editor-app/        # Main application
+│   ├── editor-canvas/     # Canvas editor
+│   ├── component-palette/ # Palette UI
+│   ├── control-panel/     # Property editor
+│   └── toolbar/           # Editor toolbar
+├── behaviors/           # Interaction logic
+├── types/               # TypeScript type definitions
+├── utils/               # Utility functions and helpers
+├── styles/              # Global CSS and Tailwind
+└── main.tsx             # Application entry point
 ```
 
 ### Available Scripts
@@ -275,7 +276,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- [Lit](https://lit.dev) - For the excellent web components framework
 - [Tailwind CSS](https://tailwindcss.com) - For the utility-first CSS framework
 - [Vite](https://vitejs.dev) - For the blazing fast build tool
 - [Jest](https://jestjs.io) - For the fast unit testing framework
