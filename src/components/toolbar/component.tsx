@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { EditorTheme } from '../../types/editor-types';
+import { Flex, ButtonGroup, Button } from '@adobe/react-spectrum';
+import { useMessageFormatter } from '@react-aria/i18n';
+import messages from '../../i18n/toolbarMessages';
 
 interface EditorToolbarProps {
   theme: EditorTheme;
@@ -16,7 +19,11 @@ interface EditorToolbarProps {
  * - Keyboard shortcuts for all actions
  * - Mobile-responsive layout
  */
-export const EditorToolbar: React.FC<EditorToolbarProps> = ({ theme, onThemeChange }) => {
+export const EditorToolbar: React.FC<EditorToolbarProps> = ({
+  theme,
+  onThemeChange
+}) => {
+  const formatMessage = useMessageFormatter(messages);
   const [zoomLevel, setZoomLevel] = useState(100);
   const [canUndo] = useState(false);
   const [canRedo] = useState(false);
@@ -71,182 +78,85 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({ theme, onThemeChan
     onThemeChange(theme === 'light' ? 'dark' : 'light');
   };
 
-  const buttonBaseStyle = {
-    padding: '8px 12px',
-    border: 'none',
-    borderRadius: '6px',
-    background: theme === 'dark' ? '#4b5563' : '#f3f4f6',
-    color: theme === 'dark' ? '#f8fafc' : '#374151',
-    cursor: 'pointer',
-    fontSize: '14px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    transition: 'all 0.2s ease'
-  };
-
-  const buttonHoverStyle = {
-    ...buttonBaseStyle,
-    background: theme === 'dark' ? '#6b7280' : '#e5e7eb'
-  };
-
   return (
-    <div
-      className="editor-toolbar"
-      role="toolbar"
-      aria-label="Editor toolbar"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '12px 16px',
-        background: theme === 'dark' ? '#374151' : 'white',
-        borderBottom: `1px solid ${theme === 'dark' ? '#4b5563' : '#e2e8f0'}`,
-        gap: '12px',
-        flexWrap: 'wrap'
-      }}
-    >
-      {/* File operations */}
-      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-        <button
-          onClick={handleNew}
-          style={buttonBaseStyle}
-          onMouseEnter={(e) => Object.assign(e.currentTarget.style, buttonHoverStyle)}
-          onMouseLeave={(e) => Object.assign(e.currentTarget.style, buttonBaseStyle)}
-          aria-label="New document (Ctrl+N)"
-          title="New document (Ctrl+N)"
-        >
-          <span aria-hidden="true">📄</span>
-          <span className="hidden sm:inline">New</span>
-        </button>
+    <div role="toolbar" aria-label={formatMessage('toolbar')}>
+      <Flex
+        gap="size-150"
+        wrap
+        alignItems="center"
+        justifyContent="space-between"
+      >
+        <ButtonGroup>
+          <Button variant="primary" onPress={handleNew} aria-label={formatMessage('new')}>
+            {formatMessage('new')}
+          </Button>
+          <Button variant="primary" onPress={handleSave} aria-label={formatMessage('save')}>
+            {formatMessage('save')}
+          </Button>
+          <Button variant="primary" onPress={handleLoad} aria-label={formatMessage('load')}>
+            {formatMessage('load')}
+          </Button>
+          <Button variant="primary" onPress={handleExport} aria-label={formatMessage('export')}>
+            {formatMessage('export')}
+          </Button>
+        </ButtonGroup>
 
-        <button
-          onClick={handleSave}
-          style={buttonBaseStyle}
-          onMouseEnter={(e) => Object.assign(e.currentTarget.style, buttonHoverStyle)}
-          onMouseLeave={(e) => Object.assign(e.currentTarget.style, buttonBaseStyle)}
-          aria-label="Save document (Ctrl+S)"
-          title="Save document (Ctrl+S)"
-        >
-          <span aria-hidden="true">💾</span>
-          <span className="hidden sm:inline">Save</span>
-        </button>
+        <ButtonGroup>
+          <Button
+            variant="secondary"
+            onPress={handleUndo}
+            isDisabled={!canUndo}
+            aria-label={formatMessage('undo')}
+          >
+            {formatMessage('undo')}
+          </Button>
+          <Button
+            variant="secondary"
+            onPress={handleRedo}
+            isDisabled={!canRedo}
+            aria-label={formatMessage('redo')}
+          >
+            {formatMessage('redo')}
+          </Button>
+        </ButtonGroup>
 
-        <button
-          onClick={handleLoad}
-          style={buttonBaseStyle}
-          onMouseEnter={(e) => Object.assign(e.currentTarget.style, buttonHoverStyle)}
-          onMouseLeave={(e) => Object.assign(e.currentTarget.style, buttonBaseStyle)}
-          aria-label="Load document (Ctrl+O)"
-          title="Load document (Ctrl+O)"
-        >
-          <span aria-hidden="true">📁</span>
-          <span className="hidden sm:inline">Load</span>
-        </button>
+        <Flex gap="size-100" alignItems="center">
+          <span>{zoomLevel}%</span>
+          <Button
+            variant="secondary"
+            onPress={() => setZoomLevel((prev) => Math.max(10, prev - 10))}
+            aria-label={formatMessage('zoomOut')}
+          >
+            −
+          </Button>
+          <Button
+            variant="secondary"
+            onPress={() => setZoomLevel((prev) => Math.min(500, prev + 10))}
+            aria-label={formatMessage('zoomIn')}
+          >
+            +
+          </Button>
+          <Button
+            variant="secondary"
+            onPress={() => setZoomLevel(100)}
+            aria-label={formatMessage('resetZoom')}
+          >
+            ⌂
+          </Button>
+        </Flex>
 
-        <button
-          onClick={handleExport}
-          style={buttonBaseStyle}
-          onMouseEnter={(e) => Object.assign(e.currentTarget.style, buttonHoverStyle)}
-          onMouseLeave={(e) => Object.assign(e.currentTarget.style, buttonBaseStyle)}
-          aria-label="Export document"
-          title="Export document"
-        >
-          <span aria-hidden="true">📤</span>
-          <span className="hidden sm:inline">Export</span>
-        </button>
-      </div>
-
-      {/* Edit operations */}
-      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-        <button
-          onClick={handleUndo}
-          disabled={!canUndo}
-          style={{
-            ...buttonBaseStyle,
-            opacity: canUndo ? 1 : 0.5,
-            cursor: canUndo ? 'pointer' : 'not-allowed'
-          }}
-          aria-label="Undo (Ctrl+Z)"
-          title="Undo (Ctrl+Z)"
-        >
-          <span aria-hidden="true">↶</span>
-          <span className="hidden sm:inline">Undo</span>
-        </button>
-
-        <button
-          onClick={handleRedo}
-          disabled={!canRedo}
-          style={{
-            ...buttonBaseStyle,
-            opacity: canRedo ? 1 : 0.5,
-            cursor: canRedo ? 'pointer' : 'not-allowed'
-          }}
-          aria-label="Redo (Ctrl+Y)"
-          title="Redo (Ctrl+Y)"
-        >
-          <span aria-hidden="true">↷</span>
-          <span className="hidden sm:inline">Redo</span>
-        </button>
-      </div>
-
-      {/* Zoom controls */}
-      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-        <span
-          style={{
-            fontSize: '14px',
-            color: theme === 'dark' ? '#d1d5db' : '#6b7280',
-            whiteSpace: 'nowrap'
-          }}
-        >
-          {zoomLevel}%
-        </span>
-        <button
-          onClick={() => setZoomLevel(prev => Math.max(10, prev - 10))}
-          style={buttonBaseStyle}
-          onMouseEnter={(e) => Object.assign(e.currentTarget.style, buttonHoverStyle)}
-          onMouseLeave={(e) => Object.assign(e.currentTarget.style, buttonBaseStyle)}
-          aria-label="Zoom out"
-          title="Zoom out"
-        >
-          <span aria-hidden="true">−</span>
-        </button>
-        <button
-          onClick={() => setZoomLevel(prev => Math.min(500, prev + 10))}
-          style={buttonBaseStyle}
-          onMouseEnter={(e) => Object.assign(e.currentTarget.style, buttonHoverStyle)}
-          onMouseLeave={(e) => Object.assign(e.currentTarget.style, buttonBaseStyle)}
-          aria-label="Zoom in"
-          title="Zoom in"
-        >
-          <span aria-hidden="true">+</span>
-        </button>
-        <button
-          onClick={() => setZoomLevel(100)}
-          style={buttonBaseStyle}
-          onMouseEnter={(e) => Object.assign(e.currentTarget.style, buttonHoverStyle)}
-          onMouseLeave={(e) => Object.assign(e.currentTarget.style, buttonBaseStyle)}
-          aria-label="Reset zoom"
-          title="Reset zoom"
-        >
-          <span aria-hidden="true">⌂</span>
-        </button>
-      </div>
-
-      {/* Theme toggle */}
-      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-        <button
-          onClick={toggleTheme}
-          style={buttonBaseStyle}
-          onMouseEnter={(e) => Object.assign(e.currentTarget.style, buttonHoverStyle)}
-          onMouseLeave={(e) => Object.assign(e.currentTarget.style, buttonBaseStyle)}
-          aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
-          title={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
-        >
-          <span aria-hidden="true">{theme === 'light' ? '🌙' : '☀️'}</span>
-          <span className="hidden sm:inline">{theme === 'light' ? 'Dark' : 'Light'}</span>
-        </button>
-      </div>
+        <ButtonGroup>
+          <Button
+            variant="primary"
+            onPress={toggleTheme}
+            aria-label={
+              theme === 'light' ? formatMessage('dark') : formatMessage('light')
+            }
+          >
+            {theme === 'light' ? formatMessage('dark') : formatMessage('light')}
+          </Button>
+        </ButtonGroup>
+      </Flex>
     </div>
   );
 };

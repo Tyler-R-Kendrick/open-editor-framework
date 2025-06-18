@@ -7,7 +7,9 @@ Object.defineProperty(window, 'matchMedia', {
     media: query,
     addEventListener: () => {},
     removeEventListener: () => {},
-  }),
+    addListener: () => {},
+    removeListener: () => {}
+  })
 });
 
 HTMLCanvasElement.prototype.getContext = () => null;
