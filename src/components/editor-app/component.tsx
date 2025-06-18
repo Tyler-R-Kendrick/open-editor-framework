@@ -1,6 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { createRoot } from 'react-dom/client';
-import { GoldenLayout, LayoutConfig, ComponentContainer } from 'golden-layout';
+import React, { useCallback, useEffect, useState } from 'react';
 import { EditorTheme } from '../../types/editor-types';
 import { EditorToolbar } from '../toolbar/component';
 import { ComponentPalette } from '../component-palette/component';
@@ -8,11 +6,10 @@ import { EditorCanvas } from '../editor-canvas/component';
 import { ControlPanel } from '../control-panel/component';
 
 /**
- * Main editor application using GoldenLayout for dockable panels
+ * Main editor application using a simple flex layout
  */
 export const EditorApp: React.FC = () => {
   const [theme, setTheme] = useState<EditorTheme>('light');
-  const layoutRef = useRef<HTMLDivElement>(null);
 
   const handleThemeChange = useCallback((e: MediaQueryListEvent | MediaQueryList) => {
     setTheme(e.matches ? 'dark' : 'light');
@@ -27,61 +24,8 @@ export const EditorApp: React.FC = () => {
     };
   }, [handleThemeChange]);
 
-  useEffect(() => {
-    if (!layoutRef.current) return;
+  const borderColor = theme === 'dark' ? '#374151' : '#e2e8f0';
 
-    const config: LayoutConfig = {
-      root: {
-        type: 'row',
-        content: [
-          {
-            type: 'component',
-            componentType: 'palette',
-            title: 'Components',
-            isClosable: true
-          },
-          {
-            type: 'component',
-            componentType: 'canvas',
-            title: 'Canvas',
-            isClosable: false,
-            reorderEnabled: false,
-            header: { popout: false, dock: false, maximise: false, close: false }
-          },
-          {
-            type: 'component',
-            componentType: 'controls',
-            title: 'Properties',
-            isClosable: true
-          }
-        ]
-      }
-    };
-
-    const layout = new GoldenLayout(layoutRef.current!);
-
-    const register = <P extends { theme: EditorTheme; 'aria-label'?: string }>(
-      type: string,
-      Component: React.FC<P>,
-      ariaLabel: string
-    ) => {
-      layout.registerComponentFactoryFunction(type, (container: ComponentContainer) => {
-        const root = createRoot(container.element as unknown as HTMLElement);
-        const props = { theme, 'aria-label': ariaLabel } as P;
-        root.render(<Component {...props} />);
-        container.on('destroy', () => root.unmount());
-        return undefined;
-      });
-    };
-
-    register('palette', ComponentPalette, 'Component Library');
-    register('canvas', EditorCanvas, 'Design Canvas');
-    register('controls', ControlPanel, 'Properties Panel');
-
-    layout.loadLayout(config);
-
-    return () => layout.destroy();
-  }, [theme]);
 
   const handleThemeToggle = (newTheme: EditorTheme) => {
     setTheme(newTheme);
@@ -100,10 +44,20 @@ export const EditorApp: React.FC = () => {
         color: theme === 'dark' ? '#f8fafc' : '#1e293b'
       }}
     >
-      <div style={{ height: '60px', borderBottom: `1px solid ${theme === 'dark' ? '#374151' : '#e2e8f0'}`, background: theme === 'dark' ? '#374151' : 'white' }}>
+      <div style={{ height: '60px', borderBottom: `1px solid ${borderColor}`, background: theme === 'dark' ? '#374151' : 'white' }}>
         <EditorToolbar theme={theme} onThemeChange={handleThemeToggle} />
       </div>
-      <div ref={layoutRef} style={{ flex: 1, position: 'relative', overflow: 'hidden' }} />
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        <div style={{ width: '250px', borderRight: `1px solid ${borderColor}`, overflow: 'auto' }}>
+          <ComponentPalette theme={theme} aria-label="Component Library" />
+        </div>
+        <div style={{ flex: 1, overflow: 'auto' }}>
+          <EditorCanvas theme={theme} aria-label="Design Canvas" />
+        </div>
+        <div style={{ width: '300px', borderLeft: `1px solid ${borderColor}`, overflow: 'auto' }}>
+          <ControlPanel theme={theme} aria-label="Properties Panel" />
+        </div>
+      </div>
     </div>
   );
 };

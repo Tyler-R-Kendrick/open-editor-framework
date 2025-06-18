@@ -1,6 +1,4 @@
 @import './tokens.css';
-@import 'golden-layout/dist/css/goldenlayout-base.css';
-@import 'golden-layout/dist/css/themes/goldenlayout-light-theme.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
