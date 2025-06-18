@@ -14,3 +14,16 @@ jobs:
           node-version: 18
       - run: npm ci
       - run: npm run build --if-present
+      - name: action-status
+        if: always()
+        # You may pin to the exact commit or the version.
+        # uses: dobladov/github-status-action@4c30ae6753b91f8697a5151bc2cb666a04d2be19
+        uses: dobladov/github-status-action@2.0.0
+        with:
+          # Use secrets.GITHUB_TOKEN or your own token if you need to trigger other workflows the use "on: status"
+          authToken: ${{ secrets.GITHUB_TOKEN }}
+          # The status of the check: success, error, failure or pending
+          state:  ${{ job.status }}
+          context: Build
+          description: "Build ${{ job.status }}"
+          
