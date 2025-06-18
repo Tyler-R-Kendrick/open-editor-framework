@@ -3,6 +3,8 @@
 @tailwind utilities;
 
 @import './tokens.css';
+@import 'golden-layout/dist/css/goldenlayout-base.css';
+@import 'golden-layout/dist/css/themes/goldenlayout-light-theme.css';
 
 /* Global base styles for accessibility and mobile support */
 @layer base {

@@ -11,3 +11,11 @@ Object.defineProperty(window, 'matchMedia', {
 });
 
 HTMLCanvasElement.prototype.getContext = () => null;
+
+class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+(window as any).ResizeObserver = ResizeObserver;
