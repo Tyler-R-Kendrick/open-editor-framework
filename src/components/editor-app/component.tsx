@@ -47,7 +47,7 @@ export const EditorApp: React.FC = () => {
             title: 'Canvas',
             isClosable: false,
             reorderEnabled: false,
-            header: { popout: false, dock: false, maximise: false, close: false }
+            header: { popout: false, dock: false, maximise: false }
           },
           {
             type: 'component',

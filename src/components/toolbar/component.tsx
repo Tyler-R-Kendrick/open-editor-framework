@@ -81,7 +81,6 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({ theme, onThemeChan
         justifyContent="space-between"
         gap="size-150"
         wrap
-        padding="size-200"
       >
         <ButtonGroup>
           <ActionButton onPress={handleNew}>New</ActionButton>
