@@ -59,8 +59,8 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
 
       canvas.width = rect.width * devicePixelRatio;
       canvas.height = rect.height * devicePixelRatio;
-      canvas.style.width = rect.width + 'px';
-      canvas.style.height = rect.height + 'px';
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
 
       if (ctx) {
         ctx.scale(devicePixelRatio, devicePixelRatio);
@@ -69,9 +69,12 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
 
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
+    const observer = new ResizeObserver(resizeCanvas);
+    observer.observe(container);
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
+      observer.disconnect();
     };
   }, []);
 

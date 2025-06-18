@@ -34,9 +34,26 @@ export const EditorApp: React.FC = () => {
       root: {
         type: 'row',
         content: [
-          { type: 'component', componentType: 'palette', title: 'Components' },
-          { type: 'component', componentType: 'canvas', title: 'Canvas' },
-          { type: 'component', componentType: 'controls', title: 'Properties' }
+          {
+            type: 'component',
+            componentType: 'palette',
+            title: 'Components',
+            isClosable: true
+          },
+          {
+            type: 'component',
+            componentType: 'canvas',
+            title: 'Canvas',
+            isClosable: false,
+            reorderEnabled: false,
+            header: { popout: false, dock: false, maximise: false, close: false }
+          },
+          {
+            type: 'component',
+            componentType: 'controls',
+            title: 'Properties',
+            isClosable: true
+          }
         ]
       }
     };
