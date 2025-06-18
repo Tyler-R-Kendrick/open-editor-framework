@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   root: true,
   env: {
     browser: true,
@@ -7,7 +7,7 @@ export default {
   },
   extends: [
     'eslint:recommended',
-    '@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/recommended',
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
     'prettier'
