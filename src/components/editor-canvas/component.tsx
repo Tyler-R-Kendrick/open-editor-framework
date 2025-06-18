@@ -367,7 +367,6 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
       }}
       role="img"
       aria-label={ariaLabel || 'Design Canvas'}
-      tabIndex={0}
     >
       <canvas
         ref={canvasRef}
