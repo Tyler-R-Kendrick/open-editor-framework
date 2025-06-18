@@ -27,67 +27,8 @@ interface PropertyField {
  * - Touch-friendly controls
  */
 export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, 'aria-label': ariaLabel }) => {
-  const [selectedComponentId] = useState<string | null>('1');
-  const [properties, setProperties] = useState<PropertyField[]>([
-    {
-      key: 'text',
-      label: 'Text',
-      type: 'text',
-      value: 'Sample Text Component'
-    },
-    {
-      key: 'fontSize',
-      label: 'Font Size',
-      type: 'range',
-      value: 16,
-      min: 8,
-      max: 72,
-      step: 1
-    },
-    {
-      key: 'fontFamily',
-      label: 'Font Family',
-      type: 'select',
-      value: 'Arial',
-      options: ['Arial', 'Helvetica', 'Times New Roman', 'Georgia', 'Verdana']
-    },
-    {
-      key: 'color',
-      label: 'Text Color',
-      type: 'color',
-      value: '#1e293b'
-    },
-    {
-      key: 'backgroundColor',
-      label: 'Background Color',
-      type: 'color',
-      value: '#ffffff'
-    },
-    {
-      key: 'borderRadius',
-      label: 'Border Radius',
-      type: 'range',
-      value: 0,
-      min: 0,
-      max: 50,
-      step: 1
-    },
-    {
-      key: 'opacity',
-      label: 'Opacity',
-      type: 'range',
-      value: 100,
-      min: 0,
-      max: 100,
-      step: 1
-    },
-    {
-      key: 'visible',
-      label: 'Visible',
-      type: 'checkbox',
-      value: true
-    }
-  ]);
+  const [selectedComponentId] = useState<string | null>(null);
+  const [properties, setProperties] = useState<PropertyField[]>([]);
 
   const handlePropertyChange = (key: string, value: any) => {
     setProperties(prev => prev.map(prop =>

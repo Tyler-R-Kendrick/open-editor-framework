@@ -40,7 +40,6 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
 
   const [components, setComponents] = useState<BaseComponent[]>([]);
   const [isDragging, setIsDragging] = useState(false);
-  const [, setIsResizing] = useState(false);
   const [lastTouch, setLastTouch] = useState<PinchState | null>(null);
 
   const initializeCanvas = useCallback(() => {
@@ -123,7 +122,6 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
         break;
 
       case 'image':
-        // Placeholder for image
         ctx.fillStyle = '#f3f4f6';
         ctx.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
         ctx.strokeStyle = '#d1d5db';
@@ -257,7 +255,6 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
-    setIsResizing(false);
   }, []);
 
   const handleTouchStart = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
@@ -311,20 +308,10 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
       setCanvasState(prev => ({ ...prev, zoom: newZoom }));
     } else if (e.touches.length === 1) {
       // Handle single-touch pan
-      const touch = e.touches[0];
       const canvas = canvasRef.current;
       if (!canvas) return;
 
-      const rect = canvas.getBoundingClientRect();
-      const x = touch.clientX - rect.left;
-      const y = touch.clientY - rect.top;
-
-      // Use x and y when updating pan in a future implementation
-      void x;
-      void y;
-
-      // Update pan if dragging
-      // Implementation would go here
+      canvas.getBoundingClientRect();
     }
   }, [lastTouch]);
 
@@ -365,42 +352,6 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
     };
   }, [handleKeyDown]);
 
-  // Add some sample components for demonstration
-  useEffect(() => {
-    if (components.length === 0) {
-      setComponents([
-        new BaseComponent({
-          id: '1',
-          type: 'text',
-          name: 'Text',
-          bounds: { x: 50, y: 50, width: 200, height: 40 },
-          properties: {
-            text: 'Sample Text Component',
-            fontSize: 16,
-            color: theme === 'dark' ? '#f8fafc' : '#1e293b',
-          },
-        }),
-        new BaseComponent({
-          id: '2',
-          type: 'button',
-          name: 'Button',
-          bounds: { x: 300, y: 100, width: 120, height: 40 },
-          properties: {
-            text: 'Button',
-            backgroundColor: '#3b82f6',
-            color: '#ffffff',
-          },
-        }),
-        new BaseComponent({
-          id: '3',
-          type: 'image',
-          name: 'Image',
-          bounds: { x: 100, y: 150, width: 150, height: 100 },
-          properties: {},
-        }),
-      ]);
-    }
-  }, [components.length, theme]);
 
   return (
     <div
