@@ -27,7 +27,7 @@ interface PropertyField {
  * - Touch-friendly controls
  */
 export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, 'aria-label': ariaLabel }) => {
-  const [selectedComponentId, setSelectedComponentId] = useState<string | null>('1');
+  const [selectedComponentId] = useState<string | null>('1');
   const [properties, setProperties] = useState<PropertyField[]>([
     {
       key: 'text',

@@ -2,6 +2,7 @@
 
 [![Build Status](https://github.com/Tyler-R-Kendrick/open-editor-framework/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/Tyler-R-Kendrick/open-editor-framework/actions/workflows/build.yml)
 [![Test Status](https://github.com/Tyler-R-Kendrick/open-editor-framework/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/Tyler-R-Kendrick/open-editor-framework/actions/workflows/test.yml)
+[![Lint Status](https://github.com/Tyler-R-Kendrick/open-editor-framework/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/Tyler-R-Kendrick/open-editor-framework/actions/workflows/lint.yml)
 
 A generic HTML5-based React editor built as a PWA (Progressive Web App) with comprehensive accessibility and mobile touch support. This framework provides a reusable canvas-based editor with component palette and property panel.
 

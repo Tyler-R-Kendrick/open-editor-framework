@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { EditorTheme, Point, CanvasState, EditorComponent } from '../../types/editor-types';
+import { EditorTheme, CanvasState, EditorComponent } from '../../types/editor-types';
 
 interface PinchState {
   startDistance: number;
@@ -39,7 +39,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
 
   const [components, setComponents] = useState<EditorComponent[]>([]);
   const [isDragging, setIsDragging] = useState(false);
-  const [isResizing, setIsResizing] = useState(false);
+  const [, setIsResizing] = useState(false);
   const [lastTouch, setLastTouch] = useState<PinchState | null>(null);
 
   const initializeCanvas = useCallback(() => {
@@ -244,7 +244,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
     }
   }, [canvasState.pan, canvasState.zoom, components]);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleMouseMove = useCallback((_e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDragging) return;
 
     // Handle dragging logic here
@@ -257,7 +257,6 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
   }, []);
 
   const handleTouchStart = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
-    const touch = e.touches[0];
     touchStartTimeRef.current = Date.now();
 
     // Handle multi-touch gestures
@@ -315,6 +314,10 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
       const rect = canvas.getBoundingClientRect();
       const x = touch.clientX - rect.left;
       const y = touch.clientY - rect.top;
+
+      // Use x and y when updating pan in a future implementation
+      void x;
+      void y;
 
       // Update pan if dragging
       // Implementation would go here
