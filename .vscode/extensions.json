@@ -5,9 +5,7 @@
     // Code formatting and linting
     "esbenp.prettier-vscode",
     "dbaeumer.vscode-eslint",
-    // Web Components and Lit development
-    "runem.lit-plugin",
-    "bierner.lit-html",
+    // Web development
     // CSS and Tailwind
     "bradlc.vscode-tailwindcss",
     "vunguyentuan.vscode-css-variables",
