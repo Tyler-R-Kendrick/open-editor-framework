@@ -1,8 +1,7 @@
+@import './tokens.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import './tokens.css';
 
 /* Global base styles for accessibility and mobile support */
 @layer base {
