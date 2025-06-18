@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { GoldenLayout, LayoutConfig, ComponentContainer } from 'golden-layout';
+import { Provider, defaultTheme } from '@adobe/react-spectrum';
 import { EditorTheme } from '../../types/editor-types';
 import { EditorToolbar } from '../toolbar/component';
 import { ComponentPalette } from '../component-palette/component';
@@ -65,13 +66,26 @@ export const EditorApp: React.FC = () => {
       Component: React.FC<P>,
       ariaLabel: string
     ) => {
-      layout.registerComponentFactoryFunction(type, (container: ComponentContainer) => {
-        const root = createRoot(container.element as unknown as HTMLElement);
-        const props = { theme, 'aria-label': ariaLabel } as P;
-        root.render(<Component {...props} />);
-        container.on('destroy', () => root.unmount());
-        return undefined;
-      });
+      layout.registerComponentFactoryFunction(
+        type,
+        (container: ComponentContainer) => {
+          const root = createRoot(
+            container.element as unknown as HTMLElement
+          );
+          const props = { theme, 'aria-label': ariaLabel } as P;
+          root.render(
+            <Provider
+              theme={defaultTheme}
+              colorScheme={theme}
+              locale={navigator.language}
+            >
+              <Component {...props} />
+            </Provider>
+          );
+          container.on('destroy', () => root.unmount());
+          return undefined;
+        }
+      );
     };
 
     register('palette', ComponentPalette, 'Component Library');
@@ -88,22 +102,21 @@ export const EditorApp: React.FC = () => {
   };
 
   return (
-    <div
-      className="editor-container"
-      role="application"
-      aria-label="React Component Editor"
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100vh',
-        background: theme === 'dark' ? '#1e293b' : '#f8fafc',
-        color: theme === 'dark' ? '#f8fafc' : '#1e293b'
-      }}
-    >
-      <div style={{ height: '60px', borderBottom: `1px solid ${theme === 'dark' ? '#374151' : '#e2e8f0'}`, background: theme === 'dark' ? '#374151' : 'white' }}>
-        <EditorToolbar theme={theme} onThemeChange={handleThemeToggle} />
+    <Provider theme={defaultTheme} colorScheme={theme} locale={navigator.language}>
+      <div
+        className="editor-container"
+        role="application"
+        aria-label="React Component Editor"
+        style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}
+      >
+        <div style={{ height: '60px' }}>
+          <EditorToolbar theme={theme} onThemeChange={handleThemeToggle} />
+        </div>
+        <div
+          ref={layoutRef}
+          style={{ flex: 1, position: 'relative', overflow: 'hidden' }}
+        />
       </div>
-      <div ref={layoutRef} style={{ flex: 1, position: 'relative', overflow: 'hidden' }} />
-    </div>
+    </Provider>
   );
 };

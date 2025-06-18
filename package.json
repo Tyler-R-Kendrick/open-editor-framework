@@ -36,12 +36,15 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@adobe/react-spectrum": "^3.42.2",
+    "@spectrum-icons/workflow": "^4.2.22",
     "golden-layout": "^2.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^4.0.0",
+    "@storybook/addon-docs": "^9.0.12",
     "@storybook/react-vite": "^9.0.12",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
@@ -57,6 +60,8 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-storybook": "9.0.12",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^30.0.0",
     "jest-environment-jsdom": "^30.0.0",
     "jsdom": "^23.2.0",
@@ -69,9 +74,7 @@
     "typescript": "^5.3.3",
     "vite": "^6.3.5",
     "vite-plugin-pwa": "^1.0.0",
-    "workbox-window": "^7.0.0",
-    "eslint-plugin-storybook": "9.0.12",
-    "@storybook/addon-docs": "^9.0.12"
+    "workbox-window": "^7.0.0"
   },
   "files": [
     "dist",

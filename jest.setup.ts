@@ -6,7 +6,9 @@ Object.defineProperty(window, 'matchMedia', {
     matches: false,
     media: query,
     addEventListener: () => {},
+    addListener: () => {},
     removeEventListener: () => {},
+    removeListener: () => {},
   }),
 });
 
