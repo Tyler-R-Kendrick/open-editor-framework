@@ -1,4 +1,5 @@
-import { EditorComponent, Point, TouchGesture } from '../types/editor-types';
+import { Point, TouchGesture } from '../types/editor-types';
+import { BaseComponent } from '../types/component-base';
 
 /**
  * Utility functions for touch gesture recognition
@@ -172,30 +173,37 @@ export class ComponentHelper {
     return `component-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  static createComponent(type: string, bounds: { x: number; y: number; width: number; height: number }, properties: Record<string, any> = {}): EditorComponent {
-    return {
+  static createComponent(
+    type: string,
+    bounds: { x: number; y: number; width: number; height: number },
+    properties: Record<string, any> = {}
+  ): BaseComponent {
+    return new BaseComponent({
       id: this.generateId(),
       type,
       name: `${type.charAt(0).toUpperCase() + type.slice(1)} Component`,
       bounds,
       properties,
       children: [],
-      parent: undefined
-    };
+      parent: undefined,
+    });
   }
 
-  static duplicateComponent(component: EditorComponent, offset: Point = { x: 20, y: 20 }): EditorComponent {
-    const duplicate: EditorComponent = {
+  static duplicateComponent(
+    component: BaseComponent,
+    offset: Point = { x: 20, y: 20 }
+  ): BaseComponent {
+    const duplicate = new BaseComponent({
       ...component,
       id: this.generateId(),
       bounds: {
         ...component.bounds,
         x: component.bounds.x + offset.x,
-        y: component.bounds.y + offset.y
+        y: component.bounds.y + offset.y,
       },
       properties: { ...component.properties },
-      children: component.children?.map(child => this.duplicateComponent(child, offset))
-    };
+      children: component.children?.map((child) => this.duplicateComponent(child, offset)),
+    });
 
     return duplicate;
   }
