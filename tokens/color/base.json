@@ -1,0 +1,10 @@
+{
+  "color": {
+    "base": {
+      "primary": { "value": "#3b82f6" },
+      "primary-light": { "value": "#60a5fa" },
+      "background": { "value": "#ffffff" },
+      "text": { "value": "#1e293b" }
+    }
+  }
+}
