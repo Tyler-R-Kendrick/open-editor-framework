@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { EditorToolbar } from './component';
 
 const meta: Meta<typeof EditorToolbar> = {
