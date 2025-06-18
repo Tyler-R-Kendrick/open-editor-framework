@@ -2,10 +2,13 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
+const isCI = process.env.CI === 'true';
+
 export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      disable: isCI,
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
@@ -59,13 +62,7 @@ export default defineConfig({
   ],
   build: {
     target: 'es2022',
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          lit: ['lit']
-        }
-      }
-    }
+    rollupOptions: {}
   },
   server: {
     port: 3000,

@@ -1,5 +1,8 @@
 # Open Editor Framework
 
+[![Build Status](https://github.com/Tyler-R-Kendrick/open-editor-framework/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/Tyler-R-Kendrick/open-editor-framework/actions/workflows/build.yml)
+[![Test Status](https://github.com/Tyler-R-Kendrick/open-editor-framework/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/Tyler-R-Kendrick/open-editor-framework/actions/workflows/test.yml)
+
 A generic HTML5-based React editor built as a PWA (Progressive Web App) with comprehensive accessibility and mobile touch support. This framework provides a reusable canvas-based editor with component palette and property panel.
 
 ## ✨ Features
@@ -35,7 +38,7 @@ A generic HTML5-based React editor built as a PWA (Progressive Web App) with com
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/open-editor-framework.git
+git clone https://github.com/Tyler-R-Kendrick/open-editor-framework.git
 cd open-editor-framework
 
 # Install dependencies
@@ -279,9 +282,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- **Documentation** - [GitHub Wiki](https://github.com/your-username/open-editor-framework/wiki)
-- **Issues** - [GitHub Issues](https://github.com/your-username/open-editor-framework/issues)
-- **Discussions** - [GitHub Discussions](https://github.com/your-username/open-editor-framework/discussions)
+- **Documentation** - [GitHub Wiki](https://github.com/Tyler-R-Kendrick/open-editor-framework/wiki)
+- **Issues** - [GitHub Issues](https://github.com/Tyler-R-Kendrick/open-editor-framework/issues)
+- **Discussions** - [GitHub Discussions](https://github.com/Tyler-R-Kendrick/open-editor-framework/discussions)
 
 ---
 
