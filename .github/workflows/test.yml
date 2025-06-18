@@ -6,6 +6,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      statuses: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -13,3 +16,11 @@ jobs:
           node-version: 18
       - run: npm ci
       - run: npm test --silent
+      - name: action-status
+        if: always()
+        uses: dobladov/github-status-action@2.0.0
+        with:
+          authToken: ${{ secrets.GITHUB_TOKEN }}
+          state: ${{ job.status }}
+          context: Test
+          description: "Test ${{ job.status }}"
