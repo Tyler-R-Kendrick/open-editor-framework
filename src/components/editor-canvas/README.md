@@ -1,6 +1,6 @@
 # Editor Canvas
 
-An HTML5 Canvas-based editor component for rendering and manipulating components.
+An HTML5 Canvas-based editor panel for rendering and manipulating components.
 
 ## Features
 

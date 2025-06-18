@@ -4,7 +4,7 @@
 [![Test Status](https://github.com/Tyler-R-Kendrick/open-editor-framework/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/Tyler-R-Kendrick/open-editor-framework/actions/workflows/test.yml)
 [![Lint Status](https://github.com/Tyler-R-Kendrick/open-editor-framework/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/Tyler-R-Kendrick/open-editor-framework/actions/workflows/lint.yml)
 
-A generic HTML5-based React editor built as a PWA (Progressive Web App) with comprehensive accessibility and mobile touch support. This framework provides a reusable canvas-based editor with component palette and property panel.
+A generic HTML5-based React editor built as a PWA (Progressive Web App) with comprehensive accessibility and mobile touch support. This framework provides a reusable canvas-based editor with component palette panel and property panel.
 
 ## ✨ Features
 
@@ -91,21 +91,21 @@ The editor is designed mobile-first with comprehensive touch gesture support:
 - Scalable fonts and UI elements
 - Clear focus indicators
 
-## 🎨 Component Architecture
+## 🎨 Panel Architecture
 
-### Core Components
+### Core Panels
 
 #### `editor-app`
-Main application component that orchestrates the canvas, palette, and control panel.
+Main application panel that orchestrates the canvas panel, palette panel, and control panel.
 
-#### `editor-canvas` 
-HTML5 canvas-based editor with touch support, zoom/pan, and component rendering.
+#### `editor-canvas`
+HTML5 canvas-based editor panel with touch support, zoom/pan, and component rendering.
 
 #### `component-palette`
-Drag-and-drop component library with search, categorization, and keyboard accessibility.
+Drag-and-drop component library panel with search, categorization, and keyboard accessibility.
 
 #### `control-panel`
-Dynamic property editor with type-specific controls for selected components.
+Dynamic property panel with type-specific controls for selected components.
 
 #### `editor-toolbar`
 Application toolbar with file operations, undo/redo, zoom controls, and theme toggle.

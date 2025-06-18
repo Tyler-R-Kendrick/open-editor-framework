@@ -1,6 +1,6 @@
-# EditorApp Component
+# EditorApp Panel
 
-A React-based main editor application component that orchestrates the canvas, palette, and control panel.
+A React-based main editor application panel that orchestrates the canvas panel, palette panel, and control panel.
 
 ## Features
 

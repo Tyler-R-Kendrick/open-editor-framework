@@ -1,6 +1,6 @@
-# EditorCanvas Component
+# EditorCanvas Panel
 
-A React-based HTML5 Canvas editor component with touch and accessibility support.
+A React-based HTML5 Canvas editor panel with touch and accessibility support.
 
 ## Features
 
