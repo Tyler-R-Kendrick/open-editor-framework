@@ -18,8 +18,8 @@ interface EditorToolbarProps {
  */
 export const EditorToolbar: React.FC<EditorToolbarProps> = ({ theme, onThemeChange }) => {
   const [zoomLevel, setZoomLevel] = useState(100);
-  const [canUndo, setCanUndo] = useState(false);
-  const [canRedo, setCanRedo] = useState(false);
+  const [canUndo] = useState(false);
+  const [canRedo] = useState(false);
 
   const handleUndo = () => {
     // Dispatch undo event or call undo handler
