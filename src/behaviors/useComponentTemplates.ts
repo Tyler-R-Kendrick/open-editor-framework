@@ -17,45 +17,10 @@ interface UseComponentTemplatesResult {
   reload: () => void;
 }
 
-// Default fallback templates in case loading fails
-const defaultTemplates: MarketplaceComponent[] = [
-  new MarketplaceComponent({
-    id: 'text',
-    name: 'Text',
-    icon: '📝',
-    description: 'Text component for labels and content',
-    category: 'Basic',
-    type: 'text',
-    defaultSize: { width: 200, height: 40 },
-    properties: {
-      text: 'Sample Text',
-      fontSize: 16,
-      fontFamily: 'Arial',
-      color: '#000000',
-    },
-  }),
-  new MarketplaceComponent({
-    id: 'button',
-    name: 'Button',
-    icon: '🔘',
-    description: 'Interactive button component',
-    category: 'Basic',
-    type: 'button',
-    defaultSize: { width: 120, height: 40 },
-    properties: {
-      text: 'Button',
-      backgroundColor: '#3b82f6',
-      color: '#ffffff',
-      borderRadius: 6,
-    },
-  }),
-];
-
-const defaultCategories = ['All', 'Basic', 'Layout', 'Form', 'Media'];
 
 /**
  * Custom hook to load component templates from an external JSON file
- * Falls back to default templates if loading fails
+ * Loads component templates from the provided URL
  * 
  * @param templateUrl - URL to the JSON file containing templates (defaults to public assets)
  * @returns Object containing templates, categories, loading state, error state, and reload function
@@ -63,8 +28,8 @@ const defaultCategories = ['All', 'Basic', 'Layout', 'Form', 'Media'];
 export const useComponentTemplates = (
   templateUrl: string = '/assets/component-templates.json'
 ): UseComponentTemplatesResult => {
-  const [templates, setTemplates] = useState<MarketplaceComponent[]>(defaultTemplates);
-  const [categories, setCategories] = useState<string[]>(defaultCategories);
+  const [templates, setTemplates] = useState<MarketplaceComponent[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -103,11 +68,10 @@ export const useComponentTemplates = (
       setTemplates(mapped);
       setCategories(data.categories);
     } catch (err) {
-      console.warn('Failed to load external component templates, using defaults:', err);
+      console.warn('Failed to load external component templates:', err);
       setError(err instanceof Error ? err.message : 'Unknown error occurred');
-      // Keep using default templates on error
-      setTemplates(defaultTemplates);
-      setCategories(defaultCategories);
+      setTemplates([]);
+      setCategories([]);
     } finally {
       setLoading(false);
     }
