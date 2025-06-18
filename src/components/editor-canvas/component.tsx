@@ -1,5 +1,10 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { EditorTheme, Point, CanvasState, EditorComponent, TouchGesture } from '../../types/editor-types';
+import { EditorTheme, Point, CanvasState, EditorComponent } from '../../types/editor-types';
+
+interface PinchState {
+  startDistance: number;
+  startZoom: number;
+}
 
 interface EditorCanvasProps {
   theme: EditorTheme;
@@ -35,7 +40,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
   const [components, setComponents] = useState<EditorComponent[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
-  const [lastTouch, setLastTouch] = useState<TouchGesture | null>(null);
+  const [lastTouch, setLastTouch] = useState<PinchState | null>(null);
 
   const initializeCanvas = useCallback(() => {
     const canvas = canvasRef.current;
@@ -268,10 +273,6 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
       setLastTouch({
         startDistance: distance,
         startZoom: canvasState.zoom,
-        center: {
-          x: (touch1.clientX + touch2.clientX) / 2,
-          y: (touch1.clientY + touch2.clientY) / 2
-        }
       });
     }
 
@@ -287,7 +288,11 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
   const handleTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
 
-    if (e.touches.length === 2 && lastTouch) {
+    if (
+      e.touches.length === 2 &&
+      lastTouch?.startDistance !== undefined &&
+      lastTouch?.startZoom !== undefined
+    ) {
       // Handle pinch-to-zoom
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
@@ -297,8 +302,8 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
         Math.pow(touch2.clientY - touch1.clientY, 2)
       );
 
-      const scale = distance / lastTouch.startDistance;
-      const newZoom = Math.max(0.1, Math.min(5, lastTouch.startZoom * scale));
+      const scale = distance / lastTouch.startDistance!;
+      const newZoom = Math.max(0.1, Math.min(5, lastTouch.startZoom! * scale));
 
       setCanvasState(prev => ({ ...prev, zoom: newZoom }));
     } else if (e.touches.length === 1) {
@@ -360,6 +365,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
         {
           id: '1',
           type: 'text',
+          name: 'Text',
           bounds: { x: 50, y: 50, width: 200, height: 40 },
           properties: {
             text: 'Sample Text Component',
@@ -370,6 +376,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
         {
           id: '2',
           type: 'button',
+          name: 'Button',
           bounds: { x: 300, y: 100, width: 120, height: 40 },
           properties: {
             text: 'Button',
@@ -380,6 +387,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
         {
           id: '3',
           type: 'image',
+          name: 'Image',
           bounds: { x: 100, y: 150, width: 150, height: 100 },
           properties: {}
         }
