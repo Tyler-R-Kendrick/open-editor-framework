@@ -1,10 +1,12 @@
 # Control Panel Component
 
-A sophisticated control panel component for editing component properties in the Open Editor Framework. Provides an intuitive interface for modifying component attributes with support for various input types and accessibility features.
+A sophisticated control panel component for editing component properties in the Open Editor Framework. Provides an intuitive interface for modifying component attributes with support for various input types, configurable field renderers, and accessibility features.
 
 ## Features
 
 - **Property Editing**: Edit component properties with type-appropriate controls
+- **Configurable Renderers**: Use custom field renderers for different property types
+- **Flexible Sections**: Configure property grouping and sections
 - **Accessibility**: Full WAI-ARIA support with keyboard navigation
 - **Touch Support**: Optimized for mobile and tablet interactions
 - **Dark Theme**: Support for dark and light themes
@@ -13,14 +15,68 @@ A sophisticated control panel component for editing component properties in the 
 
 ## Usage
 
-```typescript
-import './components/control-panel';
+### Basic Usage
 
-// Use in your HTML
-<control-panel
-  .selectedComponents=${selectedComponents}
-  .theme=${theme}>
-</control-panel>
+```tsx
+import { ControlPanel } from './components/control-panel';
+
+function MyEditor() {
+  return (
+    <ControlPanel
+      theme="light"
+      aria-label="Properties Panel"
+    />
+  );
+}
+```
+
+### With Custom Configuration
+
+```tsx
+import { 
+  ControlPanel, 
+  TextFieldRenderer, 
+  defaultFieldRenderers,
+  type ControlPanelConfig 
+} from './components/control-panel';
+
+// Custom field renderer
+const CustomTextRenderer: FieldRenderer = ({ property, theme, onChange }) => (
+  <input
+    type="text"
+    value={String(property.value ?? '')}
+    onChange={(e) => onChange(property.key, e.target.value)}
+    placeholder="Enter text..."
+    style={{ /* custom styles */ }}
+  />
+);
+
+const config: ControlPanelConfig = {
+  fieldRenderers: {
+    ...defaultFieldRenderers,
+    text: CustomTextRenderer, // Override text field renderer
+  },
+  sections: [
+    {
+      title: 'Basic Properties',
+      fields: ['text', 'color']
+    },
+    {
+      title: 'Advanced',
+      fields: ['fontSize', 'opacity']
+    }
+  ]
+};
+
+function MyEditor() {
+  return (
+    <ControlPanel
+      theme="dark"
+      config={config}
+      aria-label="Custom Properties Panel"
+    />
+  );
+}
 ```
 
 ## Properties
@@ -28,20 +84,81 @@ import './components/control-panel';
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `theme` | `EditorTheme` | `'light'` | Visual theme (light/dark) |
-| `selectedComponents` | `EditorComponent[]` | `[]` | Array of selected components |
+| `aria-label` | `string` | `'Properties Panel'` | Accessibility label |
+| `config` | `ControlPanelConfig` | `{}` | Configuration for renderers and sections |
 
-## Events
+## Configuration
 
-### Dispatched Events
+### ControlPanelConfig
 
-- `property-change`: Fired when a component property is modified
-- `component-duplicate`: Fired when the duplicate button is clicked
-- `component-delete`: Fired when the delete button is clicked
-- `component-bring-to-front`: Fired when the bring-to-front button is clicked
+```tsx
+interface ControlPanelConfig {
+  fieldRenderers?: FieldRendererMap;
+  sections?: PropertySection[];
+}
+```
 
-### Listened Events
+### Field Renderers
 
-- `selection-change`: Updates the editing component when selection changes
+The field renderer map is completely flexible and accepts any field type as a string key:
+
+```tsx
+interface FieldRendererMap {
+  [fieldType: string]: FieldRenderer;
+}
+```
+
+This means you can:
+- Override built-in field types (`text`, `number`, `color`, `select`, `checkbox`, `range`)
+- Add completely custom field types (`date-picker`, `file-upload`, `rich-text`, etc.)
+- Mix and match as needed for your use case
+
+### Built-in Field Types
+
+For convenience and type safety, built-in field types are also available:
+
+```tsx
+type BuiltInFieldType = 'text' | 'number' | 'color' | 'select' | 'checkbox' | 'range';
+
+interface BuiltInFieldRendererMap {
+  text?: FieldRenderer;
+  number?: FieldRenderer;
+  color?: FieldRenderer;
+  select?: FieldRenderer;
+  checkbox?: FieldRenderer;
+  range?: FieldRenderer;
+}
+```
+
+### Custom Field Renderer
+
+```tsx
+const MyCustomRenderer: FieldRenderer = ({ property, theme, onChange }) => {
+  return (
+    <div>
+      {/* Your custom field implementation */}
+    </div>
+  );
+};
+```
+
+### Property Sections
+
+Configure how properties are grouped:
+
+```tsx
+interface PropertySection {
+  title: string;
+  fields: string[]; // Property keys to include in this section
+}
+```
+
+## Default Configuration
+
+The component comes with sensible defaults:
+
+- **Default Renderers**: Standard HTML input controls for all supported types
+- **Default Sections**: Content, Appearance, and Visibility groupings
 
 ## Property Types Supported
 
@@ -104,4 +221,65 @@ npm run test
 
 # Run Storybook
 npm run storybook
+```
+
+### Adding Custom Field Types
+
+The field renderer map is completely flexible and supports any field type:
+
+```tsx
+import { FieldRenderer, ControlPanel } from './components/control-panel';
+
+// Create a custom renderer for a new field type
+const DatePickerRenderer: FieldRenderer = ({ property, theme, onChange }) => (
+  <input
+    type="date"
+    value={String(property.value ?? '')}
+    onChange={(e) => onChange(property.key, e.target.value)}
+    style={{
+      width: '100%',
+      padding: '8px 12px',
+      border: `1px solid ${theme === 'dark' ? '#6b7280' : '#d1d5db'}`,
+      borderRadius: '6px',
+      background: theme === 'dark' ? '#4b5563' : '#ffffff',
+      color: theme === 'dark' ? '#f8fafc' : '#1e293b',
+    }}
+  />
+);
+
+const MySliderRenderer: FieldRenderer = ({ property, theme, onChange }) => (
+  <div>
+    <input
+      type="range"
+      min={property.min || 0}
+      max={property.max || 100}
+      value={Number(property.value ?? 0)}
+      onChange={(e) => onChange(property.key, parseInt(e.target.value))}
+      style={{ width: '100%', accentColor: '#3b82f6' }}
+    />
+    <div style={{ textAlign: 'center', marginTop: '4px' }}>
+      {property.value}
+    </div>
+  </div>
+);
+
+function EditorWithCustomTypes() {
+  const config = {
+    fieldRenderers: {
+      // Add custom field types
+      'date-picker': DatePickerRenderer,
+      'my-slider': MySliderRenderer,
+      // You can also override built-in types
+      'range': MySliderRenderer,
+    },
+    sections: [
+      {
+        title: 'Custom Fields',
+        fields: ['date-picker', 'my-slider']
+      }
+    ]
+  };
+
+  return <ControlPanel theme="light" config={config} />;
+}
 ```

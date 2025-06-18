@@ -1,21 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { EditorTheme } from '../../types/editor-types';
 import { ComponentPropertyValue } from '../../types/component-base';
+import { PropertyField, ControlPanelConfig, FieldRendererMap, PropertySection } from './types';
+import { defaultFieldRenderers } from './field-renderers';
+import { defaultSections } from './config';
 
 interface ControlPanelProps {
   theme: EditorTheme;
   'aria-label'?: string;
-}
-
-interface PropertyField {
-  key: string;
-  label: string;
-  type: 'text' | 'number' | 'color' | 'select' | 'checkbox' | 'range';
-  value: ComponentPropertyValue;
-  options?: string[];
-  min?: number;
-  max?: number;
-  step?: number;
+  config?: ControlPanelConfig;
 }
 
 /**
@@ -26,10 +19,28 @@ interface PropertyField {
  * - Grouped property categories
  * - Keyboard navigation support
  * - Touch-friendly controls
+ * - Configurable field renderers and sections
  */
-export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, 'aria-label': ariaLabel }) => {
+export const ControlPanel: React.FC<ControlPanelProps> = ({
+  theme,
+  'aria-label': ariaLabel,
+  config = {}
+}) => {
   const [selectedComponentId] = useState<string | null>(null);
   const [properties, setProperties] = useState<PropertyField[]>([]);
+
+  // Merge provided config with defaults
+  const fieldRenderers: FieldRendererMap = useMemo(() => {
+    return {
+      ...(defaultFieldRenderers as FieldRendererMap),
+      ...(config.fieldRenderers || {})
+    };
+  }, [config.fieldRenderers]);
+
+  const sections: PropertySection[] = useMemo(() =>
+    config.sections || defaultSections,
+    [config.sections]
+  );
 
   const handlePropertyChange = (key: string, value: ComponentPropertyValue) => {
     setProperties(prev => prev.map(prop =>
@@ -39,143 +50,20 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, 'aria-label':
   };
 
   const renderPropertyField = (property: PropertyField) => {
-    const baseInputStyle = {
-      width: '100%',
-      padding: '8px 12px',
-      border: `1px solid ${theme === 'dark' ? '#6b7280' : '#d1d5db'}`,
-      borderRadius: '6px',
-      background: theme === 'dark' ? '#4b5563' : '#ffffff',
-      color: theme === 'dark' ? '#f8fafc' : '#1e293b',
-      fontSize: '14px',
-      outline: 'none',
-      transition: 'border-color 0.2s ease'
-    };
+    const FieldRenderer = fieldRenderers[property.type];
 
-    switch (property.type) {
-      case 'text':
-        return (
-          <input
-            type="text"
-            value={String(property.value ?? '')}
-            onChange={(e) => handlePropertyChange(property.key, e.target.value)}
-            style={baseInputStyle}
-            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-            onBlur={(e) => e.target.style.borderColor = theme === 'dark' ? '#6b7280' : '#d1d5db'}
-          />
-        );
-
-      case 'number':
-        return (
-          <input
-            type="number"
-            value={Number(property.value ?? 0)}
-            onChange={(e) => handlePropertyChange(property.key, parseInt(e.target.value))}
-            style={baseInputStyle}
-            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-            onBlur={(e) => e.target.style.borderColor = theme === 'dark' ? '#6b7280' : '#d1d5db'}
-          />
-        );
-
-      case 'color':
-        return (
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <input
-              type="color"
-              value={String(property.value ?? '#000000')}
-              onChange={(e) => handlePropertyChange(property.key, e.target.value)}
-              style={{
-                width: '40px',
-                height: '40px',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer'
-              }}
-            />
-            <input
-              type="text"
-              value={String(property.value ?? '#000000')}
-              onChange={(e) => handlePropertyChange(property.key, e.target.value)}
-              style={{ ...baseInputStyle, flex: 1 }}
-              onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-              onBlur={(e) => e.target.style.borderColor = theme === 'dark' ? '#6b7280' : '#d1d5db'}
-            />
-          </div>
-        );
-
-      case 'select':
-        return (
-          <select
-            value={String(property.value ?? '')}
-            onChange={(e) => handlePropertyChange(property.key, e.target.value)}
-            style={baseInputStyle}
-            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-            onBlur={(e) => e.target.style.borderColor = theme === 'dark' ? '#6b7280' : '#d1d5db'}
-          >
-            {property.options?.map(option => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        );
-
-      case 'checkbox':
-        return (
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-            <input
-              type="checkbox"
-              checked={Boolean(property.value)}
-              onChange={(e) => handlePropertyChange(property.key, e.target.checked)}
-              style={{
-                width: '16px',
-                height: '16px',
-                accentColor: '#3b82f6'
-              }}
-            />
-            <span style={{ fontSize: '14px', color: theme === 'dark' ? '#d1d5db' : '#374151' }}>
-              {property.value ? 'Enabled' : 'Disabled'}
-            </span>
-          </label>
-        );
-
-      case 'range':
-        return (
-          <div>
-            <input
-              type="range"
-              min={property.min}
-              max={property.max}
-              step={property.step}
-              value={Number(property.value ?? 0)}
-              onChange={(e) => handlePropertyChange(property.key, parseInt(e.target.value))}
-              style={{
-                width: '100%',
-                height: '6px',
-                borderRadius: '3px',
-                background: theme === 'dark' ? '#4b5563' : '#e5e7eb',
-                outline: 'none',
-                accentColor: '#3b82f6'
-              }}
-            />
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginTop: '4px',
-              fontSize: '12px',
-              color: theme === 'dark' ? '#9ca3af' : '#6b7280'
-            }}>
-              <span>{property.min}</span>
-              <span style={{ fontWeight: '500', color: theme === 'dark' ? '#f8fafc' : '#1e293b' }}>
-                {Number(property.value ?? 0)}
-              </span>
-              <span>{property.max}</span>
-            </div>
-          </div>
-        );
-
-      default:
-        return null;
+    if (!FieldRenderer) {
+      console.warn(`No renderer found for field type: ${property.type}`);
+      return null;
     }
+
+    return (
+      <FieldRenderer
+        property={property}
+        theme={theme}
+        onChange={handlePropertyChange}
+      />
+    );
   };
 
   return (
@@ -239,107 +127,48 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, 'aria-label':
           }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            {/* Content Section */}
-            <section>
-              <h3
-                style={{
-                  margin: '0 0 12px 0',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: theme === 'dark' ? '#d1d5db' : '#374151',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px'
-                }}
-              >
-                Content
-              </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {properties.filter(p => ['text', 'fontSize', 'fontFamily', 'color'].includes(p.key)).map(property => (
-                  <div key={property.key}>
-                    <label
-                      style={{
-                        display: 'block',
-                        marginBottom: '6px',
-                        fontSize: '14px',
-                        fontWeight: '500',
-                        color: theme === 'dark' ? '#f8fafc' : '#1e293b'
-                      }}
-                    >
-                      {property.label}
-                    </label>
-                    {renderPropertyField(property)}
-                  </div>
-                ))}
-              </div>
-            </section>
+            {sections.map(section => {
+              const sectionFields = properties.filter(p => section.fields.includes(p.key));
 
-            {/* Appearance Section */}
-            <section>
-              <h3
-                style={{
-                  margin: '0 0 12px 0',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: theme === 'dark' ? '#d1d5db' : '#374151',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px'
-                }}
-              >
-                Appearance
-              </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {properties.filter(p => ['backgroundColor', 'borderRadius', 'opacity'].includes(p.key)).map(property => (
-                  <div key={property.key}>
-                    <label
-                      style={{
-                        display: 'block',
-                        marginBottom: '6px',
-                        fontSize: '14px',
-                        fontWeight: '500',
-                        color: theme === 'dark' ? '#f8fafc' : '#1e293b'
-                      }}
-                    >
-                      {property.label}
-                    </label>
-                    {renderPropertyField(property)}
-                  </div>
-                ))}
-              </div>
-            </section>
+              if (sectionFields.length === 0) {
+                return null;
+              }
 
-            {/* Visibility Section */}
-            <section>
-              <h3
-                style={{
-                  margin: '0 0 12px 0',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: theme === 'dark' ? '#d1d5db' : '#374151',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px'
-                }}
-              >
-                Visibility
-              </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {properties.filter(p => ['visible'].includes(p.key)).map(property => (
-                  <div key={property.key}>
-                    <label
-                      style={{
-                        display: 'block',
-                        marginBottom: '6px',
-                        fontSize: '14px',
-                        fontWeight: '500',
-                        color: theme === 'dark' ? '#f8fafc' : '#1e293b'
-                      }}
-                    >
-                      {property.label}
-                    </label>
-                    {renderPropertyField(property)}
+              return (
+                <section key={section.title}>
+                  <h3
+                    style={{
+                      margin: '0 0 12px 0',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      color: theme === 'dark' ? '#d1d5db' : '#374151',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px'
+                    }}
+                  >
+                    {section.title}
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {sectionFields.map(property => (
+                      <div key={property.key}>
+                        <label
+                          style={{
+                            display: 'block',
+                            marginBottom: '6px',
+                            fontSize: '14px',
+                            fontWeight: '500',
+                            color: theme === 'dark' ? '#f8fafc' : '#1e293b'
+                          }}
+                        >
+                          {property.label}
+                        </label>
+                        {renderPropertyField(property)}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </section>
+                </section>
+              );
+            })}
           </div>
         </div>
       ) : (
