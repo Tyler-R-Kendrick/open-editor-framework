@@ -1,4 +1,4 @@
-import type { BaseComponent } from "./component-base";
+import type { BaseComponent, ComponentProperties, ComponentPropertyValue } from "./component-base";
 export type EditorTheme = 'light' | 'dark';
 
 export interface Point {
@@ -18,7 +18,7 @@ export interface EditorComponent {
   type: string;
   name: string;
   bounds: Bounds;
-  properties: Record<string, any>;
+  properties: ComponentProperties;
   zIndex?: number;
   children?: EditorComponent[];
   parent?: string;
@@ -30,7 +30,7 @@ export interface ComponentDefinition {
   icon: string;
   category: string;
   description: string;
-  defaultProperties: Record<string, any>;
+  defaultProperties: ComponentProperties;
   propertySchema: PropertySchema[];
 }
 
@@ -39,7 +39,7 @@ export interface PropertySchema {
   type: 'string' | 'number' | 'boolean' | 'color' | 'select' | 'range';
   label: string;
   description?: string;
-  default: any;
+  default: ComponentPropertyValue;
   options?: string[]; // For select type
   min?: number; // For number/range type
   max?: number; // For number/range type

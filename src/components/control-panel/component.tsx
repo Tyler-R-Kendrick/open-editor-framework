@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { EditorTheme } from '../../types/editor-types';
+import { ComponentPropertyValue } from '../../types/component-base';
 
 interface ControlPanelProps {
   theme: EditorTheme;
@@ -10,7 +11,7 @@ interface PropertyField {
   key: string;
   label: string;
   type: 'text' | 'number' | 'color' | 'select' | 'checkbox' | 'range';
-  value: any;
+  value: ComponentPropertyValue;
   options?: string[];
   min?: number;
   max?: number;
@@ -30,7 +31,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, 'aria-label':
   const [selectedComponentId] = useState<string | null>(null);
   const [properties, setProperties] = useState<PropertyField[]>([]);
 
-  const handlePropertyChange = (key: string, value: any) => {
+  const handlePropertyChange = (key: string, value: ComponentPropertyValue) => {
     setProperties(prev => prev.map(prop =>
       prop.key === key ? { ...prop, value } : prop
     ));
@@ -55,7 +56,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, 'aria-label':
         return (
           <input
             type="text"
-            value={property.value}
+            value={String(property.value ?? '')}
             onChange={(e) => handlePropertyChange(property.key, e.target.value)}
             style={baseInputStyle}
             onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
@@ -67,7 +68,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, 'aria-label':
         return (
           <input
             type="number"
-            value={property.value}
+            value={Number(property.value ?? 0)}
             onChange={(e) => handlePropertyChange(property.key, parseInt(e.target.value))}
             style={baseInputStyle}
             onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
@@ -80,7 +81,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, 'aria-label':
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <input
               type="color"
-              value={property.value}
+              value={String(property.value ?? '#000000')}
               onChange={(e) => handlePropertyChange(property.key, e.target.value)}
               style={{
                 width: '40px',
@@ -92,7 +93,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, 'aria-label':
             />
             <input
               type="text"
-              value={property.value}
+              value={String(property.value ?? '#000000')}
               onChange={(e) => handlePropertyChange(property.key, e.target.value)}
               style={{ ...baseInputStyle, flex: 1 }}
               onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
@@ -104,7 +105,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, 'aria-label':
       case 'select':
         return (
           <select
-            value={property.value}
+            value={String(property.value ?? '')}
             onChange={(e) => handlePropertyChange(property.key, e.target.value)}
             style={baseInputStyle}
             onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
@@ -123,7 +124,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, 'aria-label':
           <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
             <input
               type="checkbox"
-              checked={property.value}
+              checked={Boolean(property.value)}
               onChange={(e) => handlePropertyChange(property.key, e.target.checked)}
               style={{
                 width: '16px',
@@ -145,7 +146,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, 'aria-label':
               min={property.min}
               max={property.max}
               step={property.step}
-              value={property.value}
+              value={Number(property.value ?? 0)}
               onChange={(e) => handlePropertyChange(property.key, parseInt(e.target.value))}
               style={{
                 width: '100%',
@@ -165,7 +166,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, 'aria-label':
             }}>
               <span>{property.min}</span>
               <span style={{ fontWeight: '500', color: theme === 'dark' ? '#f8fafc' : '#1e293b' }}>
-                {property.value}
+                {Number(property.value ?? 0)}
               </span>
               <span>{property.max}</span>
             </div>

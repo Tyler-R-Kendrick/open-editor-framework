@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   MarketplaceComponent,
   MarketplaceComponentOptions,
@@ -33,7 +33,7 @@ export const useComponentTemplates = (
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadTemplates = async () => {
+  const loadTemplates = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -75,11 +75,11 @@ export const useComponentTemplates = (
     } finally {
       setLoading(false);
     }
-  };
+  }, [templateUrl]);
 
   useEffect(() => {
     loadTemplates();
-  }, [templateUrl]);
+  });
 
   const reload = () => {
     loadTemplates();
