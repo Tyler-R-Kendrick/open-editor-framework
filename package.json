@@ -39,8 +39,10 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@reduxjs/toolkit": "^2.8.2",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-redux": "^9.2.0"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.6",

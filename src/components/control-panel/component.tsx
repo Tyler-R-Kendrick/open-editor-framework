@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { EditorTheme } from '../../types/editor-types';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
 
 interface ControlPanelProps {
   theme: EditorTheme;
@@ -27,7 +29,7 @@ interface PropertyField {
  * - Touch-friendly controls
  */
 export const ControlPanel: React.FC<ControlPanelProps> = ({ theme, 'aria-label': ariaLabel }) => {
-  const [selectedComponentId, setSelectedComponentId] = useState<string | null>('1');
+  const selectedComponentId = useSelector((state: RootState) => state.canvas.canvasState.selectedComponents[0] || null);
   const [properties, setProperties] = useState<PropertyField[]>([
     {
       key: 'text',

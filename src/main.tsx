@@ -1,7 +1,9 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+import { Provider } from 'react-redux';
 import './styles/global.css';
 import { EditorApp } from './components/editor-app/component';
+import { store } from './store/store';
 
 // Register service worker for PWA functionality
 if ('serviceWorker' in navigator) {
@@ -23,6 +25,8 @@ if (!container) {
 const root = createRoot(container);
 root.render(
   <React.StrictMode>
-    <EditorApp />
+    <Provider store={store}>
+      <EditorApp />
+    </Provider>
   </React.StrictMode>
 );

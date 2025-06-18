@@ -1,5 +1,8 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { EditorTheme, Point, CanvasState, EditorComponent, TouchGesture } from '../../types/editor-types';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '../../store/store';
+import { setCanvasState, addComponent, setComponents, updateComponent, deleteComponent, undo, redo } from '../../store/canvasSlice';
 
 interface EditorCanvasProps {
   theme: EditorTheme;
@@ -23,16 +26,10 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
   const touchStartTimeRef = useRef(0);
   const longPressTimerRef = useRef<number | null>(null);
 
-  const [canvasState, setCanvasState] = useState<CanvasState>({
-    zoom: 1,
-    pan: { x: 0, y: 0 },
-    selectedComponents: [],
-    clipboard: [],
-    history: [],
-    historyIndex: -1
-  });
+  const dispatch = useDispatch<AppDispatch>();
+  const canvasState = useSelector((state: RootState) => state.canvas.canvasState);
+  const components = useSelector((state: RootState) => state.canvas.components);
 
-  const [components, setComponents] = useState<EditorComponent[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [lastTouch, setLastTouch] = useState<TouchGesture | null>(null);
@@ -195,20 +192,32 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
     switch (e.key) {
       case 'Delete':
       case 'Backspace':
-        setComponents(prev => prev.filter(c => !canvasState.selectedComponents.includes(c.id)));
-        setCanvasState(prev => ({ ...prev, selectedComponents: [] }));
+        canvasState.selectedComponents.forEach(id => dispatch(deleteComponent(id)));
+        dispatch(setCanvasState({ selectedComponents: [] }));
         break;
       case 'Escape':
-        setCanvasState(prev => ({ ...prev, selectedComponents: [] }));
+        dispatch(setCanvasState({ selectedComponents: [] }));
         break;
       case 'a':
         if (e.ctrlKey || e.metaKey) {
           e.preventDefault();
-          setCanvasState(prev => ({ ...prev, selectedComponents: components.map(c => c.id) }));
+          dispatch(setCanvasState({ selectedComponents: components.map(c => c.id) }));
+        }
+        break;
+      case 'z':
+        if (e.ctrlKey || e.metaKey) {
+          e.preventDefault();
+          dispatch(undo());
+        }
+        break;
+      case 'y':
+        if (e.ctrlKey || e.metaKey) {
+          e.preventDefault();
+          dispatch(redo());
         }
         break;
     }
-  }, [canvasState.selectedComponents, components]);
+  }, [canvasState.selectedComponents, components, dispatch]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -227,17 +236,16 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
     );
 
     if (clickedComponent) {
-      setCanvasState(prev => ({
-        ...prev,
+      dispatch(setCanvasState({
         selectedComponents: e.shiftKey
-          ? [...prev.selectedComponents, clickedComponent.id]
+          ? [...canvasState.selectedComponents, clickedComponent.id]
           : [clickedComponent.id]
       }));
       setIsDragging(true);
     } else {
-      setCanvasState(prev => ({ ...prev, selectedComponents: [] }));
+      dispatch(setCanvasState({ selectedComponents: [] }));
     }
-  }, [canvasState.pan, canvasState.zoom, components]);
+  }, [canvasState.pan, canvasState.zoom, components, canvasState.selectedComponents, dispatch]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDragging) return;
@@ -300,7 +308,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
       const scale = distance / lastTouch.startDistance;
       const newZoom = Math.max(0.1, Math.min(5, lastTouch.startZoom * scale));
 
-      setCanvasState(prev => ({ ...prev, zoom: newZoom }));
+      dispatch(setCanvasState({ zoom: newZoom }));
     } else if (e.touches.length === 1) {
       // Handle single-touch pan
       const touch = e.touches[0];
@@ -356,7 +364,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
   // Add some sample components for demonstration
   useEffect(() => {
     if (components.length === 0) {
-      setComponents([
+      dispatch(setComponents([
         {
           id: '1',
           type: 'text',
@@ -383,9 +391,9 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
           bounds: { x: 100, y: 150, width: 150, height: 100 },
           properties: {}
         }
-      ]);
+      ]));
     }
-  }, [components.length, theme]);
+  }, [components.length, theme, dispatch]);
 
   return (
     <div
@@ -434,7 +442,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
         }}
       >
         <button
-          onClick={() => setCanvasState(prev => ({ ...prev, zoom: Math.max(0.1, prev.zoom - 0.1) }))}
+          onClick={() => dispatch(setCanvasState({ zoom: Math.max(0.1, canvasState.zoom - 0.1) }))}
           style={{
             padding: '8px 12px',
             border: 'none',
@@ -457,7 +465,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
           {Math.round(canvasState.zoom * 100)}%
         </span>
         <button
-          onClick={() => setCanvasState(prev => ({ ...prev, zoom: Math.min(5, prev.zoom + 0.1) }))}
+          onClick={() => dispatch(setCanvasState({ zoom: Math.min(5, canvasState.zoom + 0.1) }))}
           style={{
             padding: '8px 12px',
             border: 'none',
@@ -471,7 +479,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
           +
         </button>
         <button
-          onClick={() => setCanvasState(prev => ({ ...prev, zoom: 1, pan: { x: 0, y: 0 } }))}
+          onClick={() => dispatch(setCanvasState({ zoom: 1, pan: { x: 0, y: 0 } }))}
           style={{
             padding: '8px 12px',
             border: 'none',

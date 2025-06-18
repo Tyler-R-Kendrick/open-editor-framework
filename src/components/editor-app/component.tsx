@@ -1,5 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { EditorTheme } from '../../types/editor-types';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '../../store/store';
+import { setTheme, setIsMobile, setActiveMobileTab } from '../../store/editorSlice';
 import { EditorToolbar } from '../toolbar/component';
 import { ComponentPalette } from '../component-palette/component';
 import { EditorCanvas } from '../editor-canvas/component';
@@ -10,17 +13,18 @@ import { ControlPanel } from '../control-panel/component';
  * Supports touch interactions and accessibility features
  */
 export const EditorApp: React.FC = () => {
-  const [theme, setTheme] = useState<EditorTheme>('light');
-  const [isMobile, setIsMobile] = useState(false);
-  const [activeMobileTab, setActiveMobileTab] = useState<'palette' | 'canvas' | 'controls'>('canvas');
+  const dispatch = useDispatch<AppDispatch>();
+  const theme = useSelector((state: RootState) => state.editor.theme);
+  const isMobile = useSelector((state: RootState) => state.editor.isMobile);
+  const activeMobileTab = useSelector((state: RootState) => state.editor.activeMobileTab);
 
   const checkMobileLayout = useCallback(() => {
-    setIsMobile(window.innerWidth <= 768);
-  }, []);
+    dispatch(setIsMobile(window.innerWidth <= 768));
+  }, [dispatch]);
 
   const handleThemeChange = useCallback((e: MediaQueryListEvent | MediaQueryList) => {
-    setTheme(e.matches ? 'dark' : 'light');
-  }, []);
+    dispatch(setTheme(e.matches ? 'dark' : 'light'));
+  }, [dispatch]);
 
   const handleResize = useCallback(() => {
     checkMobileLayout();
@@ -42,7 +46,7 @@ export const EditorApp: React.FC = () => {
   }, [handleResize, handleThemeChange]);
 
   const handleMobileTabClick = (tab: 'palette' | 'canvas' | 'controls') => {
-    setActiveMobileTab(tab);
+    dispatch(setActiveMobileTab(tab));
 
     // Provide haptic feedback on supported devices
     if ('vibrate' in navigator) {
@@ -60,7 +64,7 @@ export const EditorApp: React.FC = () => {
   };
 
   const handleThemeToggle = (newTheme: EditorTheme) => {
-    setTheme(newTheme);
+    dispatch(setTheme(newTheme));
   };
 
   return (
