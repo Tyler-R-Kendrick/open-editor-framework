@@ -20,7 +20,7 @@
     "storybook": "STORYBOOK_DISABLE_TELEMETRY=1 storybook dev -p 6006 --host 0.0.0.0 --no-open --ci",
     "storybook:safe": "STORYBOOK_DISABLE_TELEMETRY=1 NODE_ENV=production storybook dev -p 6006 --host 0.0.0.0 --no-open --ci --quiet",
     "storybook:debug": "STORYBOOK_DISABLE_TELEMETRY=1 DEBUG=1 storybook dev -p 6006 --host 0.0.0.0 --no-open --loglevel verbose",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build --output-dir dist/storybook"
   },
   "keywords": [
     "react",
