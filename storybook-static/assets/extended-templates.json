@@ -1,0 +1,111 @@
+{
+  "templates": [
+    {
+      "id": "heading",
+      "name": "Heading",
+      "icon": "📰",
+      "description": "Large heading text component",
+      "category": "Typography",
+      "template": {
+        "type": "heading",
+        "defaultSize": {
+          "width": 300,
+          "height": 60
+        },
+        "properties": {
+          "text": "Heading Text",
+          "fontSize": 32,
+          "fontWeight": "bold",
+          "color": "#1e293b"
+        }
+      }
+    },
+    {
+      "id": "card",
+      "name": "Card",
+      "icon": "🎴",
+      "description": "Card container with shadow",
+      "category": "Layout",
+      "template": {
+        "type": "card",
+        "defaultSize": {
+          "width": 280,
+          "height": 200
+        },
+        "properties": {
+          "backgroundColor": "#ffffff",
+          "borderRadius": 12,
+          "padding": 16,
+          "shadow": "0 4px 6px rgba(0,0,0,0.1)"
+        }
+      }
+    },
+    {
+      "id": "chart",
+      "name": "Chart",
+      "icon": "📊",
+      "description": "Data visualization chart",
+      "category": "Data",
+      "template": {
+        "type": "chart",
+        "defaultSize": {
+          "width": 400,
+          "height": 300
+        },
+        "properties": {
+          "chartType": "bar",
+          "data": [],
+          "title": "Chart Title"
+        }
+      }
+    },
+    {
+      "id": "toggle",
+      "name": "Toggle",
+      "icon": "🔘",
+      "description": "Toggle switch component",
+      "category": "Form",
+      "template": {
+        "type": "toggle",
+        "defaultSize": {
+          "width": 60,
+          "height": 30
+        },
+        "properties": {
+          "checked": false,
+          "disabled": false,
+          "color": "#3b82f6"
+        }
+      }
+    },
+    {
+      "id": "video",
+      "name": "Video",
+      "icon": "🎥",
+      "description": "Video player component",
+      "category": "Media",
+      "template": {
+        "type": "video",
+        "defaultSize": {
+          "width": 400,
+          "height": 225
+        },
+        "properties": {
+          "src": "",
+          "controls": true,
+          "autoplay": false,
+          "poster": ""
+        }
+      }
+    }
+  ],
+  "categories": [
+    "All",
+    "Typography",
+    "Basic",
+    "Layout",
+    "Form",
+    "Media",
+    "Data"
+  ]
+}
