@@ -10,6 +10,7 @@ export type {
   ControlPanelConfig
 } from './types';
 export {
+  getBaseInputStyle,
   TextFieldRenderer,
   NumberFieldRenderer,
   ColorFieldRenderer,
