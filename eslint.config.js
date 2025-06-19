@@ -152,6 +152,6 @@ export default [
 
   // Ignore patterns
   {
-    ignores: ['dist/', 'node_modules/', 'coverage/', 'storybook-static/']
+    ignores: ['dist/', 'node_modules/', 'coverage/']
   }
 ];
