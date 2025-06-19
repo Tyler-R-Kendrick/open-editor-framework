@@ -1,5 +1,8 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { EditorTheme, CanvasState } from '../../types/editor-types';
+import ZoomOut from '@spectrum-icons/workflow/ZoomOut';
+import ZoomIn from '@spectrum-icons/workflow/ZoomIn';
+import Refresh from '@spectrum-icons/workflow/Refresh';
 import { BaseComponent } from '../../types/component-base';
 
 interface PinchState {
@@ -410,7 +413,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
           }}
           aria-label="Zoom out"
         >
-          −
+          <ZoomOut aria-hidden="true" size="S" />
         </button>
         <span
           style={{
@@ -433,7 +436,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
           }}
           aria-label="Zoom in"
         >
-          +
+          <ZoomIn aria-hidden="true" size="S" />
         </button>
         <button
           onClick={() => setCanvasState(prev => ({ ...prev, zoom: 1, pan: { x: 0, y: 0 } }))}
@@ -447,7 +450,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
           }}
           aria-label="Reset zoom and pan"
         >
-          Reset
+          <Refresh aria-hidden="true" size="S" />
         </button>
       </div>
     </div>
