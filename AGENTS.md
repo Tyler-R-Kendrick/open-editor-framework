@@ -15,6 +15,7 @@ These instructions outline patterns and practices to follow when working with th
 7. **Testing**: run `npm run test` and ensure all tests pass.
 8. **Build Tokens**: if you modify design tokens, run `npm run build:tokens` to regenerate `src/styles/tokens.css`.
 9. **Commit Messages**: use [Conventional Commits](https://www.conventionalcommits.org/) such as `feat:`, `fix:`, `docs:`, etc.
+10. **Azure Workflow**: Do not change the `deployment_environment` input in `.github/workflows/azure-static-web-apps-kind-bush-0dd23160f.yml`. Adjusting this creates excess staging environments and blocks deployments.
 
 ## Project Structure
 
