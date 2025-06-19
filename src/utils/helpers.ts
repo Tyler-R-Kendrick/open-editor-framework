@@ -349,7 +349,7 @@ export class DataHelper {
         try {
           const data = JSON.parse(e.target?.result as string);
           resolve(data);
-        } catch (error) {
+        } catch (_error) {
           reject(new Error('Invalid JSON file'));
         }
       };

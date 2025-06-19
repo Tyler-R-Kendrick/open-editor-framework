@@ -365,7 +365,7 @@ export const CustomFieldTypes: Story = {
         border: '1px solid #bae6fd'
       }}>
         <strong>Custom Field Types:</strong> This demonstrates the flexible field renderer system.
-        You can override built-in types and add completely new field types like 'custom-date' and 'enhanced-text'.
+        You can override built-in types and add completely new field types like &apos;custom-date&apos; and &apos;enhanced-text&apos;.
       </div>
     </div>
   ),
