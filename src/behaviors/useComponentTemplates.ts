@@ -77,9 +77,10 @@ export const useComponentTemplates = (
     }
   }, [templateUrl]);
 
+  // Load templates on initial mount or when the template URL changes
   useEffect(() => {
     loadTemplates();
-  });
+  }, [loadTemplates]);
 
   const reload = () => {
     loadTemplates();
