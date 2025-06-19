@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   MarketplaceComponent,
-  MarketplaceComponentOptions,
+  MarketplaceComponentOptions
 } from '../types/component-base';
 
 export interface ComponentTemplatesData {
@@ -17,11 +17,10 @@ interface UseComponentTemplatesResult {
   reload: () => void;
 }
 
-
 /**
  * Custom hook to load component templates from an external JSON file
  * Loads component templates from the provided URL
- * 
+ *
  * @param templateUrl - URL to the JSON file containing templates (defaults to public assets)
  * @returns Object containing templates, categories, loading state, error state, and reload function
  */
@@ -41,18 +40,24 @@ export const useComponentTemplates = (
       const response = await fetch(templateUrl);
 
       if (!response.ok) {
-        throw new Error(`Failed to load templates: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `Failed to load templates: ${response.status} ${response.statusText}`
+        );
       }
 
       const data: ComponentTemplatesData = await response.json();
 
       // Validate the loaded data structure
       if (!data.templates || !Array.isArray(data.templates)) {
-        throw new Error('Invalid templates data structure: missing or invalid templates array');
+        throw new Error(
+          'Invalid templates data structure: missing or invalid templates array'
+        );
       }
 
       if (!data.categories || !Array.isArray(data.categories)) {
-        throw new Error('Invalid templates data structure: missing or invalid categories array');
+        throw new Error(
+          'Invalid templates data structure: missing or invalid categories array'
+        );
       }
 
       // Validate each template has required fields

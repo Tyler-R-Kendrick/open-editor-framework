@@ -32,8 +32,8 @@ A generic HTML5-based React editor built as a PWA (Progressive Web App) with com
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ 
-- npm 8+
+- Node.js 22+
+- npm 11+
 
 ### Installation
 
