@@ -71,6 +71,7 @@ jobs:
        contents: read
     steps:
       - uses: actions/checkout@v3
+          deployment_environment: ${{ github.head_ref || 'production' }}
         with:
           submodules: true
           lfs: false
