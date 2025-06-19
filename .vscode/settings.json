@@ -63,7 +63,9 @@
     "editor.defaultFormatter": "vscode.json-language-features"
   },
   "[css]": {
-    "editor.defaultFormatter": "vscode.css-language-features"
+    "editor.defaultFormatter": "vscode.css-language-features",
+    "css.validate": false,
+    "css.lint.unknownAtRules": "ignore"
   },
   "[html]": {
     "editor.defaultFormatter": "vscode.html-language-features"
@@ -112,5 +114,28 @@
   "debug.openDebug": "openOnDebugBreak",
   "debug.inlineValues": "on",
   "debug.focusWindowOnBreak": true,
-  "debug.showBreakpointsInOverviewRuler": true
+  "debug.showBreakpointsInOverviewRuler": true,
+  // Tailwind CSS settings
+  "tailwindCSS.includeLanguages": {
+    "css": "css",
+    "html": "html",
+    "javascript": "javascript",
+    "typescript": "typescript",
+    "javascriptreact": "javascriptreact",
+    "typescriptreact": "typescriptreact"
+  },
+  "tailwindCSS.experimental.classRegex": [
+    [
+      "cva\\(([^)]*)\\)",
+      "[\"'`]([^\"'`]*).*?[\"'`]"
+    ],
+    [
+      "cx\\(([^)]*)\\)",
+      "(?:'|\"|`)([^']*)(?:'|\"|`)"
+    ]
+  ],
+  "tailwindCSS.validate": true,
+  "css.validate": false,
+  "scss.validate": false,
+  "less.validate": false
 }

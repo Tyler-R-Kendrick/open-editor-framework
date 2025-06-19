@@ -31,7 +31,7 @@
 
   /* Focus styles for accessibility */
   *:focus {
-    outline: 2px solid theme('colors.primary.500');
+    outline: 2px solid #3b82f6;
     outline-offset: 2px;
   }
 
@@ -39,7 +39,7 @@
   button:focus,
   [role="button"]:focus,
   [tabindex]:focus {
-    @apply ring-2 ring-primary-500 ring-offset-2;
+    box-shadow: 0 0 0 2px #3b82f6, 0 0 0 4px rgba(59, 130, 246, 0.2);
   }
 
   /* Improve touch target sizes for accessibility */
@@ -83,15 +83,16 @@
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
-    @apply bg-gray-100;
+    background-color: #f3f4f6;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-gray-300 rounded-lg;
+    background-color: #d1d5db;
+    border-radius: 0.5rem;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-400;
+    background-color: #9ca3af;
   }
 }
 
@@ -119,11 +120,11 @@
   /* High contrast mode support */
   @media (prefers-contrast: high) {
     .border-light {
-      @apply border-black;
+      border-color: #000000;
     }
 
     .text-muted {
-      @apply text-black;
+      color: #000000;
     }
   }
 
