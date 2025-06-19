@@ -61,6 +61,9 @@ npm run build
 npm run preview
 ```
 
+The build script now outputs Storybook under `dist/storybook`, making the
+component documentation available at the `/storybook` endpoint in production.
+
 ## 📱 Mobile & Touch Support
 
 The editor is designed mobile-first with comprehensive touch gesture support:
