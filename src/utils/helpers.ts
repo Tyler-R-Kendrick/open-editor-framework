@@ -1,5 +1,5 @@
 import { Point, TouchGesture } from '../types/editor-types';
-import { BaseComponent } from '../types/component-base';
+import { BaseComponent, ComponentProperties } from '../types/component-base';
 
 /**
  * Utility functions for touch gesture recognition
@@ -34,7 +34,7 @@ export class TouchGestureRecognizer {
 
   handleTouchMove(touch: Touch): TouchGesture {
     this.currentPoint = this.getTouchPoint(touch);
-    
+
     // Calculate velocity
     const timeDelta = Date.now() - this.startTime;
     if (timeDelta > 0) {
@@ -160,8 +160,8 @@ export class AccessibilityHelper {
   static isUsingScreenReader(): boolean {
     // Basic heuristic - not 100% accurate but covers most cases
     return window.navigator.userAgent.includes('NVDA') ||
-           window.navigator.userAgent.includes('JAWS') ||
-           window.speechSynthesis?.speaking === false;
+      window.navigator.userAgent.includes('JAWS') ||
+      window.speechSynthesis?.speaking === false;
   }
 }
 
@@ -176,7 +176,7 @@ export class ComponentHelper {
   static createComponent(
     type: string,
     bounds: { x: number; y: number; width: number; height: number },
-    properties: Record<string, any> = {}
+    properties: ComponentProperties = {}
   ): BaseComponent {
     return new BaseComponent({
       id: this.generateId(),
@@ -210,9 +210,9 @@ export class ComponentHelper {
 
   static isPointInBounds(point: Point, bounds: { x: number; y: number; width: number; height: number }): boolean {
     return point.x >= bounds.x &&
-           point.x <= bounds.x + bounds.width &&
-           point.y >= bounds.y &&
-           point.y <= bounds.y + bounds.height;
+      point.x <= bounds.x + bounds.width &&
+      point.y >= bounds.y &&
+      point.y <= bounds.y + bounds.height;
   }
 
   static getBoundsCenter(bounds: { x: number; y: number; width: number; height: number }): Point {
@@ -293,10 +293,10 @@ export class CanvasHelper {
     ctx.lineWidth = 1;
 
     const handles = [
-      { x: bounds.x - handleSize/2, y: bounds.y - handleSize/2 }, // Top-left
-      { x: bounds.x + bounds.width - handleSize/2, y: bounds.y - handleSize/2 }, // Top-right
-      { x: bounds.x - handleSize/2, y: bounds.y + bounds.height - handleSize/2 }, // Bottom-left
-      { x: bounds.x + bounds.width - handleSize/2, y: bounds.y + bounds.height - handleSize/2 } // Bottom-right
+      { x: bounds.x - handleSize / 2, y: bounds.y - handleSize / 2 }, // Top-left
+      { x: bounds.x + bounds.width - handleSize / 2, y: bounds.y - handleSize / 2 }, // Top-right
+      { x: bounds.x - handleSize / 2, y: bounds.y + bounds.height - handleSize / 2 }, // Bottom-left
+      { x: bounds.x + bounds.width - handleSize / 2, y: bounds.y + bounds.height - handleSize / 2 } // Bottom-right
     ];
 
     handles.forEach(handle => {
@@ -312,7 +312,7 @@ export class CanvasHelper {
  * Utility functions for data persistence
  */
 export class DataHelper {
-  static saveToLocalStorage(key: string, data: any): void {
+  static saveToLocalStorage(key: string, data: unknown): void {
     try {
       localStorage.setItem(key, JSON.stringify(data));
     } catch (error) {
@@ -330,7 +330,7 @@ export class DataHelper {
     }
   }
 
-  static exportToJSON(data: any, filename: string): void {
+  static exportToJSON(data: unknown, filename: string): void {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -342,14 +342,14 @@ export class DataHelper {
     URL.revokeObjectURL(url);
   }
 
-  static importFromFile(file: File): Promise<any> {
+  static importFromFile(file: File): Promise<unknown> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
           const data = JSON.parse(e.target?.result as string);
           resolve(data);
-        } catch (error) {
+        } catch (_error) {
           reject(new Error('Invalid JSON file'));
         }
       };

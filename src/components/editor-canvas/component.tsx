@@ -84,21 +84,21 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
     const { bounds } = component;
 
     // Render component background
-    ctx.fillStyle = component.properties.backgroundColor || '#ffffff';
+    ctx.fillStyle = String(component.properties.backgroundColor ?? '#ffffff');
     ctx.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
 
     // Render component border
-    ctx.strokeStyle = component.properties.borderColor || '#e2e8f0';
-    ctx.lineWidth = component.properties.borderWidth || 1;
+    ctx.strokeStyle = String(component.properties.borderColor ?? '#e2e8f0');
+    ctx.lineWidth = Number(component.properties.borderWidth ?? 1);
     ctx.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
 
     // Render component content based on type
     switch (component.type) {
       case 'text':
-        ctx.fillStyle = component.properties.color || '#000000';
-        ctx.font = `${component.properties.fontSize || 16}px ${component.properties.fontFamily || 'Arial'}`;
+        ctx.fillStyle = String(component.properties.color ?? '#000000');
+        ctx.font = `${Number(component.properties.fontSize ?? 16)}px ${String(component.properties.fontFamily ?? 'Arial')}`;
         ctx.fillText(
-          component.properties.text || 'Text Component',
+          String(component.properties.text ?? 'Text Component'),
           bounds.x + 10,
           bounds.y + bounds.height / 2 + 6
         );
@@ -106,15 +106,15 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
 
       case 'button':
         // Button background
-        ctx.fillStyle = component.properties.backgroundColor || '#3b82f6';
+        ctx.fillStyle = String(component.properties.backgroundColor ?? '#3b82f6');
         ctx.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
 
         // Button text
-        ctx.fillStyle = component.properties.color || '#ffffff';
-        ctx.font = `${component.properties.fontSize || 14}px ${component.properties.fontFamily || 'Arial'}`;
+        ctx.fillStyle = String(component.properties.color ?? '#ffffff');
+        ctx.font = `${Number(component.properties.fontSize ?? 14)}px ${String(component.properties.fontFamily ?? 'Arial')}`;
         ctx.textAlign = 'center';
         ctx.fillText(
-          component.properties.text || 'Button',
+          String(component.properties.text ?? 'Button'),
           bounds.x + bounds.width / 2,
           bounds.y + bounds.height / 2 + 4
         );

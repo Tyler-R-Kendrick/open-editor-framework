@@ -17,11 +17,3 @@ jobs:
           node-version: 18
       - run: npm ci
       - run: npm run build --if-present
-      - name: action-status
-        if: always()
-        uses: dobladov/github-status-action@2.0.0
-        with:
-          authToken: ${{ secrets.GITHUB_TOKEN }}
-          state: ${{ job.status }}
-          context: Build
-          description: "Build ${{ job.status }}"

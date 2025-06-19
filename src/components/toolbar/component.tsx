@@ -60,7 +60,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
           try {
             const data = JSON.parse(event.target?.result as string);
             console.log('Loaded data:', data);
-          } catch (error) {
+          } catch (_error) {
             alert('Error loading file: Invalid JSON format');
           }
         };

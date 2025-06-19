@@ -1,10 +1,15 @@
 import type { Bounds, Size } from "./editor-types";
+
+// Define a more specific type for component properties
+export type ComponentPropertyValue = string | number | boolean | null | undefined | ComponentPropertyValue[] | { [key: string]: ComponentPropertyValue };
+export type ComponentProperties = Record<string, ComponentPropertyValue>;
+
 export interface BaseComponentOptions {
   id: string;
   type: string;
   name: string;
   bounds: Bounds;
-  properties?: Record<string, any>;
+  properties?: ComponentProperties;
   zIndex?: number;
   parent?: string;
   children?: BaseComponent[];
@@ -15,7 +20,7 @@ export class BaseComponent {
   type: string;
   name: string;
   bounds: Bounds;
-  properties: Record<string, any>;
+  properties: ComponentProperties;
   zIndex?: number;
   parent?: string;
   children?: BaseComponent[];
@@ -31,7 +36,7 @@ export class BaseComponent {
     this.children = opts.children as BaseComponent[] | undefined;
   }
 
-  updateProperties(props: Record<string, any>): void {
+  updateProperties(props: ComponentProperties): void {
     this.properties = { ...this.properties, ...props };
   }
 }

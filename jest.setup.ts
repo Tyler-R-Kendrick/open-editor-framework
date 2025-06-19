@@ -5,19 +5,19 @@ Object.defineProperty(window, 'matchMedia', {
   value: (query: string) => ({
     matches: false,
     media: query,
-    addEventListener: () => {},
-    removeEventListener: () => {},
-    addListener: () => {},
-    removeListener: () => {}
+    addEventListener: () => { },
+    removeEventListener: () => { },
+    addListener: () => { },
+    removeListener: () => { }
   })
 });
 
 HTMLCanvasElement.prototype.getContext = () => null;
 
 class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+  observe() { }
+  unobserve() { }
+  disconnect() { }
 }
 
-(window as any).ResizeObserver = ResizeObserver;
+(window as unknown as { ResizeObserver: typeof ResizeObserver }).ResizeObserver = ResizeObserver;
