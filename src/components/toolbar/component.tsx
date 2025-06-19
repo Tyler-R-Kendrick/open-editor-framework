@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import { EditorTheme } from '../../types/editor-types';
 import { Flex, ButtonGroup, Button } from '@adobe/react-spectrum';
+import Add from '@spectrum-icons/workflow/Add';
+import SaveFloppy from '@spectrum-icons/workflow/SaveFloppy';
+import OpenIn from '@spectrum-icons/workflow/OpenIn';
+import ExportIcon from '@spectrum-icons/workflow/Export';
+import UndoIcon from '@spectrum-icons/workflow/Undo';
+import RedoIcon from '@spectrum-icons/workflow/Redo';
+import Moon from '@spectrum-icons/workflow/Moon';
+import Light from '@spectrum-icons/workflow/Light';
 import { useMessageFormatter } from '@react-aria/i18n';
 import messages from '../../i18n/toolbarMessages';
 
@@ -24,7 +32,6 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
   onThemeChange
 }) => {
   const formatMessage = useMessageFormatter(messages);
-  const [zoomLevel, setZoomLevel] = useState(100);
   const [canUndo] = useState(false);
   const [canRedo] = useState(false);
 
@@ -88,16 +95,16 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
       >
         <ButtonGroup>
           <Button variant="primary" onPress={handleNew} aria-label={formatMessage('new')}>
-            {formatMessage('new')}
+            <Add aria-hidden="true" size="S" />
           </Button>
           <Button variant="primary" onPress={handleSave} aria-label={formatMessage('save')}>
-            {formatMessage('save')}
+            <SaveFloppy aria-hidden="true" size="S" />
           </Button>
           <Button variant="primary" onPress={handleLoad} aria-label={formatMessage('load')}>
-            {formatMessage('load')}
+            <OpenIn aria-hidden="true" size="S" />
           </Button>
           <Button variant="primary" onPress={handleExport} aria-label={formatMessage('export')}>
-            {formatMessage('export')}
+            <ExportIcon aria-hidden="true" size="S" />
           </Button>
         </ButtonGroup>
 
@@ -108,7 +115,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
             isDisabled={!canUndo}
             aria-label={formatMessage('undo')}
           >
-            {formatMessage('undo')}
+            <UndoIcon aria-hidden="true" size="S" />
           </Button>
           <Button
             variant="secondary"
@@ -116,34 +123,10 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
             isDisabled={!canRedo}
             aria-label={formatMessage('redo')}
           >
-            {formatMessage('redo')}
+            <RedoIcon aria-hidden="true" size="S" />
           </Button>
         </ButtonGroup>
 
-        <Flex gap="size-100" alignItems="center">
-          <span>{zoomLevel}%</span>
-          <Button
-            variant="secondary"
-            onPress={() => setZoomLevel((prev) => Math.max(10, prev - 10))}
-            aria-label={formatMessage('zoomOut')}
-          >
-            −
-          </Button>
-          <Button
-            variant="secondary"
-            onPress={() => setZoomLevel((prev) => Math.min(500, prev + 10))}
-            aria-label={formatMessage('zoomIn')}
-          >
-            +
-          </Button>
-          <Button
-            variant="secondary"
-            onPress={() => setZoomLevel(100)}
-            aria-label={formatMessage('resetZoom')}
-          >
-            ⌂
-          </Button>
-        </Flex>
 
         <ButtonGroup>
           <Button
@@ -153,7 +136,11 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
               theme === 'light' ? formatMessage('dark') : formatMessage('light')
             }
           >
-            {theme === 'light' ? formatMessage('dark') : formatMessage('light')}
+            {theme === 'light' ? (
+              <Moon aria-hidden="true" size="S" />
+            ) : (
+              <Light aria-hidden="true" size="S" />
+            )}
           </Button>
         </ButtonGroup>
       </Flex>

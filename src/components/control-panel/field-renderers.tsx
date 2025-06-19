@@ -1,18 +1,21 @@
 import React from 'react';
 import { FieldRenderer, BuiltInFieldRendererMap } from './types';
 
+// Shared base input style for consistent styling across field renderers
+export const getBaseInputStyle = (theme: 'light' | 'dark') => ({
+  width: '100%',
+  padding: '8px 12px',
+  border: `1px solid ${theme === 'dark' ? '#6b7280' : '#d1d5db'}`,
+  borderRadius: '6px',
+  background: theme === 'dark' ? '#4b5563' : '#ffffff',
+  color: theme === 'dark' ? '#f8fafc' : '#1e293b',
+  fontSize: '14px',
+  outline: 'none',
+  transition: 'border-color 0.2s ease'
+});
+
 export const TextFieldRenderer: FieldRenderer = ({ property, theme, onChange }) => {
-  const baseInputStyle = {
-    width: '100%',
-    padding: '8px 12px',
-    border: `1px solid ${theme === 'dark' ? '#6b7280' : '#d1d5db'}`,
-    borderRadius: '6px',
-    background: theme === 'dark' ? '#4b5563' : '#ffffff',
-    color: theme === 'dark' ? '#f8fafc' : '#1e293b',
-    fontSize: '14px',
-    outline: 'none',
-    transition: 'border-color 0.2s ease'
-  };
+  const baseInputStyle = getBaseInputStyle(theme);
 
   return (
     <input
@@ -27,17 +30,7 @@ export const TextFieldRenderer: FieldRenderer = ({ property, theme, onChange }) 
 };
 
 export const NumberFieldRenderer: FieldRenderer = ({ property, theme, onChange }) => {
-  const baseInputStyle = {
-    width: '100%',
-    padding: '8px 12px',
-    border: `1px solid ${theme === 'dark' ? '#6b7280' : '#d1d5db'}`,
-    borderRadius: '6px',
-    background: theme === 'dark' ? '#4b5563' : '#ffffff',
-    color: theme === 'dark' ? '#f8fafc' : '#1e293b',
-    fontSize: '14px',
-    outline: 'none',
-    transition: 'border-color 0.2s ease'
-  };
+  const baseInputStyle = getBaseInputStyle(theme);
 
   return (
     <input
@@ -52,17 +45,7 @@ export const NumberFieldRenderer: FieldRenderer = ({ property, theme, onChange }
 };
 
 export const ColorFieldRenderer: FieldRenderer = ({ property, theme, onChange }) => {
-  const baseInputStyle = {
-    width: '100%',
-    padding: '8px 12px',
-    border: `1px solid ${theme === 'dark' ? '#6b7280' : '#d1d5db'}`,
-    borderRadius: '6px',
-    background: theme === 'dark' ? '#4b5563' : '#ffffff',
-    color: theme === 'dark' ? '#f8fafc' : '#1e293b',
-    fontSize: '14px',
-    outline: 'none',
-    transition: 'border-color 0.2s ease'
-  };
+  const baseInputStyle = getBaseInputStyle(theme);
 
   return (
     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -91,17 +74,7 @@ export const ColorFieldRenderer: FieldRenderer = ({ property, theme, onChange })
 };
 
 export const SelectFieldRenderer: FieldRenderer = ({ property, theme, onChange }) => {
-  const baseInputStyle = {
-    width: '100%',
-    padding: '8px 12px',
-    border: `1px solid ${theme === 'dark' ? '#6b7280' : '#d1d5db'}`,
-    borderRadius: '6px',
-    background: theme === 'dark' ? '#4b5563' : '#ffffff',
-    color: theme === 'dark' ? '#f8fafc' : '#1e293b',
-    fontSize: '14px',
-    outline: 'none',
-    transition: 'border-color 0.2s ease'
-  };
+  const baseInputStyle = getBaseInputStyle(theme);
 
   return (
     <select
