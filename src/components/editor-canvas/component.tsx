@@ -28,7 +28,6 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
-  const animationIdRef = useRef<number | null>(null);
   const touchStartTimeRef = useRef(0);
   const longPressTimerRef = useRef<number | null>(null);
 
@@ -325,27 +324,18 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
     setLastTouch(null);
   }, []);
 
-  // Initialize canvas and start render loop
+  // Initialize canvas on mount
   useEffect(() => {
     const cleanup = initializeCanvas();
-
-    const startRenderLoop = () => {
-      const render = () => {
-        renderCanvas();
-        animationIdRef.current = requestAnimationFrame(render);
-      };
-      render();
-    };
-
-    startRenderLoop();
-
     return () => {
-      if (animationIdRef.current) {
-        cancelAnimationFrame(animationIdRef.current);
-      }
       cleanup?.();
     };
-  }, [initializeCanvas, renderCanvas]);
+  }, [initializeCanvas]);
+
+  // Render canvas whenever relevant state changes
+  useEffect(() => {
+    renderCanvas();
+  }, [renderCanvas]);
 
   // Keyboard event listeners
   useEffect(() => {
