@@ -9,8 +9,10 @@ import {
   defaultTheme
 } from '@adobe/react-spectrum';
 import { Provider as ReduxProvider } from 'react-redux';
-import { store } from '../../store';
+import { store, setComponents } from '../../store';
 import { I18nProvider } from '@react-aria/i18n';
+import { decodeComponents } from '../../utils/share';
+import type { BaseComponent } from '../../types/component-base';
 
 /**
  * Main editor application using a simple flex layout
@@ -35,6 +37,17 @@ export const EditorApp: React.FC = () => {
       mediaQuery.removeEventListener('change', handleThemeChange);
     };
   }, [handleThemeChange]);
+
+  useEffect(() => {
+    const params = new window.URLSearchParams(window.location.search);
+    const state = params.get('state');
+    if (state) {
+      const components = decodeComponents(state);
+      if (Array.isArray(components)) {
+        store.dispatch(setComponents(components as BaseComponent[]));
+      }
+    }
+  }, []);
 
   const borderColor = theme === 'dark' ? '#374151' : '#e2e8f0';
 
