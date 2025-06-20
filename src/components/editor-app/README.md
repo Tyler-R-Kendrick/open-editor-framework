@@ -9,6 +9,8 @@ A React-based main editor application panel that orchestrates the canvas panel, 
 - Theme support (light/dark mode)
 - Mobile tab navigation for small screens
 - React Hooks for state management
+- Collapsible side panels for more canvas space
+- Full-width layout without outer margins
 
 ## Usage
 
@@ -27,6 +29,7 @@ This component doesn't accept any props as it manages its own state internally.
 ## State Management
 
 The component uses React hooks to manage:
+
 - Theme preferences (light/dark)
 - Mobile layout detection
 - Active mobile tab selection
@@ -41,6 +44,7 @@ The component uses React hooks to manage:
 ## Mobile Support
 
 On mobile devices (< 768px width), the layout switches to a stacked view with tabs at the bottom for:
+
 - Component Palette
 - Canvas
 - Control Panel
