@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { EditorTheme } from '../../types/editor-types';
 import { Flex, ButtonGroup, Button } from '@adobe/react-spectrum';
 import Add from '@spectrum-icons/workflow/Add';
@@ -11,6 +11,8 @@ import Moon from '@spectrum-icons/workflow/Moon';
 import Light from '@spectrum-icons/workflow/Light';
 import { useMessageFormatter } from '@react-aria/i18n';
 import messages from '../../i18n/toolbarMessages';
+import { useAppDispatch } from '../../store';
+import { ActionCreators } from 'redux-undo';
 
 interface EditorToolbarProps {
   theme: EditorTheme;
@@ -32,17 +34,14 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
   onThemeChange
 }) => {
   const formatMessage = useMessageFormatter(messages);
-  const [canUndo] = useState(false);
-  const [canRedo] = useState(false);
+  const dispatch = useAppDispatch();
 
   const handleUndo = () => {
-    // Dispatch undo event or call undo handler
-    console.log('Undo action');
+    dispatch(ActionCreators.undo());
   };
 
   const handleRedo = () => {
-    // Dispatch redo event or call redo handler
-    console.log('Redo action');
+    dispatch(ActionCreators.redo());
   };
 
   const handleNew = () => {
@@ -94,16 +93,32 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
         justifyContent="space-between"
       >
         <ButtonGroup>
-          <Button variant="primary" onPress={handleNew} aria-label={formatMessage('new')}>
+          <Button
+            variant="primary"
+            onPress={handleNew}
+            aria-label={formatMessage('new')}
+          >
             <Add aria-hidden="true" size="S" />
           </Button>
-          <Button variant="primary" onPress={handleSave} aria-label={formatMessage('save')}>
+          <Button
+            variant="primary"
+            onPress={handleSave}
+            aria-label={formatMessage('save')}
+          >
             <SaveFloppy aria-hidden="true" size="S" />
           </Button>
-          <Button variant="primary" onPress={handleLoad} aria-label={formatMessage('load')}>
+          <Button
+            variant="primary"
+            onPress={handleLoad}
+            aria-label={formatMessage('load')}
+          >
             <OpenIn aria-hidden="true" size="S" />
           </Button>
-          <Button variant="primary" onPress={handleExport} aria-label={formatMessage('export')}>
+          <Button
+            variant="primary"
+            onPress={handleExport}
+            aria-label={formatMessage('export')}
+          >
             <ExportIcon aria-hidden="true" size="S" />
           </Button>
         </ButtonGroup>
@@ -112,7 +127,6 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
           <Button
             variant="secondary"
             onPress={handleUndo}
-            isDisabled={!canUndo}
             aria-label={formatMessage('undo')}
           >
             <UndoIcon aria-hidden="true" size="S" />
@@ -120,13 +134,11 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
           <Button
             variant="secondary"
             onPress={handleRedo}
-            isDisabled={!canRedo}
             aria-label={formatMessage('redo')}
           >
             <RedoIcon aria-hidden="true" size="S" />
           </Button>
         </ButtonGroup>
-
 
         <ButtonGroup>
           <Button

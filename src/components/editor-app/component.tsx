@@ -4,7 +4,12 @@ import { EditorToolbar } from '../toolbar/component';
 import { ComponentPalette } from '../component-palette/component';
 import { EditorCanvas } from '../editor-canvas/component';
 import { ControlPanel } from '../control-panel/component';
-import { Provider, defaultTheme } from '@adobe/react-spectrum';
+import {
+  Provider as SpectrumProvider,
+  defaultTheme
+} from '@adobe/react-spectrum';
+import { Provider as ReduxProvider } from 'react-redux';
+import { store } from '../../store';
 import { I18nProvider } from '@react-aria/i18n';
 
 /**
@@ -36,54 +41,59 @@ export const EditorApp: React.FC = () => {
   };
 
   return (
-    <I18nProvider locale={navigator.language}>
-      <Provider theme={defaultTheme} colorScheme={theme}>
-        <div
-          className="editor-container"
-          role="application"
-          aria-label="React Component Editor"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100vh',
-            background: theme === 'dark' ? '#1e293b' : '#f8fafc',
-            color: theme === 'dark' ? '#f8fafc' : '#1e293b'
-          }}
-        >
+    <ReduxProvider store={store}>
+      <I18nProvider locale={navigator.language}>
+        <SpectrumProvider theme={defaultTheme} colorScheme={theme}>
           <div
+            className="editor-container"
+            role="application"
+            aria-label="React Component Editor"
             style={{
-              height: '60px',
-              borderBottom: `1px solid ${borderColor}`,
-              background: theme === 'dark' ? '#374151' : 'white'
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100vh',
+              background: theme === 'dark' ? '#1e293b' : '#f8fafc',
+              color: theme === 'dark' ? '#f8fafc' : '#1e293b'
             }}
           >
-            <EditorToolbar theme={theme} onThemeChange={handleThemeToggle} />
-          </div>
-          <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
             <div
               style={{
-                width: '250px',
-                borderRight: `1px solid ${borderColor}`,
-                overflow: 'auto'
+                height: '60px',
+                borderBottom: `1px solid ${borderColor}`,
+                background: theme === 'dark' ? '#374151' : 'white'
               }}
             >
-              <ComponentPalette theme={theme} aria-label="Component Library" />
+              <EditorToolbar theme={theme} onThemeChange={handleThemeToggle} />
             </div>
-            <div style={{ flex: 1, overflow: 'auto' }}>
-              <EditorCanvas theme={theme} aria-label="Design Canvas" />
-            </div>
-            <div
-              style={{
-                width: '300px',
-                borderLeft: `1px solid ${borderColor}`,
-                overflow: 'auto'
-              }}
-            >
-              <ControlPanel theme={theme} aria-label="Properties Panel" />
+            <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+              <div
+                style={{
+                  width: '250px',
+                  borderRight: `1px solid ${borderColor}`,
+                  overflow: 'auto'
+                }}
+              >
+                <ComponentPalette
+                  theme={theme}
+                  aria-label="Component Library"
+                />
+              </div>
+              <div style={{ flex: 1, overflow: 'auto' }}>
+                <EditorCanvas theme={theme} aria-label="Design Canvas" />
+              </div>
+              <div
+                style={{
+                  width: '300px',
+                  borderLeft: `1px solid ${borderColor}`,
+                  overflow: 'auto'
+                }}
+              >
+                <ControlPanel theme={theme} aria-label="Properties Panel" />
+              </div>
             </div>
           </div>
-        </div>
-      </Provider>
-    </I18nProvider>
+        </SpectrumProvider>
+      </I18nProvider>
+    </ReduxProvider>
   );
 };
