@@ -93,10 +93,10 @@ export const EditorApp: React.FC = () => {
                 >
                   <button
                     onClick={() => setShowPalette(false)}
-                    className={`absolute right-1 top-1 z-10 rounded border p-1 text-xs transition-colors ${
+                    className={`absolute right-1 top-1 z-10 rounded p-1 text-xs transition-colors ${
                       theme === 'dark'
-                        ? 'border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600'
-                        : 'border-slate-300 bg-white text-slate-600 hover:bg-slate-100'
+                        ? 'bg-slate-700 text-slate-200 hover:bg-slate-600'
+                        : 'bg-white text-slate-600 hover:bg-slate-100'
                     }`}
                     aria-label="Collapse component palette"
                   >
@@ -112,10 +112,10 @@ export const EditorApp: React.FC = () => {
                 {!showPalette && (
                   <button
                     onClick={() => setShowPalette(true)}
-                    className={`absolute left-0 top-1 z-10 rounded border p-1 text-xs transition-colors ${
+                    className={`absolute left-0 top-1 z-10 rounded p-1 text-xs transition-colors ${
                       theme === 'dark'
-                        ? 'border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600'
-                        : 'border-slate-300 bg-white text-slate-600 hover:bg-slate-100'
+                        ? 'bg-slate-700 text-slate-200 hover:bg-slate-600'
+                        : 'bg-white text-slate-600 hover:bg-slate-100'
                     }`}
                     aria-label="Expand component palette"
                   >
@@ -125,10 +125,10 @@ export const EditorApp: React.FC = () => {
                 {!showControl && (
                   <button
                     onClick={() => setShowControl(true)}
-                    className={`absolute right-0 top-1 z-10 rounded border p-1 text-xs transition-colors ${
+                    className={`absolute right-0 top-1 z-10 rounded p-1 text-xs transition-colors ${
                       theme === 'dark'
-                        ? 'border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600'
-                        : 'border-slate-300 bg-white text-slate-600 hover:bg-slate-100'
+                        ? 'bg-slate-700 text-slate-200 hover:bg-slate-600'
+                        : 'bg-white text-slate-600 hover:bg-slate-100'
                     }`}
                     aria-label="Expand properties panel"
                   >
@@ -149,10 +149,10 @@ export const EditorApp: React.FC = () => {
                 >
                   <button
                     onClick={() => setShowControl(false)}
-                    className={`absolute left-1 top-1 z-10 rounded border p-1 text-xs transition-colors ${
+                    className={`absolute left-1 top-1 z-10 rounded p-1 text-xs transition-colors ${
                       theme === 'dark'
-                        ? 'border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600'
-                        : 'border-slate-300 bg-white text-slate-600 hover:bg-slate-100'
+                        ? 'bg-slate-700 text-slate-200 hover:bg-slate-600'
+                        : 'bg-white text-slate-600 hover:bg-slate-100'
                     }`}
                     aria-label="Collapse properties panel"
                   >

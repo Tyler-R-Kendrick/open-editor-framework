@@ -78,7 +78,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: dist
-          path: dist
+          path: .
       - uses: actions/checkout@v3
         with:
           submodules: true
