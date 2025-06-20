@@ -440,11 +440,18 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
 
   // Keyboard event listeners
   useEffect(() => {
+    const undoHandler = () => handleUndo();
+    const redoHandler = () => handleRedo();
+
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('editor-undo', undoHandler);
+    window.addEventListener('editor-redo', redoHandler);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('editor-undo', undoHandler);
+      window.removeEventListener('editor-redo', redoHandler);
     };
-  }, [handleKeyDown]);
+  }, [handleKeyDown, handleUndo, handleRedo]);
 
   return (
     <div

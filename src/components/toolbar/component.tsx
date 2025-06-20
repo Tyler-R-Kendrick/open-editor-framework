@@ -50,10 +50,12 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
 
   const handleUndo = () => {
     dispatch(ActionCreators.undo());
+    window.dispatchEvent(new window.CustomEvent('editor-undo'));
   };
 
   const handleRedo = () => {
     dispatch(ActionCreators.redo());
+    window.dispatchEvent(new window.CustomEvent('editor-redo'));
   };
 
   const handleNew = () => {
