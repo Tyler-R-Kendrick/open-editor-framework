@@ -53,8 +53,6 @@ export const EditorApp: React.FC = () => {
     }
   }, []);
 
-  const borderColor = theme === 'dark' ? '#374151' : '#e2e8f0';
-
   const handleThemeToggle = (newTheme: EditorTheme) => {
     setTheme(newTheme);
   };
@@ -64,24 +62,20 @@ export const EditorApp: React.FC = () => {
       <I18nProvider locale={navigator.language}>
         <SpectrumProvider theme={defaultTheme} colorScheme={theme}>
           <div
-            className="editor-container"
+            className={`editor-container flex flex-col w-full h-full ${
+              theme === 'dark'
+                ? 'bg-slate-800 text-slate-100'
+                : 'bg-slate-50 text-slate-900'
+            }`}
             role="application"
             aria-label="React Component Editor"
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '100%',
-              height: '100%',
-              background: theme === 'dark' ? '#1e293b' : '#f8fafc',
-              color: theme === 'dark' ? '#f8fafc' : '#1e293b'
-            }}
           >
             <div
-              style={{
-                height: '60px',
-                borderBottom: `1px solid ${borderColor}`,
-                background: theme === 'dark' ? '#374151' : 'white'
-              }}
+              className={`h-[60px] border-b ${
+                theme === 'dark'
+                  ? 'border-slate-700 bg-slate-700'
+                  : 'border-slate-200 bg-white'
+              }`}
             >
               <EditorToolbar
                 theme={theme}
@@ -90,31 +84,20 @@ export const EditorApp: React.FC = () => {
                 onResolutionChange={setResolution}
               />
             </div>
-            <div
-              style={{
-                display: 'flex',
-                flex: 1,
-                overflow: 'hidden',
-                position: 'relative'
-              }}
-            >
+            <div className="relative flex flex-1 overflow-hidden">
               {showPalette && (
                 <div
-                  style={{
-                    width: '250px',
-                    borderRight: `1px solid ${borderColor}`,
-                    overflow: 'auto',
-                    position: 'relative'
-                  }}
+                  className={`relative w-[250px] overflow-auto border-r ${
+                    theme === 'dark' ? 'border-slate-700' : 'border-slate-200'
+                  }`}
                 >
                   <button
                     onClick={() => setShowPalette(false)}
-                    style={{
-                      position: 'absolute',
-                      top: 4,
-                      right: 4,
-                      zIndex: 10
-                    }}
+                    className={`absolute right-1 top-1 z-10 rounded border p-1 text-xs transition-colors ${
+                      theme === 'dark'
+                        ? 'border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600'
+                        : 'border-slate-300 bg-white text-slate-600 hover:bg-slate-100'
+                    }`}
                     aria-label="Collapse component palette"
                   >
                     «
@@ -125,16 +108,15 @@ export const EditorApp: React.FC = () => {
                   />
                 </div>
               )}
-              <div style={{ flex: 1, overflow: 'auto', position: 'relative' }}>
+              <div className="relative flex-1 overflow-auto">
                 {!showPalette && (
                   <button
                     onClick={() => setShowPalette(true)}
-                    style={{
-                      position: 'absolute',
-                      left: 0,
-                      top: 4,
-                      zIndex: 10
-                    }}
+                    className={`absolute left-0 top-1 z-10 rounded border p-1 text-xs transition-colors ${
+                      theme === 'dark'
+                        ? 'border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600'
+                        : 'border-slate-300 bg-white text-slate-600 hover:bg-slate-100'
+                    }`}
                     aria-label="Expand component palette"
                   >
                     »
@@ -143,12 +125,11 @@ export const EditorApp: React.FC = () => {
                 {!showControl && (
                   <button
                     onClick={() => setShowControl(true)}
-                    style={{
-                      position: 'absolute',
-                      right: 0,
-                      top: 4,
-                      zIndex: 10
-                    }}
+                    className={`absolute right-0 top-1 z-10 rounded border p-1 text-xs transition-colors ${
+                      theme === 'dark'
+                        ? 'border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600'
+                        : 'border-slate-300 bg-white text-slate-600 hover:bg-slate-100'
+                    }`}
                     aria-label="Expand properties panel"
                   >
                     «
@@ -162,21 +143,17 @@ export const EditorApp: React.FC = () => {
               </div>
               {showControl && (
                 <div
-                  style={{
-                    width: '300px',
-                    borderLeft: `1px solid ${borderColor}`,
-                    overflow: 'auto',
-                    position: 'relative'
-                  }}
+                  className={`relative w-[300px] overflow-auto border-l ${
+                    theme === 'dark' ? 'border-slate-700' : 'border-slate-200'
+                  }`}
                 >
                   <button
                     onClick={() => setShowControl(false)}
-                    style={{
-                      position: 'absolute',
-                      top: 4,
-                      left: 4,
-                      zIndex: 10
-                    }}
+                    className={`absolute left-1 top-1 z-10 rounded border p-1 text-xs transition-colors ${
+                      theme === 'dark'
+                        ? 'border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600'
+                        : 'border-slate-300 bg-white text-slate-600 hover:bg-slate-100'
+                    }`}
                     aria-label="Collapse properties panel"
                   >
                     »
