@@ -7,7 +7,7 @@ import { store } from '../src/store';
 test('renders editor canvas', () => {
   render(
     <Provider store={store}>
-      <EditorCanvas theme="light" />
+      <EditorCanvas theme="light" canvasSize="infinite" />
     </Provider>
   );
   const canvas = screen.getByRole('img', { name: /design canvas/i });

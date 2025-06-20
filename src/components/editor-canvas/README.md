@@ -25,18 +25,19 @@ import { EditorCanvas } from './editor-canvas/component.js';
 
 ## Properties
 
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `theme` | `EditorTheme` | `'light'` | Visual theme (light/dark) |
+| Property     | Type          | Default      | Description                       |
+| ------------ | ------------- | ------------ | --------------------------------- |
+| `theme`      | `EditorTheme` | `'light'`    | Visual theme (light/dark)         |
+| `canvasSize` | `CanvasSize`  | `'infinite'` | Canvas dimensions or `'infinite'` |
 
 ## Events
 
-| Event | Detail | Description |
-|-------|--------|-------------|
-| `selection-change` | `{selectedComponents: string[]}` | Fired when component selection changes |
-| `context-menu` | `{point: Point, components: EditorComponent}` | Fired on long press/right click |
-| `component-move` | `{component: EditorComponent, position: Point}` | Fired when component is moved |
-| `component-resize` | `{component: EditorComponent, bounds: Bounds}` | Fired when component is resized |
+| Event              | Detail                                          | Description                            |
+| ------------------ | ----------------------------------------------- | -------------------------------------- |
+| `selection-change` | `{selectedComponents: string[]}`                | Fired when component selection changes |
+| `context-menu`     | `{point: Point, components: EditorComponent}`   | Fired on long press/right click        |
+| `component-move`   | `{component: EditorComponent, position: Point}` | Fired when component is moved          |
+| `component-resize` | `{component: EditorComponent, bounds: Bounds}`  | Fired when component is resized        |
 
 ## Keyboard Shortcuts
 

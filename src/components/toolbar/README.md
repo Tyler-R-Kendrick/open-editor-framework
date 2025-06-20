@@ -23,9 +23,10 @@ import { EditorToolbar } from './toolbar/component.js';
 
 ## Properties
 
-| Property | Type          | Default   | Description               |
-| -------- | ------------- | --------- | ------------------------- |
-| `theme`  | `EditorTheme` | `'light'` | Visual theme (light/dark) |
+| Property     | Type          | Default      | Description                             |
+| ------------ | ------------- | ------------ | --------------------------------------- |
+| `theme`      | `EditorTheme` | `'light'`    | Visual theme (light/dark)               |
+| `canvasSize` | `CanvasSize`  | `'infinite'` | Selected canvas size or infinite canvas |
 
 ## Events
 

@@ -12,7 +12,12 @@ test('renders toolbar', () => {
     <ReduxProvider store={store}>
       <I18nProvider locale="en-US">
         <Provider theme={defaultTheme} colorScheme="light">
-          <EditorToolbar theme="light" onThemeChange={() => {}} />
+          <EditorToolbar
+            theme="light"
+            onThemeChange={() => {}}
+            canvasSize="infinite"
+            onCanvasSizeChange={() => {}}
+          />
         </Provider>
       </I18nProvider>
     </ReduxProvider>
@@ -28,7 +33,12 @@ test('dispatches save event', async () => {
     <ReduxProvider store={store}>
       <I18nProvider locale="en-US">
         <Provider theme={defaultTheme} colorScheme="light">
-          <EditorToolbar theme="light" onThemeChange={() => {}} />
+          <EditorToolbar
+            theme="light"
+            onThemeChange={() => {}}
+            canvasSize="infinite"
+            onCanvasSizeChange={() => {}}
+          />
         </Provider>
       </I18nProvider>
     </ReduxProvider>
@@ -36,4 +46,22 @@ test('dispatches save event', async () => {
   await userEvent.click(screen.getByRole('button', { name: /save/i }));
   expect(listener).toHaveBeenCalled();
   window.removeEventListener('editor-save', listener);
+});
+
+test('renders canvas size selector', () => {
+  render(
+    <ReduxProvider store={store}>
+      <I18nProvider locale="en-US">
+        <Provider theme={defaultTheme} colorScheme="light">
+          <EditorToolbar
+            theme="light"
+            onThemeChange={() => {}}
+            canvasSize="infinite"
+            onCanvasSizeChange={() => {}}
+          />
+        </Provider>
+      </I18nProvider>
+    </ReduxProvider>
+  );
+  expect(screen.getByLabelText(/canvas size/i)).toBeInTheDocument();
 });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { EditorTheme } from '../../types/editor-types';
+import { EditorTheme, CanvasSize } from '../../types/editor-types';
 import { Flex, ButtonGroup, Button } from '@adobe/react-spectrum';
 import Add from '@spectrum-icons/workflow/Add';
 import SaveFloppy from '@spectrum-icons/workflow/SaveFloppy';
@@ -16,6 +16,8 @@ import { ActionCreators } from 'redux-undo';
 interface EditorToolbarProps {
   theme: EditorTheme;
   onThemeChange: (theme: EditorTheme) => void;
+  canvasSize: CanvasSize;
+  onCanvasSizeChange: (size: CanvasSize) => void;
 }
 
 /**
@@ -30,7 +32,9 @@ interface EditorToolbarProps {
  */
 export const EditorToolbar: React.FC<EditorToolbarProps> = ({
   theme,
-  onThemeChange
+  onThemeChange,
+  canvasSize,
+  onCanvasSizeChange
 }) => {
   const formatMessage = useMessageFormatter(messages);
   const dispatch = useAppDispatch();
@@ -150,6 +154,30 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
             )}
           </Button>
         </ButtonGroup>
+
+        <select
+          aria-label={formatMessage('canvasSize')}
+          value={
+            canvasSize === 'infinite'
+              ? 'infinite'
+              : `${canvasSize.width}x${canvasSize.height}`
+          }
+          onChange={(e) => {
+            const value = e.target.value;
+            if (value === 'infinite') {
+              onCanvasSizeChange('infinite');
+            } else {
+              const [w, h] = value.split('x').map(Number);
+              onCanvasSizeChange({ width: w, height: h });
+            }
+          }}
+          style={{ padding: '4px 8px', borderRadius: '4px' }}
+        >
+          <option value="infinite">{formatMessage('infinite')}</option>
+          <option value="360x640">{formatMessage('mobile')}</option>
+          <option value="768x1024">{formatMessage('tablet')}</option>
+          <option value="1920x1080">{formatMessage('desktop')}</option>
+        </select>
       </Flex>
     </div>
   );
