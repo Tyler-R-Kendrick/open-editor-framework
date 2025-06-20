@@ -37,3 +37,20 @@ test('dispatches save event', async () => {
   expect(listener).toHaveBeenCalled();
   window.removeEventListener('editor-save', listener);
 });
+
+test('dispatches share event', async () => {
+  const listener = jest.fn();
+  window.addEventListener('editor-share', listener);
+  render(
+    <ReduxProvider store={store}>
+      <I18nProvider locale="en-US">
+        <Provider theme={defaultTheme} colorScheme="light">
+          <EditorToolbar theme="light" onThemeChange={() => {}} />
+        </Provider>
+      </I18nProvider>
+    </ReduxProvider>
+  );
+  await userEvent.click(screen.getByRole('button', { name: /share/i }));
+  expect(listener).toHaveBeenCalled();
+  window.removeEventListener('editor-share', listener);
+});
