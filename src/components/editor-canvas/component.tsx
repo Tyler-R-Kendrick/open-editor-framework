@@ -13,8 +13,11 @@ interface PinchState {
   startZoom: number;
 }
 
+import type { Resolution } from '../../types/editor-types';
+
 interface EditorCanvasProps {
   theme: EditorTheme;
+  resolution?: Resolution;
   'aria-label'?: string;
 }
 
@@ -29,6 +32,7 @@ interface EditorCanvasProps {
  */
 export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   theme,
+  resolution,
   'aria-label': ariaLabel
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -224,18 +228,24 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
     ctx.strokeStyle = theme === 'dark' ? '#374151' : '#f1f5f9';
     ctx.lineWidth = 1;
     const gridSize = 20;
+    const startX =
+      (((-canvasState.pan.x / canvasState.zoom) % gridSize) + gridSize) %
+      gridSize;
+    const startY =
+      (((-canvasState.pan.y / canvasState.zoom) % gridSize) + gridSize) %
+      gridSize;
 
-    for (let x = 0; x < width; x += gridSize) {
+    for (let x = startX; x < width / canvasState.zoom; x += gridSize) {
       ctx.beginPath();
       ctx.moveTo(x, 0);
-      ctx.lineTo(x, height);
+      ctx.lineTo(x, height / canvasState.zoom);
       ctx.stroke();
     }
 
-    for (let y = 0; y < height; y += gridSize) {
+    for (let y = startY; y < height / canvasState.zoom; y += gridSize) {
       ctx.beginPath();
       ctx.moveTo(0, y);
-      ctx.lineTo(width, y);
+      ctx.lineTo(width / canvasState.zoom, y);
       ctx.stroke();
     }
 
@@ -441,8 +451,9 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       ref={containerRef}
       className="canvas-container"
       style={{
-        width: '100%',
-        height: '100%',
+        width: resolution ? `${resolution.width}px` : '100%',
+        height: resolution ? `${resolution.height}px` : '100%',
+        margin: resolution ? '0 auto' : undefined,
         position: 'relative',
         overflow: 'hidden',
         background: theme === 'dark' ? '#1e293b' : '#f8fafc',

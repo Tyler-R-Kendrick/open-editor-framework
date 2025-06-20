@@ -11,7 +11,9 @@ export const toolbarMessages = {
     resetZoom: 'Reset zoom',
     share: 'Share',
     dark: 'Dark',
-    light: 'Light'
+    light: 'Light',
+    resolution: 'Resolution',
+    infinite: 'Infinite Canvas'
   },
   'es-ES': {
     toolbar: 'Barra de herramientas',
@@ -25,7 +27,9 @@ export const toolbarMessages = {
     resetZoom: 'Restablecer zoom',
     share: 'Compartir',
     dark: 'Oscuro',
-    light: 'Claro'
+    light: 'Claro',
+    resolution: 'Resoluci\u00f3n',
+    infinite: 'Lienzo infinito'
   }
 };
 export default toolbarMessages;
