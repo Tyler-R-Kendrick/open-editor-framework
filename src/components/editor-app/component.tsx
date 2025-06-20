@@ -53,7 +53,7 @@ export const EditorApp: React.FC = () => {
     }
   }, []);
 
-  const borderColor =
+  const borderClass =
     theme === 'dark' ? 'border-slate-700' : 'border-slate-200';
 
   const handleThemeToggle = (newTheme: EditorTheme) => {
@@ -74,9 +74,9 @@ export const EditorApp: React.FC = () => {
             }`}
           >
             <div
-              className={`h-15 border-b ${
+              className={`h-[60px] border-b ${
                 theme === 'dark' ? 'bg-slate-700' : 'bg-white'
-              } ${borderColor}`}
+              } ${borderClass}`}
             >
               <EditorToolbar
                 theme={theme}
@@ -88,7 +88,7 @@ export const EditorApp: React.FC = () => {
             <div className="flex flex-1 overflow-hidden relative">
               {showPalette && (
                 <div
-                  className={`w-64 overflow-auto relative border-r ${borderColor}`}
+                  className={`w-64 overflow-auto relative border-r ${borderClass}`}
                 >
                   <button
                     onClick={() => setShowPalette(false)}
@@ -130,7 +130,7 @@ export const EditorApp: React.FC = () => {
               </div>
               {showControl && (
                 <div
-                  className={`w-72 overflow-auto relative border-l ${borderColor}`}
+                  className={`w-72 overflow-auto relative border-l ${borderClass}`}
                 >
                   <button
                     onClick={() => setShowControl(false)}
