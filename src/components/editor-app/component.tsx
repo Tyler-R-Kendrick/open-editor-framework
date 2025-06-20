@@ -53,7 +53,8 @@ export const EditorApp: React.FC = () => {
     }
   }, []);
 
-  const borderColor = theme === 'dark' ? '#374151' : '#e2e8f0';
+  const borderColor =
+    theme === 'dark' ? 'border-slate-700' : 'border-slate-200';
 
   const handleThemeToggle = (newTheme: EditorTheme) => {
     setTheme(newTheme);
@@ -64,24 +65,18 @@ export const EditorApp: React.FC = () => {
       <I18nProvider locale={navigator.language}>
         <SpectrumProvider theme={defaultTheme} colorScheme={theme}>
           <div
-            className="editor-container"
             role="application"
             aria-label="React Component Editor"
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '100%',
-              height: '100%',
-              background: theme === 'dark' ? '#1e293b' : '#f8fafc',
-              color: theme === 'dark' ? '#f8fafc' : '#1e293b'
-            }}
+            className={`flex flex-col w-full h-full ${
+              theme === 'dark'
+                ? 'bg-slate-800 text-slate-50'
+                : 'bg-slate-50 text-slate-800'
+            }`}
           >
             <div
-              style={{
-                height: '60px',
-                borderBottom: `1px solid ${borderColor}`,
-                background: theme === 'dark' ? '#374151' : 'white'
-              }}
+              className={`h-15 border-b ${
+                theme === 'dark' ? 'bg-slate-700' : 'bg-white'
+              } ${borderColor}`}
             >
               <EditorToolbar
                 theme={theme}
@@ -90,31 +85,14 @@ export const EditorApp: React.FC = () => {
                 onResolutionChange={setResolution}
               />
             </div>
-            <div
-              style={{
-                display: 'flex',
-                flex: 1,
-                overflow: 'hidden',
-                position: 'relative'
-              }}
-            >
+            <div className="flex flex-1 overflow-hidden relative">
               {showPalette && (
                 <div
-                  style={{
-                    width: '250px',
-                    borderRight: `1px solid ${borderColor}`,
-                    overflow: 'auto',
-                    position: 'relative'
-                  }}
+                  className={`w-64 overflow-auto relative border-r ${borderColor}`}
                 >
                   <button
                     onClick={() => setShowPalette(false)}
-                    style={{
-                      position: 'absolute',
-                      top: 4,
-                      right: 4,
-                      zIndex: 10
-                    }}
+                    className="absolute top-1 right-1 z-10 p-1 text-xs rounded border bg-transparent text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                     aria-label="Collapse component palette"
                   >
                     «
@@ -125,16 +103,11 @@ export const EditorApp: React.FC = () => {
                   />
                 </div>
               )}
-              <div style={{ flex: 1, overflow: 'auto', position: 'relative' }}>
+              <div className="flex-1 overflow-auto relative">
                 {!showPalette && (
                   <button
                     onClick={() => setShowPalette(true)}
-                    style={{
-                      position: 'absolute',
-                      left: 0,
-                      top: 4,
-                      zIndex: 10
-                    }}
+                    className="absolute left-0 top-1 z-10 p-1 text-xs rounded border bg-transparent text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                     aria-label="Expand component palette"
                   >
                     »
@@ -143,12 +116,7 @@ export const EditorApp: React.FC = () => {
                 {!showControl && (
                   <button
                     onClick={() => setShowControl(true)}
-                    style={{
-                      position: 'absolute',
-                      right: 0,
-                      top: 4,
-                      zIndex: 10
-                    }}
+                    className="absolute right-0 top-1 z-10 p-1 text-xs rounded border bg-transparent text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                     aria-label="Expand properties panel"
                   >
                     «
@@ -162,21 +130,11 @@ export const EditorApp: React.FC = () => {
               </div>
               {showControl && (
                 <div
-                  style={{
-                    width: '300px',
-                    borderLeft: `1px solid ${borderColor}`,
-                    overflow: 'auto',
-                    position: 'relative'
-                  }}
+                  className={`w-72 overflow-auto relative border-l ${borderColor}`}
                 >
                   <button
                     onClick={() => setShowControl(false)}
-                    style={{
-                      position: 'absolute',
-                      top: 4,
-                      left: 4,
-                      zIndex: 10
-                    }}
+                    className="absolute top-1 left-1 z-10 p-1 text-xs rounded border bg-transparent text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                     aria-label="Collapse properties panel"
                   >
                     »

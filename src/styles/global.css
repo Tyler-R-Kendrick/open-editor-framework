@@ -10,9 +10,11 @@
   *::after {
     box-sizing: border-box;
   }
+
   html {
     /* Prevent text size adjust on iOS */
     -webkit-text-size-adjust: 100%;
+
     /* Enable smooth scrolling */
     scroll-behavior: smooth;
   }
@@ -20,8 +22,10 @@
   body {
     /* Prevent rubber band scrolling on iOS */
     overflow: hidden;
+
     /* Improve touch scrolling performance on iOS */
     -webkit-overflow-scrolling: touch;
+
     /* Disable text selection highlighting on touch devices */
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -29,8 +33,9 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+
     /* Ensure proper background color for contrast */
-    background-color: #ffffff;
+    background-color: #fff;
     color: #1e293b;
   }
 
@@ -38,15 +43,6 @@
   *:focus {
     outline: 2px solid #3b82f6;
     outline-offset: 2px;
-  }
-
-  /* Custom focus styles for interactive elements */
-  button:focus,
-  [role='button']:focus,
-  [tabindex]:focus {
-    box-shadow:
-      0 0 0 2px #3b82f6,
-      0 0 0 4px rgba(59, 130, 246, 0.2);
   }
 
   /* Improve touch target sizes for accessibility */
@@ -57,6 +53,15 @@
   textarea {
     min-height: 44px;
     min-width: 44px;
+  }
+
+  /* Custom focus styles for interactive elements */
+  button:focus,
+  [role='button']:focus,
+  [tabindex]:focus {
+    box-shadow:
+      0 0 0 2px #3b82f6,
+      0 0 0 4px rgb(59 130 246 / 20%);
   }
 }
 
@@ -105,10 +110,10 @@
 @layer utilities {
   /* Animation utilities */
   .animate-touch-feedback {
-    animation: touchFeedback 0.1s ease-out;
+    animation: touch-feedback 0.1s ease-out;
   }
 
-  @keyframes touchFeedback {
+  @keyframes touch-feedback {
     0% {
       transform: scale(1);
     }
@@ -125,11 +130,11 @@
   /* High contrast mode support */
   @media (prefers-contrast: high) {
     .border-light {
-      border-color: #000000;
+      border-color: #000;
     }
 
     .text-muted {
-      color: #000000;
+      color: #000;
     }
   }
 

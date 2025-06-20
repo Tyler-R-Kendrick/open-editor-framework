@@ -11,7 +11,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "serve": "vite preview --port 3000",
-    "lint": "eslint . --fix",
+    "lint": "eslint . --fix && npm run lint:styles",
+    "lint:styles": "stylelint \"src/**/*.css\" --ignore-pattern \"**/tokens.css\"",
     "format": "prettier --write .",
     "test": "jest",
     "test:coverage": "jest --coverage",
@@ -85,7 +86,11 @@
     "vite-plugin-pwa": "^1.0.0",
     "workbox-window": "^7.3.0",
     "glob": "^11.0.3",
-    "npm": "^11.4.2"
+    "npm": "^11.4.2",
+    "stylelint": "^15.10.2",
+    "stylelint-config-prettier": "9.0.4",
+    "stylelint-config-standard": "^34.0.0",
+    "stylelint-config-tailwindcss": "^1.0.0"
   },
   "engines": {
     "node": ">=22.0.0",
