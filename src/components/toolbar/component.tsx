@@ -4,14 +4,13 @@ import { Flex, ButtonGroup, Button } from '@adobe/react-spectrum';
 import Add from '@spectrum-icons/workflow/Add';
 import SaveFloppy from '@spectrum-icons/workflow/SaveFloppy';
 import OpenIn from '@spectrum-icons/workflow/OpenIn';
-import ExportIcon from '@spectrum-icons/workflow/Export';
 import UndoIcon from '@spectrum-icons/workflow/Undo';
 import RedoIcon from '@spectrum-icons/workflow/Redo';
 import Moon from '@spectrum-icons/workflow/Moon';
 import Light from '@spectrum-icons/workflow/Light';
 import { useMessageFormatter } from '@react-aria/i18n';
 import messages from '../../i18n/toolbarMessages';
-import { useAppDispatch } from '../../store';
+import { useAppDispatch, store } from '../../store';
 import { ActionCreators } from 'redux-undo';
 
 interface EditorToolbarProps {
@@ -22,7 +21,7 @@ interface EditorToolbarProps {
 /**
  * Editor toolbar with actions and theme controls
  * Features:
- * - File operations (new, save, load, export)
+ * - File operations (new, save, open)
  * - Undo/redo functionality
  * - Zoom controls with keyboard shortcuts
  * - Theme toggle
@@ -51,10 +50,13 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
   };
 
   const handleSave = () => {
-    console.log('Save document');
+    const state = store.getState().canvas.present;
+    window.dispatchEvent(
+      new window.CustomEvent('editor-save', { detail: { canvas: state } })
+    );
   };
 
-  const handleLoad = () => {
+  const handleOpen = () => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
@@ -65,7 +67,11 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
         reader.onload = (event) => {
           try {
             const data = JSON.parse(event.target?.result as string);
-            console.log('Loaded data:', data);
+            window.dispatchEvent(
+              new window.CustomEvent('editor-open', {
+                detail: { canvas: data }
+              })
+            );
           } catch (_error) {
             alert('Error loading file: Invalid JSON format');
           }
@@ -74,10 +80,6 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
       }
     };
     input.click();
-  };
-
-  const handleExport = () => {
-    console.log('Export document');
   };
 
   const toggleTheme = () => {
@@ -109,17 +111,10 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
           </Button>
           <Button
             variant="primary"
-            onPress={handleLoad}
-            aria-label={formatMessage('load')}
+            onPress={handleOpen}
+            aria-label={formatMessage('open')}
           >
             <OpenIn aria-hidden="true" size="S" />
-          </Button>
-          <Button
-            variant="primary"
-            onPress={handleExport}
-            aria-label={formatMessage('export')}
-          >
-            <ExportIcon aria-hidden="true" size="S" />
           </Button>
         </ButtonGroup>
 

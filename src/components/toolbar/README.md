@@ -4,7 +4,7 @@ A comprehensive toolbar component providing file operations, editing controls, a
 
 ## Features
 
-- **File Operations**: New, Save, Load, Export functionality
+- **File Operations**: New, Save, Open functionality
 - **Editing Controls**: Undo/redo with visual feedback
 - **Zoom Controls**: Zoom in/out/reset with live percentage display
 - **Theme Toggle**: Switch between light and dark themes
@@ -23,56 +23,58 @@ import { EditorToolbar } from './toolbar/component.js';
 
 ## Properties
 
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `theme` | `EditorTheme` | `'light'` | Visual theme (light/dark) |
+| Property | Type          | Default   | Description               |
+| -------- | ------------- | --------- | ------------------------- |
+| `theme`  | `EditorTheme` | `'light'` | Visual theme (light/dark) |
 
 ## Events
 
-| Event | Detail | Description |
-|-------|--------|-------------|
-| `editor-new` | `{}` | Fired when new document is requested |
-| `editor-save` | `{}` | Fired when save is requested |
-| `editor-load` | `{file: File}` | Fired when file load is requested |
-| `editor-export` | `{}` | Fired when export is requested |
-| `editor-undo` | `{}` | Fired when undo is requested |
-| `editor-redo` | `{}` | Fired when redo is requested |
-| `editor-zoom` | `{zoom: number}` | Fired when zoom level changes |
-| `theme-change` | `{theme: EditorTheme}` | Fired when theme toggle is clicked |
+| Event          | Detail                 | Description                          |
+| -------------- | ---------------------- | ------------------------------------ |
+| `editor-new`   | `{}`                   | Fired when new document is requested |
+| `editor-save`  | `{canvas: object}`     | Fired when save is requested         |
+| `editor-open`  | `{canvas: object}`     | Fired when a file is opened          |
+| `editor-undo`  | `{}`                   | Fired when undo is requested         |
+| `editor-redo`  | `{}`                   | Fired when redo is requested         |
+| `editor-zoom`  | `{zoom: number}`       | Fired when zoom level changes        |
+| `theme-change` | `{theme: EditorTheme}` | Fired when theme toggle is clicked   |
 
 ## Keyboard Shortcuts
 
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl+N` | New document |
-| `Ctrl+S` | Save document |
-| `Ctrl+O` | Open/Load document |
-| `Ctrl+E` | Export document |
-| `Ctrl+Z` | Undo |
-| `Ctrl+Shift+Z` | Redo |
-| `Ctrl++` | Zoom in |
-| `Ctrl+-` | Zoom out |
-| `Ctrl+0` | Reset zoom to 100% |
+| Shortcut       | Action             |
+| -------------- | ------------------ |
+| `Ctrl+N`       | New document       |
+| `Ctrl+S`       | Save document      |
+| `Ctrl+O`       | Open document      |
+| `Ctrl+Z`       | Undo               |
+| `Ctrl+Shift+Z` | Redo               |
+| `Ctrl++`       | Zoom in            |
+| `Ctrl+-`       | Zoom out           |
+| `Ctrl+0`       | Reset zoom to 100% |
 
 ## Sections
 
 The toolbar is divided into three sections:
 
 ### Left Section (File Operations)
+
 - Logo and branding
-- File operations (New, Save, Load, Export)
+- File operations (New, Save, Open)
 
 ### Center Section (Editing)
+
 - Undo/Redo buttons
 - Zoom controls with percentage display
 
 ### Right Section (Settings)
+
 - Theme toggle switch
 - External links (GitHub)
 
 ## Mobile Behavior
 
 On mobile devices (≤768px):
+
 - Logo text is hidden to save space
 - Zoom controls are hidden
 - Button sizes are reduced
@@ -111,6 +113,7 @@ Uses CSS custom properties for theming:
 ## Theme Toggle
 
 The theme toggle provides a smooth animated switch between light and dark modes with:
+
 - Animated slider transition
 - Sun/moon icons for visual feedback
 - ARIA switch role for accessibility
