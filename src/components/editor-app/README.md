@@ -43,7 +43,7 @@ The component uses React hooks to manage:
 
 ## Mobile Support
 
-On mobile devices (< 768px width), the layout switches to a stacked view with tabs at the bottom for:
+On mobile devices (< 768px width), the layout shows one panel at a time. A persistent bottom navigation bar lets you switch between:
 
 - Component Palette
 - Canvas
