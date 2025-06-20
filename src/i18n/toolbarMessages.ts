@@ -9,6 +9,7 @@ export const toolbarMessages = {
     zoomOut: 'Zoom out',
     zoomIn: 'Zoom in',
     resetZoom: 'Reset zoom',
+    share: 'Share',
     dark: 'Dark',
     light: 'Light'
   },
@@ -22,6 +23,7 @@ export const toolbarMessages = {
     zoomOut: 'Alejar',
     zoomIn: 'Acercar',
     resetZoom: 'Restablecer zoom',
+    share: 'Compartir',
     dark: 'Oscuro',
     light: 'Claro'
   }
