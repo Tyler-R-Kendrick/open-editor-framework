@@ -12,7 +12,7 @@ These instructions outline patterns and practices to follow when working with th
 4. **Code Formatting**: format code with `npm run format`. The project uses Prettier with the configuration in `.prettierrc`.
 5. **Linting**: run `npm run lint` before committing. Fix any reported issues.
 6. **Type Checking**: ensure `npm run type-check` passes.
-7. **Testing**: run `npm run test` and ensure all tests pass.
+7. **Testing**: run `npm run test` and ensure all unit tests pass. When you make changes that affect component rendering, also run `npm run test:e2e` and inspect the Playwright report for visual differences.
 8. **Build Tokens**: if you modify design tokens, run `npm run build:tokens` to regenerate `src/styles/tokens.css`.
 9. **Commit Messages**: use [Conventional Commits](https://www.conventionalcommits.org/) such as `feat:`, `fix:`, `docs:`, etc.
 10. **Azure Workflow**: Do not change the `deployment_environment` input in `.github/workflows/azure-static-web-apps-kind-bush-0dd23160f.yml`. Adjusting this creates excess staging environments and blocks deployments.
