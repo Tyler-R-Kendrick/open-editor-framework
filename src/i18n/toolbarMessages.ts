@@ -10,7 +10,12 @@ export const toolbarMessages = {
     zoomIn: 'Zoom in',
     resetZoom: 'Reset zoom',
     dark: 'Dark',
-    light: 'Light'
+    light: 'Light',
+    canvasSize: 'Canvas size',
+    infinite: 'Infinite',
+    mobile: 'Mobile',
+    tablet: 'Tablet',
+    desktop: 'Desktop'
   },
   'es-ES': {
     toolbar: 'Barra de herramientas',
@@ -23,7 +28,12 @@ export const toolbarMessages = {
     zoomIn: 'Acercar',
     resetZoom: 'Restablecer zoom',
     dark: 'Oscuro',
-    light: 'Claro'
+    light: 'Claro',
+    canvasSize: 'Tamaño del lienzo',
+    infinite: 'Infinito',
+    mobile: 'Móvil',
+    tablet: 'Tableta',
+    desktop: 'Escritorio'
   }
 };
 export default toolbarMessages;

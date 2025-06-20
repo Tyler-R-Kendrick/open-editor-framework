@@ -76,3 +76,10 @@ export interface AccessibilityOptions {
   screenReader: boolean;
   keyboardNavigation: boolean;
 }
+
+export type CanvasSize =
+  | 'infinite'
+  | {
+      width: number;
+      height: number;
+    };

@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { EditorTheme, CanvasState } from '../../types/editor-types';
+import { EditorTheme, CanvasState, CanvasSize } from '../../types/editor-types';
 import ZoomOut from '@spectrum-icons/workflow/ZoomOut';
 import ZoomIn from '@spectrum-icons/workflow/ZoomIn';
 import Refresh from '@spectrum-icons/workflow/Refresh';
@@ -15,6 +15,7 @@ interface PinchState {
 
 interface EditorCanvasProps {
   theme: EditorTheme;
+  canvasSize: CanvasSize;
   'aria-label'?: string;
 }
 
@@ -29,6 +30,7 @@ interface EditorCanvasProps {
  */
 export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   theme,
+  canvasSize,
   'aria-label': ariaLabel
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -441,8 +443,8 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       ref={containerRef}
       className="canvas-container"
       style={{
-        width: '100%',
-        height: '100%',
+        width: canvasSize === 'infinite' ? '100%' : `${canvasSize.width}px`,
+        height: canvasSize === 'infinite' ? '100%' : `${canvasSize.height}px`,
         position: 'relative',
         overflow: 'hidden',
         background: theme === 'dark' ? '#1e293b' : '#f8fafc',
