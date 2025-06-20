@@ -1,5 +1,5 @@
 import React from 'react';
-import { EditorTheme } from '../../types/editor-types';
+import { EditorTheme, Resolution } from '../../types/editor-types';
 import { Flex, ButtonGroup, Button } from '@adobe/react-spectrum';
 import Add from '@spectrum-icons/workflow/Add';
 import SaveFloppy from '@spectrum-icons/workflow/SaveFloppy';
@@ -18,6 +18,8 @@ import { encodeComponents } from '../../utils/share';
 interface EditorToolbarProps {
   theme: EditorTheme;
   onThemeChange: (theme: EditorTheme) => void;
+  resolution?: Resolution;
+  onResolutionChange?: (resolution?: Resolution) => void;
 }
 
 /**
@@ -32,10 +34,19 @@ interface EditorToolbarProps {
  */
 export const EditorToolbar: React.FC<EditorToolbarProps> = ({
   theme,
-  onThemeChange
+  onThemeChange,
+  resolution,
+  onResolutionChange
 }) => {
   const formatMessage = useMessageFormatter(messages);
   const dispatch = useAppDispatch();
+
+  const resolutions: { label: string; value?: Resolution }[] = [
+    { label: formatMessage('infinite'), value: undefined },
+    { label: '1024x768', value: { width: 1024, height: 768 } },
+    { label: '1366x768', value: { width: 1366, height: 768 } },
+    { label: '1920x1080', value: { width: 1920, height: 1080 } }
+  ];
 
   const handleUndo = () => {
     dispatch(ActionCreators.undo());
@@ -176,6 +187,52 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
             )}
           </Button>
         </ButtonGroup>
+
+        {onResolutionChange && (
+          <select
+            aria-label={formatMessage('resolution')}
+            value={
+              resolution
+                ? `${resolution.width}x${resolution.height}`
+                : 'infinite'
+            }
+            onChange={(e) => {
+              const value = e.target.value;
+              const selected = resolutions.find((r) =>
+                r.value
+                  ? `${r.value.width}x${r.value.height}` === value
+                  : value === 'infinite'
+              );
+              onResolutionChange(selected?.value);
+            }}
+            style={{
+              padding: '8px 12px',
+              border: `1px solid ${theme === 'dark' ? '#6b7280' : '#d1d5db'}`,
+              borderRadius: '6px',
+              background: theme === 'dark' ? '#4b5563' : '#ffffff',
+              color: theme === 'dark' ? '#f8fafc' : '#1e293b',
+              fontSize: '14px'
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = '#3b82f6';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor =
+                theme === 'dark' ? '#6b7280' : '#d1d5db';
+            }}
+          >
+            {resolutions.map((r) => (
+              <option
+                key={r.label}
+                value={
+                  r.value ? `${r.value.width}x${r.value.height}` : 'infinite'
+                }
+              >
+                {r.label}
+              </option>
+            ))}
+          </select>
+        )}
       </Flex>
     </div>
   );

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { EditorTheme } from '../../types/editor-types';
+import type { Resolution } from '../../types/editor-types';
 import { EditorToolbar } from '../toolbar/component';
 import { ComponentPalette } from '../component-palette/component';
 import { EditorCanvas } from '../editor-canvas/component';
@@ -21,6 +22,9 @@ export const EditorApp: React.FC = () => {
   const [theme, setTheme] = useState<EditorTheme>('light');
   const [showPalette, setShowPalette] = useState(true);
   const [showControl, setShowControl] = useState(true);
+  const [resolution, setResolution] = useState<Resolution | undefined>(
+    undefined
+  );
 
   const handleThemeChange = useCallback(
     (e: MediaQueryListEvent | MediaQueryList) => {
@@ -79,7 +83,12 @@ export const EditorApp: React.FC = () => {
                 background: theme === 'dark' ? '#374151' : 'white'
               }}
             >
-              <EditorToolbar theme={theme} onThemeChange={handleThemeToggle} />
+              <EditorToolbar
+                theme={theme}
+                onThemeChange={handleThemeToggle}
+                resolution={resolution}
+                onResolutionChange={setResolution}
+              />
             </div>
             <div
               style={{
@@ -145,7 +154,11 @@ export const EditorApp: React.FC = () => {
                     «
                   </button>
                 )}
-                <EditorCanvas theme={theme} aria-label="Design Canvas" />
+                <EditorCanvas
+                  theme={theme}
+                  resolution={resolution}
+                  aria-label="Design Canvas"
+                />
               </div>
               {showControl && (
                 <div

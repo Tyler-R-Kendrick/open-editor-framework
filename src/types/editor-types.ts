@@ -15,6 +15,8 @@ export interface Size {
   height: number;
 }
 
+export type Resolution = Size;
+
 export interface Bounds extends Point, Size {}
 
 export interface EditorComponent {
