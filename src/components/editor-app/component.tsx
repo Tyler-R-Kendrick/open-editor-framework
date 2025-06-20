@@ -56,6 +56,11 @@ export const EditorApp: React.FC = () => {
   const borderClass =
     theme === 'dark' ? 'border-slate-700' : 'border-slate-200';
 
+  const toggleButtonClass =
+    theme === 'dark'
+      ? 'absolute z-10 p-1 text-xs rounded border bg-slate-700 border-slate-700 text-slate-200 hover:bg-slate-600'
+      : 'absolute z-10 p-1 text-xs rounded border bg-white border-slate-200 text-slate-700 hover:bg-slate-100';
+
   const handleThemeToggle = (newTheme: EditorTheme) => {
     setTheme(newTheme);
   };
@@ -92,7 +97,7 @@ export const EditorApp: React.FC = () => {
                 >
                   <button
                     onClick={() => setShowPalette(false)}
-                    className="absolute top-1 right-1 z-10 p-1 text-xs rounded border bg-transparent text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                    className={`top-1 right-1 ${toggleButtonClass}`}
                     aria-label="Collapse component palette"
                   >
                     «
@@ -107,7 +112,7 @@ export const EditorApp: React.FC = () => {
                 {!showPalette && (
                   <button
                     onClick={() => setShowPalette(true)}
-                    className="absolute left-0 top-1 z-10 p-1 text-xs rounded border bg-transparent text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                    className={`left-0 top-1 ${toggleButtonClass}`}
                     aria-label="Expand component palette"
                   >
                     »
@@ -116,7 +121,7 @@ export const EditorApp: React.FC = () => {
                 {!showControl && (
                   <button
                     onClick={() => setShowControl(true)}
-                    className="absolute right-0 top-1 z-10 p-1 text-xs rounded border bg-transparent text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                    className={`right-0 top-1 ${toggleButtonClass}`}
                     aria-label="Expand properties panel"
                   >
                     «
@@ -134,7 +139,7 @@ export const EditorApp: React.FC = () => {
                 >
                   <button
                     onClick={() => setShowControl(false)}
-                    className="absolute top-1 left-1 z-10 p-1 text-xs rounded border bg-transparent text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                    className={`top-1 left-1 ${toggleButtonClass}`}
                     aria-label="Collapse properties panel"
                   >
                     »
