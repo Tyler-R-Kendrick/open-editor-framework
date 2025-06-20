@@ -4,6 +4,7 @@ import { Flex, ButtonGroup, Button } from '@adobe/react-spectrum';
 import Add from '@spectrum-icons/workflow/Add';
 import SaveFloppy from '@spectrum-icons/workflow/SaveFloppy';
 import OpenIn from '@spectrum-icons/workflow/OpenIn';
+import Share from '@spectrum-icons/workflow/Share';
 import UndoIcon from '@spectrum-icons/workflow/Undo';
 import RedoIcon from '@spectrum-icons/workflow/Redo';
 import Moon from '@spectrum-icons/workflow/Moon';
@@ -12,6 +13,7 @@ import { useMessageFormatter } from '@react-aria/i18n';
 import messages from '../../i18n/toolbarMessages';
 import { useAppDispatch, store } from '../../store';
 import { ActionCreators } from 'redux-undo';
+import { encodeComponents } from '../../utils/share';
 
 interface EditorToolbarProps {
   theme: EditorTheme;
@@ -86,6 +88,23 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
     input.click();
   };
 
+  const handleShare = async () => {
+    const components = store.getState().canvas.present.components;
+    const encoded = encodeComponents(components);
+    const url = new URL(window.location.href);
+    url.searchParams.set('state', encoded);
+    try {
+      await navigator.clipboard.writeText(url.toString());
+    } catch (_err) {
+      window.prompt('Share this link:', url.toString());
+    }
+    window.dispatchEvent(
+      new window.CustomEvent('editor-share', {
+        detail: { url: url.toString() }
+      })
+    );
+  };
+
   const toggleTheme = () => {
     onThemeChange(theme === 'light' ? 'dark' : 'light');
   };
@@ -119,6 +138,13 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
             aria-label={formatMessage('open')}
           >
             <OpenIn aria-hidden="true" size="S" />
+          </Button>
+          <Button
+            variant="primary"
+            onPress={handleShare}
+            aria-label={formatMessage('share')}
+          >
+            <Share aria-hidden="true" size="S" />
           </Button>
         </ButtonGroup>
 

@@ -48,6 +48,28 @@ test('dispatches save event', async () => {
   window.removeEventListener('editor-save', listener);
 });
 
+test('dispatches share event', async () => {
+  const listener = jest.fn();
+  window.addEventListener('editor-share', listener);
+  render(
+    <ReduxProvider store={store}>
+      <I18nProvider locale="en-US">
+        <Provider theme={defaultTheme} colorScheme="light">
+          <EditorToolbar
+            theme="light"
+            onThemeChange={() => {}}
+            canvasSize="infinite"
+            onCanvasSizeChange={() => {}}
+          />
+        </Provider>
+      </I18nProvider>
+    </ReduxProvider>
+  );
+  await userEvent.click(screen.getByRole('button', { name: /share/i }));
+  expect(listener).toHaveBeenCalled();
+  window.removeEventListener('editor-share', listener);
+});
+
 test('renders canvas size selector', () => {
   render(
     <ReduxProvider store={store}>
