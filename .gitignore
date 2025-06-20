@@ -405,3 +405,7 @@ FodyWeavers.xsd
 
 # Ignore package lock
 package-lock.json
+
+# Playwright
+playwright-report/
+test-results/

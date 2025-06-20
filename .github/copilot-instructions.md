@@ -49,4 +49,5 @@ Coding standards, domain knowledge, and preferences that AI should follow.
 - Ensure tests cover both mobile and desktop interactions.
 - Use Playwright's built-in accessibility checks.
 - Test component props, events, and user interactions.
+- When your changes may alter how components render, run `npm run test:e2e` and review the Playwright report for visual changes.
 
