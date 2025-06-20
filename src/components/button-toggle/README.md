@@ -9,6 +9,7 @@ A reusable toggle button component with theme-aware styling and accessibility su
 - **Accessibility**: Proper ARIA attributes and keyboard navigation
 - **Touch-optimized**: Minimum 44px touch targets for mobile devices
 - **Smooth transitions**: Responsive hover and state change animations
+- **TypeScript support**: Full type safety with exported interfaces
 
 ## Usage
 
@@ -65,6 +66,31 @@ The component uses theme-aware colors:
 - Maintains minimum 44px touch targets
 - Respects disabled state with visual and interaction feedback
 
+## useButtonStyles Hook
+
+The package also exports a `useButtonStyles` hook for consistent styling of other button types:
+
+```tsx
+import { useButtonStyles } from './components/button-toggle';
+
+function MyComponent({ theme }: { theme: EditorTheme }) {
+  const buttonStyles = useButtonStyles(theme);
+  
+  return (
+    <div>
+      <button style={buttonStyles.primary}>Primary Action</button>
+      <button style={buttonStyles.secondary}>Secondary Action</button>
+      <button style={buttonStyles.destructive}>Delete</button>
+    </div>
+  );
+}
+```
+
+Available button styles:
+- `primary`: Bold colored button for main actions
+- `secondary`: Subtle button for secondary actions  
+- `destructive`: Warning-colored button for delete/remove actions
+
 ## Replacing Existing Toggle Buttons
 
 This component can replace inline toggle button implementations:
@@ -104,8 +130,25 @@ This component can replace inline toggle button implementations:
 </ButtonToggle>
 ```
 
+## Benefits
+
+- **Reduced code duplication**: Eliminates 20+ lines of repeated styling code
+- **Consistent styling**: All toggle buttons use the same visual patterns
+- **Better accessibility**: Built-in ARIA attributes and keyboard support
+- **Easier maintenance**: Style updates only need to be made in one place
+- **Type safety**: Full TypeScript support prevents common errors
+
+## Integration
+
+To use this component in your project:
+
+1. Import the component: `import { ButtonToggle } from './components/button-toggle';`
+2. Replace existing toggle button implementations with the new component
+3. Ensure you have the `EditorTheme` type available from `./types/editor-types`
+
 ## Related Components
 
 - Use with control panel field renderers for consistent toggle styling
 - Can be combined with other form components for complex interfaces
 - Integrates well with the existing theme system
+- Follows the same patterns as other components in the framework
