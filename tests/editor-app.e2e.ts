@@ -13,11 +13,13 @@ test('renders component palette', async ({ page }) => {
 });
 
 test('renders design canvas', async ({ page }) => {
-  await expect(page.getByLabel('Design Canvas')).toBeVisible();
+  await expect(page.getByLabel('Design Canvas', { exact: true })).toBeVisible();
 });
 
 test('renders properties panel', async ({ page }) => {
-  await expect(page.getByLabel('Properties Panel')).toBeVisible();
+  await expect(
+    page.getByLabel('Properties Panel', { exact: true })
+  ).toBeVisible();
 });
 
 test('can toggle theme', async ({ page }) => {
