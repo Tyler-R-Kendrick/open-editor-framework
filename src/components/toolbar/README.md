@@ -5,6 +5,7 @@ A comprehensive toolbar component providing file operations, editing controls, a
 ## Features
 
 - **File Operations**: New, Save, Open functionality
+- **Share Links**: Generate URL containing the current canvas state
 - **Editing Controls**: Undo/redo with visual feedback
 - **Zoom Controls**: Zoom in/out/reset with live percentage display
 - **Theme Toggle**: Switch between light and dark themes
@@ -34,6 +35,7 @@ import { EditorToolbar } from './toolbar/component.js';
 | `editor-new`   | `{}`                   | Fired when new document is requested |
 | `editor-save`  | `{canvas: object}`     | Fired when save is requested         |
 | `editor-open`  | `{canvas: object}`     | Fired when a file is opened          |
+| `editor-share` | `{url: string}`        | Fired when a share link is generated |
 | `editor-undo`  | `{}`                   | Fired when undo is requested         |
 | `editor-redo`  | `{}`                   | Fired when redo is requested         |
 | `editor-zoom`  | `{zoom: number}`       | Fired when zoom level changes        |
