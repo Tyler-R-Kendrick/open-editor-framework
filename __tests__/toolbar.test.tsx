@@ -54,3 +54,37 @@ test('dispatches share event', async () => {
   expect(listener).toHaveBeenCalled();
   window.removeEventListener('editor-share', listener);
 });
+
+test('dispatches undo event', async () => {
+  const listener = jest.fn();
+  window.addEventListener('editor-undo', listener);
+  render(
+    <ReduxProvider store={store}>
+      <I18nProvider locale="en-US">
+        <Provider theme={defaultTheme} colorScheme="light">
+          <EditorToolbar theme="light" onThemeChange={() => {}} />
+        </Provider>
+      </I18nProvider>
+    </ReduxProvider>
+  );
+  await userEvent.click(screen.getByRole('button', { name: /undo/i }));
+  expect(listener).toHaveBeenCalled();
+  window.removeEventListener('editor-undo', listener);
+});
+
+test('dispatches redo event', async () => {
+  const listener = jest.fn();
+  window.addEventListener('editor-redo', listener);
+  render(
+    <ReduxProvider store={store}>
+      <I18nProvider locale="en-US">
+        <Provider theme={defaultTheme} colorScheme="light">
+          <EditorToolbar theme="light" onThemeChange={() => {}} />
+        </Provider>
+      </I18nProvider>
+    </ReduxProvider>
+  );
+  await userEvent.click(screen.getByRole('button', { name: /redo/i }));
+  expect(listener).toHaveBeenCalled();
+  window.removeEventListener('editor-redo', listener);
+});
