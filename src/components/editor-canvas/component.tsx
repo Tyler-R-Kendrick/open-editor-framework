@@ -4,6 +4,9 @@ import ZoomOut from '@spectrum-icons/workflow/ZoomOut';
 import ZoomIn from '@spectrum-icons/workflow/ZoomIn';
 import Refresh from '@spectrum-icons/workflow/Refresh';
 import { BaseComponent } from '../../types/component-base';
+import { useAppDispatch, useAppSelector } from '../../store';
+import { setComponents, setZoom, setPan } from '../../store';
+import { ActionCreators } from 'redux-undo';
 
 interface PinchState {
   startDistance: number;
@@ -24,7 +27,10 @@ interface EditorCanvasProps {
  * - Canvas rendering with zoom/pan
  * - Multi-touch gesture support
  */
-export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label': ariaLabel }) => {
+export const EditorCanvas: React.FC<EditorCanvasProps> = ({
+  theme,
+  'aria-label': ariaLabel
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -32,17 +38,24 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
   const longPressTimerRef = useRef<number | null>(null);
 
   const [canvasState, setCanvasState] = useState<CanvasState>({
-    zoom: 1,
-    pan: { x: 0, y: 0 },
     selectedComponents: [],
-    clipboard: [],
-    history: [],
-    historyIndex: -1
+    clipboard: []
   });
 
-  const [components, setComponents] = useState<BaseComponent[]>([]);
+  const dispatch = useAppDispatch();
+  const components = useAppSelector((state) => state.canvas.present.components);
+  const zoom = useAppSelector((state) => state.canvas.present.zoom);
+  const pan = useAppSelector((state) => state.canvas.present.pan);
   const [isDragging, setIsDragging] = useState(false);
   const [lastTouch, setLastTouch] = useState<PinchState | null>(null);
+
+  const handleUndo = useCallback(() => {
+    dispatch(ActionCreators.undo());
+  }, [dispatch]);
+
+  const handleRedo = useCallback(() => {
+    dispatch(ActionCreators.redo());
+  }, [dispatch]);
 
   const initializeCanvas = useCallback(() => {
     const canvas = canvasRef.current;
@@ -79,84 +92,118 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
     };
   }, []);
 
-  const renderComponent = useCallback((component: BaseComponent) => {
-    const ctx = ctxRef.current;
-    if (!ctx) return;
+  const renderComponent = useCallback(
+    (component: BaseComponent) => {
+      const ctx = ctxRef.current;
+      if (!ctx) return;
 
-    const { bounds } = component;
+      const { bounds } = component;
 
-    // Render component background
-    ctx.fillStyle = String(component.properties.backgroundColor ?? '#ffffff');
-    ctx.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+      // Render component background
+      ctx.fillStyle = String(component.properties.backgroundColor ?? '#ffffff');
+      ctx.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
 
-    // Render component border
-    ctx.strokeStyle = String(component.properties.borderColor ?? '#e2e8f0');
-    ctx.lineWidth = Number(component.properties.borderWidth ?? 1);
-    ctx.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
+      // Render component border
+      ctx.strokeStyle = String(component.properties.borderColor ?? '#e2e8f0');
+      ctx.lineWidth = Number(component.properties.borderWidth ?? 1);
+      ctx.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
 
-    // Render component content based on type
-    switch (component.type) {
-      case 'text':
-        ctx.fillStyle = String(component.properties.color ?? '#000000');
-        ctx.font = `${Number(component.properties.fontSize ?? 16)}px ${String(component.properties.fontFamily ?? 'Arial')}`;
-        ctx.fillText(
-          String(component.properties.text ?? 'Text Component'),
-          bounds.x + 10,
-          bounds.y + bounds.height / 2 + 6
+      // Render component content based on type
+      switch (component.type) {
+        case 'text':
+          ctx.fillStyle = String(component.properties.color ?? '#000000');
+          ctx.font = `${Number(component.properties.fontSize ?? 16)}px ${String(component.properties.fontFamily ?? 'Arial')}`;
+          ctx.fillText(
+            String(component.properties.text ?? 'Text Component'),
+            bounds.x + 10,
+            bounds.y + bounds.height / 2 + 6
+          );
+          break;
+
+        case 'button':
+          // Button background
+          ctx.fillStyle = String(
+            component.properties.backgroundColor ?? '#3b82f6'
+          );
+          ctx.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+
+          // Button text
+          ctx.fillStyle = String(component.properties.color ?? '#ffffff');
+          ctx.font = `${Number(component.properties.fontSize ?? 14)}px ${String(component.properties.fontFamily ?? 'Arial')}`;
+          ctx.textAlign = 'center';
+          ctx.fillText(
+            String(component.properties.text ?? 'Button'),
+            bounds.x + bounds.width / 2,
+            bounds.y + bounds.height / 2 + 4
+          );
+          ctx.textAlign = 'start';
+          break;
+
+        case 'image':
+          ctx.fillStyle = '#f3f4f6';
+          ctx.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+          ctx.strokeStyle = '#d1d5db';
+          ctx.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
+
+          // Image icon
+          ctx.fillStyle = '#9ca3af';
+          ctx.font = '20px Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText(
+            '🖼️',
+            bounds.x + bounds.width / 2,
+            bounds.y + bounds.height / 2 + 8
+          );
+          ctx.textAlign = 'start';
+          break;
+      }
+
+      // Render selection indicator
+      if (canvasState.selectedComponents.includes(component.id)) {
+        ctx.strokeStyle = '#3b82f6';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        ctx.strokeRect(
+          bounds.x - 2,
+          bounds.y - 2,
+          bounds.width + 4,
+          bounds.height + 4
         );
-        break;
+        ctx.setLineDash([]);
 
-      case 'button':
-        // Button background
-        ctx.fillStyle = String(component.properties.backgroundColor ?? '#3b82f6');
-        ctx.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+        // Render resize handles
+        const handleSize = 8;
+        ctx.fillStyle = '#3b82f6';
 
-        // Button text
-        ctx.fillStyle = String(component.properties.color ?? '#ffffff');
-        ctx.font = `${Number(component.properties.fontSize ?? 14)}px ${String(component.properties.fontFamily ?? 'Arial')}`;
-        ctx.textAlign = 'center';
-        ctx.fillText(
-          String(component.properties.text ?? 'Button'),
-          bounds.x + bounds.width / 2,
-          bounds.y + bounds.height / 2 + 4
+        // Corner handles
+        ctx.fillRect(
+          bounds.x - handleSize / 2,
+          bounds.y - handleSize / 2,
+          handleSize,
+          handleSize
         );
-        ctx.textAlign = 'start';
-        break;
-
-      case 'image':
-        ctx.fillStyle = '#f3f4f6';
-        ctx.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
-        ctx.strokeStyle = '#d1d5db';
-        ctx.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
-
-        // Image icon
-        ctx.fillStyle = '#9ca3af';
-        ctx.font = '20px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('🖼️', bounds.x + bounds.width / 2, bounds.y + bounds.height / 2 + 8);
-        ctx.textAlign = 'start';
-        break;
-    }
-
-    // Render selection indicator
-    if (canvasState.selectedComponents.includes(component.id)) {
-      ctx.strokeStyle = '#3b82f6';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([5, 5]);
-      ctx.strokeRect(bounds.x - 2, bounds.y - 2, bounds.width + 4, bounds.height + 4);
-      ctx.setLineDash([]);
-
-      // Render resize handles
-      const handleSize = 8;
-      ctx.fillStyle = '#3b82f6';
-
-      // Corner handles
-      ctx.fillRect(bounds.x - handleSize / 2, bounds.y - handleSize / 2, handleSize, handleSize);
-      ctx.fillRect(bounds.x + bounds.width - handleSize / 2, bounds.y - handleSize / 2, handleSize, handleSize);
-      ctx.fillRect(bounds.x - handleSize / 2, bounds.y + bounds.height - handleSize / 2, handleSize, handleSize);
-      ctx.fillRect(bounds.x + bounds.width - handleSize / 2, bounds.y + bounds.height - handleSize / 2, handleSize, handleSize);
-    }
-  }, [canvasState.selectedComponents]);
+        ctx.fillRect(
+          bounds.x + bounds.width - handleSize / 2,
+          bounds.y - handleSize / 2,
+          handleSize,
+          handleSize
+        );
+        ctx.fillRect(
+          bounds.x - handleSize / 2,
+          bounds.y + bounds.height - handleSize / 2,
+          handleSize,
+          handleSize
+        );
+        ctx.fillRect(
+          bounds.x + bounds.width - handleSize / 2,
+          bounds.y + bounds.height - handleSize / 2,
+          handleSize,
+          handleSize
+        );
+      }
+    },
+    [canvasState.selectedComponents]
+  );
 
   const renderCanvas = useCallback(() => {
     const ctx = ctxRef.current;
@@ -170,8 +217,8 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
 
     // Apply pan and zoom transformations
     ctx.save();
-    ctx.translate(canvasState.pan.x, canvasState.pan.y);
-    ctx.scale(canvasState.zoom, canvasState.zoom);
+    ctx.translate(pan.x, pan.y);
+    ctx.scale(zoom, zoom);
 
     // Render grid
     ctx.strokeStyle = theme === 'dark' ? '#374151' : '#f1f5f9';
@@ -193,129 +240,173 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
     }
 
     // Render components
-    components.forEach(component => {
+    components.forEach((component) => {
       renderComponent(component);
     });
 
     ctx.restore();
-  }, [canvasState.pan, canvasState.zoom, components, renderComponent, theme]);
+  }, [pan, zoom, components, renderComponent, theme]);
 
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    switch (e.key) {
-      case 'Delete':
-      case 'Backspace':
-        setComponents(prev => prev.filter(c => !canvasState.selectedComponents.includes(c.id)));
-        setCanvasState(prev => ({ ...prev, selectedComponents: [] }));
-        break;
-      case 'Escape':
-        setCanvasState(prev => ({ ...prev, selectedComponents: [] }));
-        break;
-      case 'a':
-        if (e.ctrlKey || e.metaKey) {
-          e.preventDefault();
-          setCanvasState(prev => ({ ...prev, selectedComponents: components.map(c => c.id) }));
-        }
-        break;
-    }
-  }, [canvasState.selectedComponents, components]);
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      switch (e.key) {
+        case 'Delete':
+        case 'Backspace':
+          dispatch(
+            setComponents(
+              components.filter(
+                (c) => !canvasState.selectedComponents.includes(c.id)
+              )
+            )
+          );
+          setCanvasState((prev) => ({ ...prev, selectedComponents: [] }));
+          break;
+        case 'Escape':
+          setCanvasState((prev) => ({ ...prev, selectedComponents: [] }));
+          break;
+        case 'a':
+          if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            setCanvasState((prev) => ({
+              ...prev,
+              selectedComponents: components.map((c) => c.id)
+            }));
+          }
+          break;
+        case 'z':
+          if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            if (e.shiftKey) {
+              handleRedo();
+            } else {
+              handleUndo();
+            }
+          }
+          break;
+      }
+    },
+    [
+      canvasState.selectedComponents,
+      components,
+      handleUndo,
+      handleRedo,
+      dispatch
+    ]
+  );
 
-  const handleMouseDown = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent<HTMLCanvasElement>) => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left - canvasState.pan.x) / canvasState.zoom;
-    const y = (e.clientY - rect.top - canvasState.pan.y) / canvasState.zoom;
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left - pan.x) / zoom;
+      const y = (e.clientY - rect.top - pan.y) / zoom;
 
-    // Check if clicking on a component
-    const clickedComponent = components.find(component =>
-      x >= component.bounds.x &&
-      x <= component.bounds.x + component.bounds.width &&
-      y >= component.bounds.y &&
-      y <= component.bounds.y + component.bounds.height
-    );
+      // Check if clicking on a component
+      const clickedComponent = components.find(
+        (component) =>
+          x >= component.bounds.x &&
+          x <= component.bounds.x + component.bounds.width &&
+          y >= component.bounds.y &&
+          y <= component.bounds.y + component.bounds.height
+      );
 
-    if (clickedComponent) {
-      setCanvasState(prev => ({
-        ...prev,
-        selectedComponents: e.shiftKey
-          ? [...prev.selectedComponents, clickedComponent.id]
-          : [clickedComponent.id]
-      }));
-      setIsDragging(true);
-    } else {
-      setCanvasState(prev => ({ ...prev, selectedComponents: [] }));
-    }
-  }, [canvasState.pan, canvasState.zoom, components]);
+      if (clickedComponent) {
+        setCanvasState((prev) => ({
+          ...prev,
+          selectedComponents: e.shiftKey
+            ? [...prev.selectedComponents, clickedComponent.id]
+            : [clickedComponent.id]
+        }));
+        setIsDragging(true);
+      } else {
+        setCanvasState((prev) => ({ ...prev, selectedComponents: [] }));
+      }
+    },
+    [pan, zoom, components]
+  );
 
-  const handleMouseMove = useCallback((_e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDragging) return;
+  const handleMouseMove = useCallback(
+    (_e: React.MouseEvent<HTMLCanvasElement>) => {
+      if (!isDragging) return;
 
-    // Handle dragging logic here
-    // This would update component positions based on mouse movement
-  }, [isDragging]);
+      // Handle dragging logic here
+      // This would update component positions based on mouse movement
+    },
+    [isDragging]
+  );
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
   }, []);
 
-  const handleTouchStart = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
-    touchStartTimeRef.current = Date.now();
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent<HTMLCanvasElement>) => {
+      touchStartTimeRef.current = Date.now();
 
-    // Handle multi-touch gestures
-    if (e.touches.length === 2) {
-      const touch1 = e.touches[0];
-      const touch2 = e.touches[1];
+      // Handle multi-touch gestures
+      if (e.touches.length === 2) {
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
 
-      const distance = Math.sqrt(
-        Math.pow(touch2.clientX - touch1.clientX, 2) +
-        Math.pow(touch2.clientY - touch1.clientY, 2)
-      );
+        const distance = Math.sqrt(
+          Math.pow(touch2.clientX - touch1.clientX, 2) +
+            Math.pow(touch2.clientY - touch1.clientY, 2)
+        );
 
-      setLastTouch({
-        startDistance: distance,
-        startZoom: canvasState.zoom,
-      });
-    }
-
-    // Long press detection
-    longPressTimerRef.current = window.setTimeout(() => {
-      // Handle long press (context menu, etc.)
-      if ('vibrate' in navigator) {
-        navigator.vibrate(50);
+        setLastTouch({
+          startDistance: distance,
+          startZoom: zoom
+        });
       }
-    }, 500);
-  }, [canvasState.zoom]);
 
-  const handleTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
-    e.preventDefault();
+      // Long press detection
+      longPressTimerRef.current = window.setTimeout(() => {
+        // Handle long press (context menu, etc.)
+        if ('vibrate' in navigator) {
+          navigator.vibrate(50);
+        }
+      }, 500);
+    },
+    [zoom]
+  );
 
-    if (
-      e.touches.length === 2 &&
-      lastTouch?.startDistance !== undefined &&
-      lastTouch?.startZoom !== undefined
-    ) {
-      // Handle pinch-to-zoom
-      const touch1 = e.touches[0];
-      const touch2 = e.touches[1];
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent<HTMLCanvasElement>) => {
+      e.preventDefault();
 
-      const distance = Math.sqrt(
-        Math.pow(touch2.clientX - touch1.clientX, 2) +
-        Math.pow(touch2.clientY - touch1.clientY, 2)
-      );
+      if (
+        e.touches.length === 2 &&
+        lastTouch?.startDistance !== undefined &&
+        lastTouch?.startZoom !== undefined
+      ) {
+        // Handle pinch-to-zoom
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
 
-      const scale = distance / lastTouch.startDistance!;
-      const newZoom = Math.max(0.1, Math.min(5, lastTouch.startZoom! * scale));
+        const distance = Math.sqrt(
+          Math.pow(touch2.clientX - touch1.clientX, 2) +
+            Math.pow(touch2.clientY - touch1.clientY, 2)
+        );
 
-      setCanvasState(prev => ({ ...prev, zoom: newZoom }));
-    } else if (e.touches.length === 1) {
-      // Handle single-touch pan
-      const canvas = canvasRef.current;
-      if (!canvas) return;
+        const scale = distance / lastTouch.startDistance!;
+        const newZoom = Math.max(
+          0.1,
+          Math.min(5, lastTouch.startZoom! * scale)
+        );
 
-      canvas.getBoundingClientRect();
-    }
-  }, [lastTouch]);
+        dispatch(setZoom(newZoom));
+      } else if (e.touches.length === 1) {
+        // Handle single-touch pan
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        canvas.getBoundingClientRect();
+      }
+    },
+    [lastTouch, dispatch]
+  );
 
   const handleTouchEnd = useCallback(() => {
     if (longPressTimerRef.current) {
@@ -344,7 +435,6 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [handleKeyDown]);
-
 
   return (
     <div
@@ -392,7 +482,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
         }}
       >
         <button
-          onClick={() => setCanvasState(prev => ({ ...prev, zoom: Math.max(0.1, prev.zoom - 0.1) }))}
+          onClick={() => dispatch(setZoom(Math.max(0.1, zoom - 0.1)))}
           style={{
             padding: '8px 12px',
             border: 'none',
@@ -412,10 +502,10 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
             fontSize: '14px'
           }}
         >
-          {Math.round(canvasState.zoom * 100)}%
+          {Math.round(zoom * 100)}%
         </span>
         <button
-          onClick={() => setCanvasState(prev => ({ ...prev, zoom: Math.min(5, prev.zoom + 0.1) }))}
+          onClick={() => dispatch(setZoom(Math.min(5, zoom + 0.1)))}
           style={{
             padding: '8px 12px',
             border: 'none',
@@ -429,7 +519,10 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({ theme, 'aria-label':
           <ZoomIn aria-hidden="true" size="S" />
         </button>
         <button
-          onClick={() => setCanvasState(prev => ({ ...prev, zoom: 1, pan: { x: 0, y: 0 } }))}
+          onClick={() => {
+            dispatch(setZoom(1));
+            dispatch(setPan({ x: 0, y: 0 }));
+          }}
           style={{
             padding: '8px 12px',
             border: 'none',

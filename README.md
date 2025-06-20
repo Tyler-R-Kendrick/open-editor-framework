@@ -9,13 +9,16 @@ A generic HTML5-based React editor built as a PWA (Progressive Web App) with com
 ## ✨ Features
 
 ### Core Functionality
+
 - **HTML5 Canvas Editor** - High-performance canvas-based editing with zoom, pan, and multi-selection
-- **Component Palette** - Drag-and-drop component library with search and categorization  
+- **Component Palette** - Drag-and-drop component library with search and categorization
 - **Property Panel** - Dynamic property editing with type-specific controls
 - **PWA Support** - Installable app with offline capabilities and service worker
+- **Undo/Redo History** - Centralized Redux store with history management
 - **Responsive Design** - Mobile-first design that adapts to desktop and tablet
 
 ### Accessibility & Inclusion
+
 - **WCAG 2.1 AA Compliant** - Screen reader support, keyboard navigation, focus management
 - **Touch-First Design** - Optimized for touch devices with gesture recognition
 - **High Contrast Support** - Automatic adaptation to user contrast preferences
@@ -23,6 +26,7 @@ A generic HTML5-based React editor built as a PWA (Progressive Web App) with com
 - **Keyboard Shortcuts** - Full keyboard accessibility for power users
 
 ### Technical Features
+
 - **TypeScript** - Full type safety and excellent developer experience
 - **React 18** - Modern React with hooks and functional components
 - **Tailwind CSS** - Utility-first styling with consistent design system
@@ -32,6 +36,7 @@ A generic HTML5-based React editor built as a PWA (Progressive Web App) with com
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js 22+
 - npm 11+
 
@@ -74,18 +79,21 @@ The editor is designed mobile-first with comprehensive touch gesture support:
 ## ♿ Accessibility Features
 
 ### Screen Reader Support
+
 - Semantic HTML structure with proper ARIA labels
 - Live regions for dynamic content updates
 - Comprehensive keyboard navigation
 - Screen reader announcements for user actions
 
 ### Keyboard Navigation
+
 - **Tab/Shift+Tab** - Navigate between focusable elements
 - **Enter/Space** - Activate buttons and components
 - **Arrow Keys** - Navigate within component groups
 - **Escape** - Cancel operations and clear selections
 
 ### Visual Accessibility
+
 - High contrast mode support
 - Customizable color themes (light/dark)
 - Scalable fonts and UI elements
@@ -96,18 +104,23 @@ The editor is designed mobile-first with comprehensive touch gesture support:
 ### Core Panels
 
 #### `editor-app`
+
 Main application panel that orchestrates the canvas panel, palette panel, and control panel.
 
 #### `editor-canvas`
+
 HTML5 canvas-based editor panel with touch support, zoom/pan, and component rendering.
 
 #### `component-palette`
+
 Drag-and-drop component library panel with search, categorization, and keyboard accessibility.
 
 #### `control-panel`
+
 Dynamic property panel with type-specific controls for selected components.
 
 #### `editor-toolbar`
+
 Application toolbar with file operations, undo/redo, zoom controls, and theme toggle.
 
 ### Type System
@@ -169,6 +182,7 @@ npm run type-check   # TypeScript type checking
 ### Adding New Components
 
 1. **Define Component Type**
+
 ```typescript
 // Add to component definitions
 {
@@ -187,6 +201,7 @@ npm run type-check   # TypeScript type checking
 ```
 
 2. **Implement Rendering**
+
 ```typescript
 // Add to canvas component rendering
 case 'my-component':
@@ -195,6 +210,7 @@ case 'my-component':
 ```
 
 3. **Add Property Schema**
+
 ```typescript
 // Define editable properties
 {
@@ -222,15 +238,19 @@ The editor supports light and dark themes with CSS custom properties:
 ## 🧪 Testing
 
 ### Unit Tests
+
 ```bash
 npm run test          # Run all tests
 ```
 
 ### Accessibility Testing
+
 The project includes automated accessibility testing and follows WCAG 2.1 AA guidelines.
 
 ### Browser Testing
+
 Tested and supported on:
+
 - Chrome/Chromium 90+
 - Firefox 88+
 - Safari 14+
@@ -240,6 +260,7 @@ Tested and supported on:
 ## 📦 Deployment
 
 ### Static Hosting
+
 The built application can be deployed to any static hosting service:
 
 ```bash
@@ -248,6 +269,7 @@ npm run build
 ```
 
 ### PWA Features
+
 - **Service Worker** - Automatic caching and offline support
 - **Web App Manifest** - Installable app experience
 - **Background Sync** - Offline operation support
@@ -257,6 +279,7 @@ npm run build
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ### Development Setup
+
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/amazing-feature`
 3. Make your changes and add tests
@@ -266,6 +289,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 7. Open a Pull Request
 
 ### Code Standards
+
 - **ESLint** - Code linting with TypeScript rules
 - **Prettier** - Code formatting
 - **Conventional Commits** - Commit message format

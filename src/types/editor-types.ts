@@ -1,4 +1,8 @@
-import type { BaseComponent, ComponentProperties, ComponentPropertyValue } from "./component-base";
+import type {
+  BaseComponent,
+  ComponentProperties,
+  ComponentPropertyValue
+} from './component-base';
 export type EditorTheme = 'light' | 'dark';
 
 export interface Point {
@@ -11,7 +15,7 @@ export interface Size {
   height: number;
 }
 
-export interface Bounds extends Point, Size { }
+export interface Bounds extends Point, Size {}
 
 export interface EditorComponent {
   id: string;
@@ -60,12 +64,8 @@ export interface TouchGesture {
 }
 
 export interface CanvasState {
-  zoom: number;
-  pan: Point;
   selectedComponents: string[];
   clipboard: BaseComponent[];
-  history: BaseComponent[][];
-  historyIndex: number;
 }
 
 export interface AccessibilityOptions {
