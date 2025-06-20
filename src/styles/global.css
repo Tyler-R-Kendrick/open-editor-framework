@@ -5,6 +5,11 @@
 
 /* Global base styles for accessibility and mobile support */
 @layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
   html {
     /* Prevent text size adjust on iOS */
     -webkit-text-size-adjust: 100%;
@@ -37,14 +42,16 @@
 
   /* Custom focus styles for interactive elements */
   button:focus,
-  [role="button"]:focus,
+  [role='button']:focus,
   [tabindex]:focus {
-    box-shadow: 0 0 0 2px #3b82f6, 0 0 0 4px rgba(59, 130, 246, 0.2);
+    box-shadow:
+      0 0 0 2px #3b82f6,
+      0 0 0 4px rgba(59, 130, 246, 0.2);
   }
 
   /* Improve touch target sizes for accessibility */
   button,
-  [role="button"],
+  [role='button'],
   input,
   select,
   textarea {
@@ -54,7 +61,6 @@
 }
 
 @layer components {
-
   /* Component-specific utility classes */
   .touch-action-none {
     touch-action: none;
@@ -97,7 +103,6 @@
 }
 
 @layer utilities {
-
   /* Animation utilities */
   .animate-touch-feedback {
     animation: touchFeedback 0.1s ease-out;
