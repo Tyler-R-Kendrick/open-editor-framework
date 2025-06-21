@@ -224,6 +224,7 @@ The control panel supports any field type through the generic field renderer map
 
 ```tsx
 import { FieldRenderer, ControlPanel } from './components/control-panel';
+import { ButtonToggle, useButtonStyles } from '../button-toggle';
 
 // Create renderers for completely new field types
 const FileUploadRenderer: FieldRenderer = ({ property, theme, onChange }) => (
@@ -278,25 +279,14 @@ const RichTextRenderer: FieldRenderer = ({ property, theme, onChange }) => (
 );
 
 const ToggleRenderer: FieldRenderer = ({ property, theme, onChange }) => (
-  <button
-    onClick={() => onChange(property.key, !property.value)}
-    style={{
-      width: '100%',
-      padding: '12px',
-      border: 'none',
-      borderRadius: '8px',
-      background: property.value 
-        ? (theme === 'dark' ? '#10b981' : '#22c55e')
-        : (theme === 'dark' ? '#6b7280' : '#d1d5db'),
-      color: property.value ? '#ffffff' : (theme === 'dark' ? '#d1d5db' : '#374151'),
-      fontSize: '14px',
-      fontWeight: '600',
-      cursor: 'pointer',
-      transition: 'all 0.2s ease',
-    }}
+  <ButtonToggle
+    isActive={!!property.value}
+    onToggle={() => onChange(property.key, !property.value)}
+    theme={theme}
+    aria-label={`Toggle ${property.key}`}
   >
     {property.value ? '✓ Enabled' : '✗ Disabled'}
-  </button>
+  </ButtonToggle>
 );
 
 function EditorWithCustomFieldTypes() {
@@ -369,6 +359,7 @@ const LocationRenderer: FieldRenderer = ({ property, theme, onChange }) => {
 const TagsRenderer: FieldRenderer = ({ property, theme, onChange }) => {
   const tags = String(property.value ?? '').split(',').filter(Boolean);
   const [inputValue, setInputValue] = React.useState('');
+  const buttonStyles = useButtonStyles(theme);
   
   const addTag = () => {
     if (inputValue.trim() && !tags.includes(inputValue.trim())) {
@@ -403,14 +394,7 @@ const TagsRenderer: FieldRenderer = ({ property, theme, onChange }) => {
             {tag}
             <button
               onClick={() => removeTag(tag)}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#ffffff',
-                cursor: 'pointer',
-                padding: '0',
-                fontSize: '12px'
-              }}
+              style={buttonStyles.destructive}
             >
               ×
             </button>
@@ -435,14 +419,7 @@ const TagsRenderer: FieldRenderer = ({ property, theme, onChange }) => {
         />
         <button
           onClick={addTag}
-          style={{
-            padding: '8px 12px',
-            background: theme === 'dark' ? '#6366f1' : '#8b5cf6',
-            color: '#ffffff',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
+          style={buttonStyles.primary}
         >
           Add
         </button>
