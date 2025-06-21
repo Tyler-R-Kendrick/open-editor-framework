@@ -47,7 +47,9 @@
     "redux": "^5.0.1",
     "@reduxjs/toolkit": "^2.8.2",
     "react-redux": "^9.2.0",
-    "redux-undo": "^1.1.0"
+    "redux-undo": "^1.1.0",
+    "lz-string": "^1.5.0",
+    "react-router-dom": "^6.23.0"
   },
   "devDependencies": {
     "@azure/static-web-apps-cli": "^2.0.6",

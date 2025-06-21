@@ -2,6 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles/global.css';
 import { EditorApp } from './components/editor-app/component';
+import { BrowserRouter } from 'react-router-dom';
 
 // Register service worker for PWA functionality
 if ('serviceWorker' in navigator) {
@@ -23,6 +24,8 @@ if (!container) {
 const root = createRoot(container);
 root.render(
   <React.StrictMode>
-    <EditorApp />
+    <BrowserRouter>
+      <EditorApp />
+    </BrowserRouter>
   </React.StrictMode>
 );
