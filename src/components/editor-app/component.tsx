@@ -15,6 +15,7 @@ import { store, setComponents } from '../../store';
 import { I18nProvider } from '@react-aria/i18n';
 import { decodeComponents } from '../../utils/share';
 import type { BaseComponent } from '../../types/component-base';
+import { useSearchParams } from 'react-router-dom';
 
 /**
  * Main editor application using a simple flex layout
@@ -53,16 +54,17 @@ export const EditorApp: React.FC = () => {
     };
   }, [handleThemeChange]);
 
+  const [searchParams] = useSearchParams();
+
   useEffect(() => {
-    const params = new window.URLSearchParams(window.location.search);
-    const state = params.get('state');
+    const state = searchParams.get('state');
     if (state) {
       const components = decodeComponents(state);
       if (Array.isArray(components)) {
         store.dispatch(setComponents(components as BaseComponent[]));
       }
     }
-  }, []);
+  }, [searchParams]);
 
   const handleThemeToggle = (newTheme: EditorTheme) => {
     setTheme(newTheme);

@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { EditorApp } from '../src/components/editor-app/component';
+import { MemoryRouter } from 'react-router-dom';
 
 beforeEach(() => {
   global.fetch = jest.fn(() =>
@@ -16,7 +17,11 @@ afterEach(() => {
 });
 
 test('renders the main editor application', async () => {
-  render(<EditorApp />);
+  render(
+    <MemoryRouter>
+      <EditorApp />
+    </MemoryRouter>
+  );
   const app = await screen.findByRole('application', {
     name: /react component editor/i
   });
