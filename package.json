@@ -21,7 +21,8 @@
     "storybook": "STORYBOOK_DISABLE_TELEMETRY=1 storybook dev -p 6006 --host 0.0.0.0 --no-open --ci",
     "storybook:safe": "STORYBOOK_DISABLE_TELEMETRY=1 NODE_ENV=production storybook dev -p 6006 --host 0.0.0.0 --no-open --ci --quiet",
     "storybook:debug": "STORYBOOK_DISABLE_TELEMETRY=1 DEBUG=1 storybook dev -p 6006 --host 0.0.0.0 --no-open --loglevel verbose",
-    "build-storybook": "storybook build --output-dir dist/storybook"
+    "build-storybook": "storybook build --output-dir dist/storybook",
+    "deploy:cloudflare": "wrangler deploy"
   },
   "keywords": [
     "react",
@@ -52,7 +53,6 @@
     "react-router-dom": "^6.23.0"
   },
   "devDependencies": {
-    "@azure/static-web-apps-cli": "^2.0.6",
     "@chromatic-com/storybook": "^4.0.0",
     "@storybook/addon-docs": "^9.0.12",
     "@storybook/react-vite": "^9.0.12",
@@ -92,7 +92,8 @@
     "@playwright/test": "^1.53.1",
     "stylelint": "^16.21.0",
     "stylelint-config-standard": "^38.0.0",
-    "stylelint-config-tailwindcss": "^1.0.0"
+    "stylelint-config-tailwindcss": "^1.0.0",
+    "wrangler": "^4.20.5"
   },
   "engines": {
     "node": ">=22.0.0",
