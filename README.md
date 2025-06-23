@@ -4,8 +4,6 @@
 [![Test Status](https://github.com/Tyler-R-Kendrick/open-editor-framework/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/Tyler-R-Kendrick/open-editor-framework/actions/workflows/test.yml)
 [![Lint Status](https://github.com/Tyler-R-Kendrick/open-editor-framework/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/Tyler-R-Kendrick/open-editor-framework/actions/workflows/lint.yml)
 
-[View Demo](https://kind-bush-0dd23160f.6.azurestaticapps.net/)
-
 A generic HTML5-based React editor built as a PWA (Progressive Web App) with comprehensive accessibility and mobile touch support. This framework provides a reusable canvas-based editor with component palette panel and property panel.
 
 ## ✨ Features
@@ -270,6 +268,18 @@ The built application can be deployed to any static hosting service:
 npm run build
 # Deploy the dist/ directory
 ```
+
+### Cloudflare Workers
+
+You can deploy the app using [Cloudflare Workers](https://developers.cloudflare.com/workers/).
+Install the Wrangler CLI and run:
+
+```bash
+npm run build
+npm run deploy:cloudflare
+```
+
+A GitHub Actions workflow runs this command automatically whenever changes are merged into `main`.
 
 ### PWA Features
 
