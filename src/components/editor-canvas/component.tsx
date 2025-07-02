@@ -608,11 +608,9 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
         aria-label="Interactive design canvas"
       />
 
-      {components.map((component) =>
-        canvasState.selectedComponents.includes(component.id) ? (
-          <DraggableOverlay key={component.id} component={component} />
-        ) : null
-      )}
+      {components.map((component) => (
+        <DraggableOverlay key={component.id} component={component} />
+      ))}
 
       {/* Canvas controls overlay */}
       <div

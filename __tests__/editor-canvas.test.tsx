@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { EditorCanvas } from '../src/components/editor-canvas/component';
 import { Provider } from 'react-redux';
 import { store, addComponent, setComponents } from '../src/store';
@@ -15,7 +15,7 @@ test('renders editor canvas', () => {
   expect(canvas).toBeInTheDocument();
 });
 
-test('renders draggable overlay only when component is selected', () => {
+test('renders draggable overlay for each component', () => {
   store.dispatch(setComponents([]));
   store.dispatch(
     addComponent(
@@ -35,12 +35,6 @@ test('renders draggable overlay only when component is selected', () => {
     </Provider>
   );
 
-  const canvas = container.querySelector('canvas');
-  expect(canvas).toBeTruthy();
-  if (canvas) {
-    fireEvent.mouseDown(canvas, { clientX: 1, clientY: 1 });
-  }
-
-  const overlay = container.querySelector('div[aria-hidden="true"]');
-  expect(overlay).toBeInTheDocument();
+  const overlays = container.querySelectorAll('div[aria-hidden="true"]');
+  expect(overlays.length).toBe(1);
 });
