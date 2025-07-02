@@ -147,6 +147,12 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       e.preventDefault();
       e.stopPropagation();
 
+      // Clear any canvas long press timer that might interfere
+      if (longPressTimerRef.current) {
+        clearTimeout(longPressTimerRef.current);
+        longPressTimerRef.current = null;
+      }
+
       if (e.touches.length === 1) {
         const touch = e.touches[0];
         setIsTouchDragging(true);
@@ -176,12 +182,24 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       }
     };
 
+    const handleTouchCancel = (e: React.TouchEvent) => {
+      // Handle touch cancel events (when touch is interrupted)
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (isTouchDragging) {
+        setIsTouchDragging(false);
+        handleDragEnd();
+      }
+    };
+
     return (
       <div
         {...dragProps}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchCancel}
         aria-hidden="true"
         style={{
           position: 'absolute',
@@ -523,15 +541,29 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
           if (clickedComponent) {
             // Let overlay handle the touch event for dragging
             // Canvas should not interfere with component dragging
+            // Don't set long press timer for component touches
             return;
           } else {
             setCanvasState((prev) => ({ ...prev, selectedComponents: [] }));
+            // Only set long press timer for canvas background touches
+            longPressTimerRef.current = window.setTimeout(() => {
+              // Handle long press (context menu, etc.)
+              if ('vibrate' in navigator) {
+                navigator.vibrate(50);
+              }
+            }, 500);
           }
         }
       }
 
       // Handle multi-touch gestures
       if (e.touches.length === 2) {
+        // Clear any existing long press timer for multi-touch
+        if (longPressTimerRef.current) {
+          clearTimeout(longPressTimerRef.current);
+          longPressTimerRef.current = null;
+        }
+
         const touch1 = e.touches[0];
         const touch2 = e.touches[1];
 
@@ -545,20 +577,18 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
           startZoom: canvasState.zoom
         });
       }
-
-      // Long press detection
-      longPressTimerRef.current = window.setTimeout(() => {
-        // Handle long press (context menu, etc.)
-        if ('vibrate' in navigator) {
-          navigator.vibrate(50);
-        }
-      }, 500);
     },
     [canvasState.zoom, canvasState.pan, components]
   );
 
   const handleTouchMove = useCallback(
     (e: React.TouchEvent<HTMLCanvasElement>) => {
+      // Clear long press timer on any touch movement
+      if (longPressTimerRef.current) {
+        clearTimeout(longPressTimerRef.current);
+        longPressTimerRef.current = null;
+      }
+
       // Only prevent default for multi-touch gestures, not single touch
       if (e.touches.length > 1) {
         e.preventDefault();
