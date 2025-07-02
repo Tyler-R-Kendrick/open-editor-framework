@@ -25,7 +25,7 @@ import React, {
   useState
 } from 'react';
 import { ActionCreators } from 'redux-undo';
-import { setComponents, updateComponent } from '../../store';
+import { clearSelection, setComponents, setSelectedComponents, updateComponent } from '../../store';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { BaseComponent } from '../../types/component-base';
 import { EditorTheme } from '../../types/editor-types';
@@ -46,7 +46,6 @@ interface EditorCanvasProps {
 interface CanvasState {
   zoom: number;
   pan: { x: number; y: number };
-  selectedComponents: string[];
 }
 
 interface DraggableComponentProps {
@@ -307,12 +306,12 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
 
   const [canvasState, setCanvasState] = useState({
     zoom: 1,
-    pan: { x: 0, y: 0 },
-    selectedComponents: [] as string[]
+    pan: { x: 0, y: 0 }
   });
 
   const dispatch = useAppDispatch();
   const components = useAppSelector((state) => state.canvas.present.components);
+  const selectedComponents = useAppSelector((state) => state.canvas.present.selectedComponents);
   const [_isDragging, setIsDragging] = useState(false);
   const [lastTouch, setLastTouch] = useState<PinchState | null>(null);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
@@ -339,10 +338,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
 
     // Select the component being dragged
     const componentId = event.active.id as string;
-    setCanvasState((prev) => ({
-      ...prev,
-      selectedComponents: [componentId]
-    }));
+    dispatch(setSelectedComponents([componentId]));
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -506,7 +502,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       }
 
       // Render selection indicator
-      if (canvasState.selectedComponents.includes(component.id)) {
+      if (selectedComponents.includes(component.id)) {
         ctx.strokeStyle = '#3b82f6';
         ctx.lineWidth = 2;
         ctx.setLineDash([5, 5]);
@@ -549,7 +545,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
         );
       }
     },
-    [canvasState.selectedComponents]
+    [selectedComponents]
   );
 
   const renderCanvas = useCallback(() => {
@@ -608,22 +604,19 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
           dispatch(
             setComponents(
               components.filter(
-                (c) => !canvasState.selectedComponents.includes(c.id)
+                (c) => !selectedComponents.includes(c.id)
               )
             )
           );
-          setCanvasState((prev) => ({ ...prev, selectedComponents: [] }));
+          dispatch(clearSelection());
           break;
         case 'Escape':
-          setCanvasState((prev) => ({ ...prev, selectedComponents: [] }));
+          dispatch(clearSelection());
           break;
         case 'a':
           if (e.ctrlKey || e.metaKey) {
             e.preventDefault();
-            setCanvasState((prev) => ({
-              ...prev,
-              selectedComponents: components.map((c) => c.id)
-            }));
+            dispatch(setSelectedComponents(components.map((c) => c.id)));
           }
           break;
         case 'z':
@@ -639,7 +632,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       }
     },
     [
-      canvasState.selectedComponents,
+      selectedComponents,
       components,
       handleUndo,
       handleRedo,
@@ -666,17 +659,16 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       );
 
       if (clickedComponent) {
-        setCanvasState((prev) => ({
-          ...prev,
-          selectedComponents: e.shiftKey
-            ? [...prev.selectedComponents, clickedComponent.id]
-            : [clickedComponent.id]
-        }));
+        if (e.shiftKey) {
+          dispatch(setSelectedComponents([...selectedComponents, clickedComponent.id]));
+        } else {
+          dispatch(setSelectedComponents([clickedComponent.id]));
+        }
       } else {
-        setCanvasState((prev) => ({ ...prev, selectedComponents: [] }));
+        dispatch(clearSelection());
       }
     },
-    [canvasState.pan, canvasState.zoom, components]
+    [canvasState.pan, canvasState.zoom, components, selectedComponents, dispatch]
   );
 
   const handleMouseMove = useCallback(
@@ -714,7 +706,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
           );
 
           if (!clickedComponent) {
-            setCanvasState((prev) => ({ ...prev, selectedComponents: [] }));
+            dispatch(clearSelection());
           }
         }
       }
@@ -735,7 +727,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
         });
       }
     },
-    [canvasState.zoom, canvasState.pan, components]
+    [canvasState.zoom, canvasState.pan, components, dispatch]
   );
 
   const handleTouchMove = useCallback(
@@ -833,7 +825,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
             key={component.id}
             component={component}
             canvasState={canvasState}
-            isSelected={canvasState.selectedComponents.includes(component.id)}
+            isSelected={selectedComponents.includes(component.id)}
           />
         ))}
       </DroppableCanvas>

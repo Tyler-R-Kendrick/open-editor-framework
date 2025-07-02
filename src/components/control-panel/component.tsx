@@ -1,9 +1,11 @@
-import React, { useState, useMemo } from 'react';
-import { EditorTheme } from '../../types/editor-types';
+import React, { useEffect, useMemo, useState } from 'react';
+import { updateComponent } from '../../store';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { ComponentPropertyValue } from '../../types/component-base';
-import { PropertyField, ControlPanelConfig, FieldRendererMap, PropertySection } from './types';
-import { defaultFieldRenderers } from './field-renderers';
+import { EditorTheme } from '../../types/editor-types';
 import { defaultSections } from './config';
+import { defaultFieldRenderers } from './field-renderers';
+import { ControlPanelConfig, FieldRendererMap, PropertyField, PropertySection } from './types';
 
 interface ControlPanelProps {
   theme: EditorTheme;
@@ -26,8 +28,37 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   'aria-label': ariaLabel,
   config = {}
 }) => {
-  const [selectedComponentId] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+  const selectedComponents = useAppSelector((state: any) => state.canvas.present.selectedComponents);
+  const components = useAppSelector((state: any) => state.canvas.present.components);
+
+  const selectedComponent = useMemo(() => {
+    if (selectedComponents.length === 1) {
+      return components.find((c: any) => c.id === selectedComponents[0]);
+    }
+    return null;
+  }, [selectedComponents, components]);
+
   const [properties, setProperties] = useState<PropertyField[]>([]);
+
+  // Update properties when selected component changes
+  useEffect(() => {
+    if (selectedComponent) {
+      // Convert component properties to PropertyField format
+      const componentProperties: PropertyField[] = Object.entries(selectedComponent.properties).map(([key, value]) => ({
+        key,
+        label: key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1').trim(),
+        type: typeof value === 'string' ? 'text' :
+          typeof value === 'number' ? 'number' :
+            typeof value === 'boolean' ? 'switch' : 'text',
+        value: value as ComponentPropertyValue,
+        required: false
+      }));
+      setProperties(componentProperties);
+    } else {
+      setProperties([]);
+    }
+  }, [selectedComponent]);
 
   // Merge provided config with defaults
   const fieldRenderers: FieldRendererMap = useMemo(() => {
@@ -43,10 +74,15 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   );
 
   const handlePropertyChange = (key: string, value: ComponentPropertyValue) => {
-    setProperties(prev => prev.map(prop =>
-      prop.key === key ? { ...prop, value } : prop
-    ));
-    console.log(`Property changed: ${key} = ${value}`);
+    if (selectedComponent) {
+      dispatch(updateComponent({
+        ...selectedComponent,
+        properties: {
+          ...selectedComponent.properties,
+          [key]: value
+        }
+      }));
+    }
   };
 
   const renderPropertyField = (property: PropertyField) => {
@@ -94,7 +130,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
         >
           Properties
         </h2>
-        {selectedComponentId ? (
+        {selectedComponent ? (
           <p
             style={{
               margin: 0,
@@ -102,7 +138,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
               color: theme === 'dark' ? '#9ca3af' : '#6b7280'
             }}
           >
-            Component ID: {selectedComponentId}
+            {selectedComponent.type.charAt(0).toUpperCase() + selectedComponent.type.slice(1)} Component
           </p>
         ) : (
           <p
@@ -118,7 +154,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
       </div>
 
       {/* Properties form */}
-      {selectedComponentId ? (
+      {selectedComponent ? (
         <div
           style={{
             flex: 1,
@@ -127,48 +163,35 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
           }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            {sections.map(section => {
-              const sectionFields = properties.filter(p => section.fields.includes(p.key));
-
-              if (sectionFields.length === 0) {
-                return null;
-              }
-
-              return (
-                <section key={section.title}>
-                  <h3
+            {properties.length > 0 ? (
+              properties.map(property => (
+                <div key={property.key}>
+                  <label
                     style={{
-                      margin: '0 0 12px 0',
+                      display: 'block',
+                      marginBottom: '6px',
                       fontSize: '14px',
-                      fontWeight: '600',
-                      color: theme === 'dark' ? '#d1d5db' : '#374151',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px'
+                      fontWeight: '500',
+                      color: theme === 'dark' ? '#f8fafc' : '#1e293b'
                     }}
                   >
-                    {section.title}
-                  </h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    {sectionFields.map(property => (
-                      <div key={property.key}>
-                        <label
-                          style={{
-                            display: 'block',
-                            marginBottom: '6px',
-                            fontSize: '14px',
-                            fontWeight: '500',
-                            color: theme === 'dark' ? '#f8fafc' : '#1e293b'
-                          }}
-                        >
-                          {property.label}
-                        </label>
-                        {renderPropertyField(property)}
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              );
-            })}
+                    {property.label}
+                  </label>
+                  {renderPropertyField(property)}
+                </div>
+              ))
+            ) : (
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: '14px',
+                  color: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                  textAlign: 'center'
+                }}
+              >
+                No editable properties
+              </p>
+            )}
           </div>
         </div>
       ) : (
@@ -202,7 +225,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
       )}
 
       {/* Actions */}
-      {selectedComponentId && (
+      {selectedComponent && (
         <div
           style={{
             padding: '16px',
@@ -212,7 +235,15 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
         >
           <div style={{ display: 'flex', gap: '8px' }}>
             <button
-              onClick={() => console.log('Reset properties')}
+              onClick={() => {
+                // Reset properties to default values
+                if (selectedComponent) {
+                  dispatch(updateComponent({
+                    ...selectedComponent,
+                    properties: {}
+                  }));
+                }
+              }}
               style={{
                 flex: 1,
                 padding: '8px 16px',
@@ -234,7 +265,10 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
               Reset
             </button>
             <button
-              onClick={() => console.log('Delete component')}
+              onClick={() => {
+                // Delete selected component
+                console.log('Delete component:', selectedComponent.id);
+              }}
               style={{
                 flex: 1,
                 padding: '8px 16px',
