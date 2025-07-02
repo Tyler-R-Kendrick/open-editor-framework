@@ -96,21 +96,24 @@ export class ComponentHelper {
     component: BaseComponent,
     offset: Point = { x: 20, y: 20 }
   ): BaseComponent {
-    const duplicate = new BaseComponent({
+    const newId = this.generateId();
+    const children = component.children?.map((child) => {
+      const dupChild = this.duplicateComponent(child, offset);
+      dupChild.parent = newId;
+      return dupChild;
+    });
+
+    return new BaseComponent({
       ...component,
-      id: this.generateId(),
+      id: newId,
       bounds: {
         ...component.bounds,
         x: component.bounds.x + offset.x,
         y: component.bounds.y + offset.y
       },
       properties: { ...component.properties },
-      children: component.children?.map((child) =>
-        this.duplicateComponent(child, offset)
-      )
+      children
     });
-
-    return duplicate;
   }
 
   static isPointInBounds(
