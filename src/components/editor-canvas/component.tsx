@@ -370,17 +370,22 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
     }
 
     // Update component position
-    dispatch(
-      updateComponent(
-        new BaseComponent({
-          ...component,
-          bounds: {
-            ...component.bounds,
-            x: constrainedX,
-            y: constrainedY
-          }
-        })
-      )
+    const updated = new BaseComponent({
+      ...component,
+      bounds: {
+        ...component.bounds,
+        x: constrainedX,
+        y: constrainedY
+      }
+    });
+    dispatch(updateComponent(updated));
+    window.dispatchEvent(
+      new window.CustomEvent('component-move', {
+        detail: {
+          component: updated,
+          position: { x: constrainedX, y: constrainedY }
+        }
+      })
     );
   };
 
@@ -391,6 +396,15 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   const handleRedo = useCallback(() => {
     dispatch(ActionCreators.redo());
   }, [dispatch]);
+
+  // Emit selection change events
+  useEffect(() => {
+    window.dispatchEvent(
+      new window.CustomEvent('selection-change', {
+        detail: { selectedComponents: canvasState.selectedComponents }
+      })
+    );
+  }, [canvasState.selectedComponents]);
 
   const initializeCanvas = useCallback(() => {
     const canvas = canvasRef.current;
