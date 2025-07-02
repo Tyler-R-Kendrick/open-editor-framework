@@ -25,18 +25,18 @@ import { EditorCanvas } from './editor-canvas/component.js';
 
 ## Properties
 
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `theme` | `EditorTheme` | `'light'` | Visual theme (light/dark) |
+| Property | Type          | Default   | Description               |
+| -------- | ------------- | --------- | ------------------------- |
+| `theme`  | `EditorTheme` | `'light'` | Visual theme (light/dark) |
 
 ## Events
 
-| Event | Detail | Description |
-|-------|--------|-------------|
-| `selection-change` | `{selectedComponents: string[]}` | Fired when component selection changes |
-| `context-menu` | `{point: Point, components: EditorComponent}` | Fired on long press/right click |
-| `component-move` | `{component: EditorComponent, position: Point}` | Fired when component is moved |
-| `component-resize` | `{component: EditorComponent, bounds: Bounds}` | Fired when component is resized |
+| Event              | Detail                                          | Description                            |
+| ------------------ | ----------------------------------------------- | -------------------------------------- |
+| `selection-change` | `{selectedComponents: string[]}`                | Fired when component selection changes |
+| `context-menu`     | `{point: Point, components: EditorComponent}`   | Fired on long press/right click        |
+| `component-move`   | `{component: EditorComponent, position: Point}` | Fired when component is moved          |
+| `component-resize` | `{component: EditorComponent, bounds: Bounds}`  | Fired when component is resized        |
 
 ## Keyboard Shortcuts
 
@@ -52,9 +52,13 @@ import { EditorCanvas } from './editor-canvas/component.js';
 
 - **Tap**: Select component
 - **Long Press**: Context menu
-- **Drag**: Move component (if selected) or pan canvas
+- **Drag**: Move component using React Aria DnD
 - **Pinch**: Zoom canvas
 - **Two-finger pan**: Pan canvas
+
+Drag interactions use the `useDrag` hook from **React Aria**, which provides
+mobile-friendly drag and drop with accessible behavior consistent with the
+Spectrum design system.
 
 ## Structure
 
