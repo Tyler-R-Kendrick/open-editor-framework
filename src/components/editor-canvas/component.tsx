@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { useDrag } from '@react-aria/dnd';
+import { DraggableCore, DraggableData, DraggableEvent } from 'react-draggable';
 import { EditorTheme, CanvasState } from '../../types/editor-types';
 import ZoomOut from '@spectrum-icons/workflow/ZoomOut';
 import ZoomIn from '@spectrum-icons/workflow/ZoomIn';
@@ -54,54 +54,31 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const [lastTouch, setLastTouch] = useState<PinchState | null>(null);
 
-  const dragOffsetRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const activeDragIdRef = useRef<string | null>(null);
-  const cancelDragRef = useRef(false);
 
   const DraggableOverlay: React.FC<{ component: BaseComponent }> = ({
     component
   }) => {
-    const { dragProps } = useDrag({
-      getItems: () => [{ id: component.id, type: 'component' }],
-      onDragStart: (e) => {
-        const container = containerRef.current;
-        if (!container) return;
-        const rect = container.getBoundingClientRect();
-        const x = (e.x - rect.left - canvasState.pan.x) / canvasState.zoom;
-        const y = (e.y - rect.top - canvasState.pan.y) / canvasState.zoom;
-        const hits = components.filter(
-          (c) =>
-            x >= c.bounds.x &&
-            x <= c.bounds.x + c.bounds.width &&
-            y >= c.bounds.y &&
-            y <= c.bounds.y + c.bounds.height
-        );
-        if (hits.length > 1) {
-          cancelDragRef.current = true;
-          return;
-        }
-        cancelDragRef.current = false;
-        activeDragIdRef.current = component.id;
-        dragOffsetRef.current = {
-          x: x - component.bounds.x,
-          y: y - component.bounds.y
-        };
-        setIsDragging(true);
-        setCanvasState((prev) => ({
-          ...prev,
-          selectedComponents: [component.id]
-        }));
-      },
-      onDragMove: (e) => {
-        if (cancelDragRef.current || activeDragIdRef.current !== component.id)
-          return;
-        const container = containerRef.current;
-        if (!container) return;
-        const rect = container.getBoundingClientRect();
-        let x = (e.x - rect.left - canvasState.pan.x) / canvasState.zoom;
-        let y = (e.y - rect.top - canvasState.pan.y) / canvasState.zoom;
-        x -= dragOffsetRef.current.x;
-        y -= dragOffsetRef.current.y;
+    const nodeRef = useRef<HTMLDivElement>(null);
+    const startBoundsRef = useRef(component.bounds);
+
+    const handleStart = useCallback(() => {
+      activeDragIdRef.current = component.id;
+      startBoundsRef.current = component.bounds;
+      setIsDragging(true);
+      setCanvasState((prev) => ({
+        ...prev,
+        selectedComponents: [component.id]
+      }));
+    }, [component.id, component.bounds]);
+
+    /* eslint-disable react-hooks/exhaustive-deps */
+    const handleDrag = useCallback(
+      (_e: DraggableEvent, data: DraggableData) => {
+        if (activeDragIdRef.current !== component.id) return;
+        let x = startBoundsRef.current.x + data.deltaX / canvasState.zoom;
+        let y = startBoundsRef.current.y + data.deltaY / canvasState.zoom;
+
         if (resolution) {
           x = Math.max(
             0,
@@ -112,6 +89,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
             Math.min(y, resolution.height - component.bounds.height)
           );
         }
+
         dispatch(
           updateComponent(
             new BaseComponent({
@@ -121,28 +99,38 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
           )
         );
       },
-      onDragEnd: () => {
-        if (cancelDragRef.current || activeDragIdRef.current !== component.id)
-          return;
-        activeDragIdRef.current = null;
-        setIsDragging(false);
-      }
-    });
+      [component, canvasState.zoom, resolution, dispatch]
+    );
+    /* eslint-enable react-hooks/exhaustive-deps */
+
+    const handleStop = useCallback(() => {
+      if (activeDragIdRef.current !== component.id) return;
+      activeDragIdRef.current = null;
+      setIsDragging(false);
+    }, [component.id]);
 
     return (
-      <div
-        {...dragProps}
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          left: component.bounds.x * canvasState.zoom + canvasState.pan.x,
-          top: component.bounds.y * canvasState.zoom + canvasState.pan.y,
-          width: component.bounds.width * canvasState.zoom,
-          height: component.bounds.height * canvasState.zoom,
-          touchAction: 'none',
-          background: 'transparent'
-        }}
-      />
+      <DraggableCore
+        nodeRef={nodeRef}
+        onStart={handleStart}
+        onDrag={handleDrag}
+        onStop={handleStop}
+        scale={canvasState.zoom}
+      >
+        <div
+          ref={nodeRef}
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            left: component.bounds.x * canvasState.zoom + canvasState.pan.x,
+            top: component.bounds.y * canvasState.zoom + canvasState.pan.y,
+            width: component.bounds.width * canvasState.zoom,
+            height: component.bounds.height * canvasState.zoom,
+            background: 'transparent',
+            touchAction: 'none'
+          }}
+        />
+      </DraggableCore>
     );
   };
 
@@ -608,9 +596,11 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
         aria-label="Interactive design canvas"
       />
 
-      {components.map((component) => (
-        <DraggableOverlay key={component.id} component={component} />
-      ))}
+      {components.map((component) =>
+        canvasState.selectedComponents.includes(component.id) ? (
+          <DraggableOverlay key={component.id} component={component} />
+        ) : null
+      )}
 
       {/* Canvas controls overlay */}
       <div
