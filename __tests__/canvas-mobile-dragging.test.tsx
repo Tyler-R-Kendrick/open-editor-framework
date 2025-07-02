@@ -175,13 +175,11 @@ describe('EditorCanvas Mobile Dragging', () => {
 
     store.dispatch(addComponent(testComponent));
 
-    const { container } = render(
+    render(
       <Provider store={store}>
         <EditorCanvas theme="light" resolution={{ width: 400, height: 400 }} />
       </Provider>
     );
-
-    const draggableComponent = container.querySelector(`[data-testid="draggable-component-${testComponent.id}"]`) as HTMLElement;
 
     // Get initial position from store
     const initialState = store.getState();
