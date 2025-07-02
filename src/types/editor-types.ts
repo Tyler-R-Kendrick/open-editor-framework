@@ -17,7 +17,7 @@ export interface Size {
 
 export type Resolution = Size;
 
-export interface Bounds extends Point, Size {}
+export interface Bounds extends Point, Size { }
 
 export interface EditorComponent {
   id: string;
@@ -50,19 +50,6 @@ export interface PropertySchema {
   min?: number; // For number/range type
   max?: number; // For number/range type
   step?: number; // For number/range type
-}
-
-export interface TouchGesture {
-  type: 'tap' | 'longpress' | 'pan' | 'pinch' | 'swipe';
-  startPoint: Point;
-  currentPoint: Point;
-  deltaX: number;
-  deltaY: number;
-  scale?: number;
-  velocity?: Point;
-  duration: number;
-  startDistance?: number; // For pinch gestures
-  startZoom?: number; // For zoom scaling
 }
 
 export interface CanvasState {

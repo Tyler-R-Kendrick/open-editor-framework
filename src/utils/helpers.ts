@@ -1,117 +1,10 @@
-import { Point, TouchGesture } from '../types/editor-types';
+import { debounce, throttle } from 'lodash';
 import { BaseComponent, ComponentProperties } from '../types/component-base';
-
-/**
- * Utility functions for touch gesture recognition
- */
-export class TouchGestureRecognizer {
-  private startTime: number = 0;
-  private startPoint: Point = { x: 0, y: 0 };
-  private currentPoint: Point = { x: 0, y: 0 };
-  private lastPoint: Point = { x: 0, y: 0 };
-  private velocity: Point = { x: 0, y: 0 };
-  private longPressTimer: number | null = null;
-  private isLongPress = false;
-
-  private readonly LONG_PRESS_DELAY = 500;
-  private readonly TAP_THRESHOLD = 10;
-  private readonly SWIPE_THRESHOLD = 50;
-  private readonly SWIPE_VELOCITY_THRESHOLD = 0.5;
-
-  handleTouchStart(touch: Touch): void {
-    this.startTime = Date.now();
-    this.startPoint = this.getTouchPoint(touch);
-    this.currentPoint = { ...this.startPoint };
-    this.lastPoint = { ...this.startPoint };
-    this.isLongPress = false;
-
-    // Start long press detection
-    this.longPressTimer = window.setTimeout(() => {
-      this.isLongPress = true;
-      this.onLongPress?.(this.createGesture('longpress'));
-    }, this.LONG_PRESS_DELAY);
-  }
-
-  handleTouchMove(touch: Touch): TouchGesture {
-    this.currentPoint = this.getTouchPoint(touch);
-
-    // Calculate velocity
-    const timeDelta = Date.now() - this.startTime;
-    if (timeDelta > 0) {
-      this.velocity = {
-        x: (this.currentPoint.x - this.lastPoint.x) / timeDelta,
-        y: (this.currentPoint.y - this.lastPoint.y) / timeDelta
-      };
-    }
-
-    this.lastPoint = { ...this.currentPoint };
-
-    // Cancel long press if moved too much
-    if (this.longPressTimer && this.getDistance(this.startPoint, this.currentPoint) > this.TAP_THRESHOLD) {
-      clearTimeout(this.longPressTimer);
-      this.longPressTimer = null;
-    }
-
-    return this.createGesture('pan');
-  }
-
-  handleTouchEnd(touch: Touch): TouchGesture | null {
-    const endPoint = this.getTouchPoint(touch);
-    const duration = Date.now() - this.startTime;
-    const distance = this.getDistance(this.startPoint, endPoint);
-
-    // Clear long press timer
-    if (this.longPressTimer) {
-      clearTimeout(this.longPressTimer);
-      this.longPressTimer = null;
-    }
-
-    // Determine gesture type
-    if (this.isLongPress) {
-      return null; // Already handled
-    } else if (distance < this.TAP_THRESHOLD && duration < 300) {
-      return this.createGesture('tap');
-    } else if (distance > this.SWIPE_THRESHOLD) {
-      const speed = distance / duration;
-      if (speed > this.SWIPE_VELOCITY_THRESHOLD) {
-        return this.createGesture('swipe');
-      }
-    }
-
-    return this.createGesture('pan');
-  }
-
-  private getTouchPoint(touch: Touch): Point {
-    return {
-      x: touch.clientX,
-      y: touch.clientY
-    };
-  }
-
-  private getDistance(p1: Point, p2: Point): number {
-    const dx = p2.x - p1.x;
-    const dy = p2.y - p1.y;
-    return Math.sqrt(dx * dx + dy * dy);
-  }
-
-  private createGesture(type: TouchGesture['type']): TouchGesture {
-    return {
-      type,
-      startPoint: this.startPoint,
-      currentPoint: this.currentPoint,
-      deltaX: this.currentPoint.x - this.startPoint.x,
-      deltaY: this.currentPoint.y - this.startPoint.y,
-      velocity: this.velocity,
-      duration: Date.now() - this.startTime
-    };
-  }
-
-  // Event handlers (to be overridden)
-  onLongPress?: (gesture: TouchGesture) => void;
-}
+import { Point } from '../types/editor-types';
 
 /**
  * Utility functions for accessibility
+ * Using established patterns from react-aria where possible
  */
 export class AccessibilityHelper {
   static announceToScreenReader(message: string, priority: 'polite' | 'assertive' = 'polite'): void {
@@ -155,13 +48,6 @@ export class AccessibilityHelper {
 
   static getPreferredContrast(): 'normal' | 'high' {
     return window.matchMedia('(prefers-contrast: high)').matches ? 'high' : 'normal';
-  }
-
-  static isUsingScreenReader(): boolean {
-    // Basic heuristic - not 100% accurate but covers most cases
-    return window.navigator.userAgent.includes('NVDA') ||
-      window.navigator.userAgent.includes('JAWS') ||
-      window.speechSynthesis?.speaking === false;
   }
 }
 
@@ -358,3 +244,6 @@ export class DataHelper {
     });
   }
 }
+
+// Export throttle and debounce from lodash for common performance optimizations
+export { debounce, throttle };

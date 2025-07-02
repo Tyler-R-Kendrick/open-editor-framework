@@ -1,16 +1,7 @@
-import { useState, useEffect } from 'react';
+// This file is kept for backward compatibility but now exports from react-use
+import { useMedia } from 'react-use';
 
 export function useMediaQuery(query: string): boolean {
-  const getMatches = () => window.matchMedia(query).matches;
-  const [matches, setMatches] = useState(getMatches);
-
-  useEffect(() => {
-    const mql = window.matchMedia(query);
-    const handler = (e: MediaQueryListEvent) => setMatches(e.matches);
-    mql.addEventListener('change', handler);
-    setMatches(mql.matches);
-    return () => mql.removeEventListener('change', handler);
-  }, [query]);
-
-  return matches;
+  // react-use's useMedia returns true/false
+  return useMedia(query);
 }
