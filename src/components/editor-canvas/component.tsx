@@ -334,12 +334,12 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over, delta } = event;
+    const { active, delta } = event;
 
     setActiveId(null);
     setIsDragging(false);
 
-    if (!over || !delta) return;
+    if (!delta) return;
 
     // Calculate new position based on drag delta
     const componentId = active.id as string;
