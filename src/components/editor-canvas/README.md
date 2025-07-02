@@ -58,7 +58,9 @@ import { EditorCanvas } from './editor-canvas/component.js';
 
 Drag interactions use the `useDrag` hook from **React Aria**, which provides
 mobile-friendly drag and drop with accessible behavior consistent with the
-Spectrum design system.
+Spectrum design system. A transparent draggable overlay is rendered over a
+component only when it is selected so that selection isn't blocked by the
+overlay.
 
 ## Structure
 
