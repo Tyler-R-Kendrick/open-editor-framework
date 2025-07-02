@@ -50,10 +50,20 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
     };
   }, [config.fieldRenderers]);
 
-  const sections: PropertySection[] = useMemo(
+  const baseSections = useMemo(
     () => config.sections || defaultSections,
     [config.sections]
   );
+
+  const sections: PropertySection[] = useMemo(() => {
+    const known = new Set(baseSections.flatMap((s) => s.fields));
+    const extras = properties
+      .map((p) => p.key)
+      .filter((k) => !known.has(k));
+    return extras.length > 0
+      ? [...baseSections, { title: 'Other', fields: extras }]
+      : baseSections;
+  }, [baseSections, properties]);
 
   const loadComponentProperties = (component: BaseComponent | undefined) => {
     if (!component) {
@@ -84,12 +94,11 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
     const handleSelection = (e: any) => {
       const id = e.detail.selectedComponents[0] ?? null;
       setSelectedComponentId(id);
-      loadComponentProperties(components.find((c) => c.id === id));
     };
     window.addEventListener('selection-change', handleSelection as any);
     return () =>
       window.removeEventListener('selection-change', handleSelection as any);
-  }, [components]);
+  }, []);
 
   useEffect(() => {
     if (selectedComponentId) {
