@@ -4,7 +4,10 @@ import { ComponentPalette } from '../src/components/component-palette/component'
 
 beforeEach(() => {
   global.fetch = jest.fn(() =>
-    Promise.resolve({ ok: true, json: async () => ({ templates: [], categories: ['All'] }) })
+    Promise.resolve({
+      ok: true,
+      json: async () => ({ templates: [], categories: ['All'] })
+    })
   ) as jest.Mock;
 });
 

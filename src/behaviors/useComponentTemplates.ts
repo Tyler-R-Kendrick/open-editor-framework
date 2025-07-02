@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { MarketplaceComponent, type ComponentProperties } from '../types/component-base';
+import {
+  MarketplaceComponent,
+  type ComponentProperties
+} from '../types/component-base';
 import { defaultComponentTemplates } from '../samples/defaultComponentTemplates';
 import type { Size } from '../types/editor-types';
 
