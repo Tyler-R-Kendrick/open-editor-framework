@@ -1,120 +1,14 @@
-import { Point, TouchGesture } from '../types/editor-types';
+import { Point } from '../types/editor-types';
 import { BaseComponent, ComponentProperties } from '../types/component-base';
-
-/**
- * Utility functions for touch gesture recognition
- */
-export class TouchGestureRecognizer {
-  private startTime: number = 0;
-  private startPoint: Point = { x: 0, y: 0 };
-  private currentPoint: Point = { x: 0, y: 0 };
-  private lastPoint: Point = { x: 0, y: 0 };
-  private velocity: Point = { x: 0, y: 0 };
-  private longPressTimer: number | null = null;
-  private isLongPress = false;
-
-  private readonly LONG_PRESS_DELAY = 500;
-  private readonly TAP_THRESHOLD = 10;
-  private readonly SWIPE_THRESHOLD = 50;
-  private readonly SWIPE_VELOCITY_THRESHOLD = 0.5;
-
-  handleTouchStart(touch: Touch): void {
-    this.startTime = Date.now();
-    this.startPoint = this.getTouchPoint(touch);
-    this.currentPoint = { ...this.startPoint };
-    this.lastPoint = { ...this.startPoint };
-    this.isLongPress = false;
-
-    // Start long press detection
-    this.longPressTimer = window.setTimeout(() => {
-      this.isLongPress = true;
-      this.onLongPress?.(this.createGesture('longpress'));
-    }, this.LONG_PRESS_DELAY);
-  }
-
-  handleTouchMove(touch: Touch): TouchGesture {
-    this.currentPoint = this.getTouchPoint(touch);
-
-    // Calculate velocity
-    const timeDelta = Date.now() - this.startTime;
-    if (timeDelta > 0) {
-      this.velocity = {
-        x: (this.currentPoint.x - this.lastPoint.x) / timeDelta,
-        y: (this.currentPoint.y - this.lastPoint.y) / timeDelta
-      };
-    }
-
-    this.lastPoint = { ...this.currentPoint };
-
-    // Cancel long press if moved too much
-    if (this.longPressTimer && this.getDistance(this.startPoint, this.currentPoint) > this.TAP_THRESHOLD) {
-      clearTimeout(this.longPressTimer);
-      this.longPressTimer = null;
-    }
-
-    return this.createGesture('pan');
-  }
-
-  handleTouchEnd(touch: Touch): TouchGesture | null {
-    const endPoint = this.getTouchPoint(touch);
-    const duration = Date.now() - this.startTime;
-    const distance = this.getDistance(this.startPoint, endPoint);
-
-    // Clear long press timer
-    if (this.longPressTimer) {
-      clearTimeout(this.longPressTimer);
-      this.longPressTimer = null;
-    }
-
-    // Determine gesture type
-    if (this.isLongPress) {
-      return null; // Already handled
-    } else if (distance < this.TAP_THRESHOLD && duration < 300) {
-      return this.createGesture('tap');
-    } else if (distance > this.SWIPE_THRESHOLD) {
-      const speed = distance / duration;
-      if (speed > this.SWIPE_VELOCITY_THRESHOLD) {
-        return this.createGesture('swipe');
-      }
-    }
-
-    return this.createGesture('pan');
-  }
-
-  private getTouchPoint(touch: Touch): Point {
-    return {
-      x: touch.clientX,
-      y: touch.clientY
-    };
-  }
-
-  private getDistance(p1: Point, p2: Point): number {
-    const dx = p2.x - p1.x;
-    const dy = p2.y - p1.y;
-    return Math.sqrt(dx * dx + dy * dy);
-  }
-
-  private createGesture(type: TouchGesture['type']): TouchGesture {
-    return {
-      type,
-      startPoint: this.startPoint,
-      currentPoint: this.currentPoint,
-      deltaX: this.currentPoint.x - this.startPoint.x,
-      deltaY: this.currentPoint.y - this.startPoint.y,
-      velocity: this.velocity,
-      duration: Date.now() - this.startTime
-    };
-  }
-
-  // Event handlers (to be overridden)
-  onLongPress?: (gesture: TouchGesture) => void;
-}
 
 /**
  * Utility functions for accessibility
  */
 export class AccessibilityHelper {
-  static announceToScreenReader(message: string, priority: 'polite' | 'assertive' = 'polite'): void {
+  static announceToScreenReader(
+    message: string,
+    priority: 'polite' | 'assertive' = 'polite'
+  ): void {
     const announcement = document.createElement('div');
     announcement.setAttribute('aria-live', priority);
     announcement.setAttribute('aria-atomic', 'true');
@@ -140,7 +34,10 @@ export class AccessibilityHelper {
     }
   }
 
-  static addKeyboardNavigation(element: HTMLElement, handler: (e: KeyboardEvent) => void): void {
+  static addKeyboardNavigation(
+    element: HTMLElement,
+    handler: (e: KeyboardEvent) => void
+  ): void {
     element.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
@@ -150,18 +47,24 @@ export class AccessibilityHelper {
   }
 
   static getPreferredMotion(): 'full' | 'reduced' {
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'reduced' : 'full';
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      ? 'reduced'
+      : 'full';
   }
 
   static getPreferredContrast(): 'normal' | 'high' {
-    return window.matchMedia('(prefers-contrast: high)').matches ? 'high' : 'normal';
+    return window.matchMedia('(prefers-contrast: high)').matches
+      ? 'high'
+      : 'normal';
   }
 
   static isUsingScreenReader(): boolean {
     // Basic heuristic - not 100% accurate but covers most cases
-    return window.navigator.userAgent.includes('NVDA') ||
+    return (
+      window.navigator.userAgent.includes('NVDA') ||
       window.navigator.userAgent.includes('JAWS') ||
-      window.speechSynthesis?.speaking === false;
+      window.speechSynthesis?.speaking === false
+    );
   }
 }
 
@@ -185,7 +88,7 @@ export class ComponentHelper {
       bounds,
       properties,
       children: [],
-      parent: undefined,
+      parent: undefined
     });
   }
 
@@ -199,30 +102,45 @@ export class ComponentHelper {
       bounds: {
         ...component.bounds,
         x: component.bounds.x + offset.x,
-        y: component.bounds.y + offset.y,
+        y: component.bounds.y + offset.y
       },
       properties: { ...component.properties },
-      children: component.children?.map((child) => this.duplicateComponent(child, offset)),
+      children: component.children?.map((child) =>
+        this.duplicateComponent(child, offset)
+      )
     });
 
     return duplicate;
   }
 
-  static isPointInBounds(point: Point, bounds: { x: number; y: number; width: number; height: number }): boolean {
-    return point.x >= bounds.x &&
+  static isPointInBounds(
+    point: Point,
+    bounds: { x: number; y: number; width: number; height: number }
+  ): boolean {
+    return (
+      point.x >= bounds.x &&
       point.x <= bounds.x + bounds.width &&
       point.y >= bounds.y &&
-      point.y <= bounds.y + bounds.height;
+      point.y <= bounds.y + bounds.height
+    );
   }
 
-  static getBoundsCenter(bounds: { x: number; y: number; width: number; height: number }): Point {
+  static getBoundsCenter(bounds: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  }): Point {
     return {
       x: bounds.x + bounds.width / 2,
       y: bounds.y + bounds.height / 2
     };
   }
 
-  static expandBounds(bounds: { x: number; y: number; width: number; height: number }, padding: number) {
+  static expandBounds(
+    bounds: { x: number; y: number; width: number; height: number },
+    padding: number
+  ) {
     return {
       x: bounds.x - padding,
       y: bounds.y - padding,
@@ -236,7 +154,9 @@ export class ComponentHelper {
  * Utility functions for canvas operations
  */
 export class CanvasHelper {
-  static getHighDPIContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D | null {
+  static getHighDPIContext(
+    canvas: HTMLCanvasElement
+  ): CanvasRenderingContext2D | null {
     const ctx = canvas.getContext('2d');
     if (!ctx) return null;
 
@@ -252,7 +172,13 @@ export class CanvasHelper {
     return ctx;
   }
 
-  static drawGrid(ctx: CanvasRenderingContext2D, width: number, height: number, gridSize: number = 20, color: string = '#e2e8f0'): void {
+  static drawGrid(
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    gridSize: number = 20,
+    color: string = '#e2e8f0'
+  ): void {
     ctx.save();
     ctx.strokeStyle = color;
     ctx.lineWidth = 1;
@@ -277,16 +203,30 @@ export class CanvasHelper {
     ctx.restore();
   }
 
-  static drawSelectionBorder(ctx: CanvasRenderingContext2D, bounds: { x: number; y: number; width: number; height: number }, color: string = '#3b82f6'): void {
+  static drawSelectionBorder(
+    ctx: CanvasRenderingContext2D,
+    bounds: { x: number; y: number; width: number; height: number },
+    color: string = '#3b82f6'
+  ): void {
     ctx.save();
     ctx.strokeStyle = color;
     ctx.lineWidth = 2;
     ctx.setLineDash([5, 5]);
-    ctx.strokeRect(bounds.x - 2, bounds.y - 2, bounds.width + 4, bounds.height + 4);
+    ctx.strokeRect(
+      bounds.x - 2,
+      bounds.y - 2,
+      bounds.width + 4,
+      bounds.height + 4
+    );
     ctx.restore();
   }
 
-  static drawResizeHandles(ctx: CanvasRenderingContext2D, bounds: { x: number; y: number; width: number; height: number }, handleSize: number = 8, color: string = '#3b82f6'): void {
+  static drawResizeHandles(
+    ctx: CanvasRenderingContext2D,
+    bounds: { x: number; y: number; width: number; height: number },
+    handleSize: number = 8,
+    color: string = '#3b82f6'
+  ): void {
     ctx.save();
     ctx.fillStyle = color;
     ctx.strokeStyle = '#ffffff';
@@ -294,12 +234,21 @@ export class CanvasHelper {
 
     const handles = [
       { x: bounds.x - handleSize / 2, y: bounds.y - handleSize / 2 }, // Top-left
-      { x: bounds.x + bounds.width - handleSize / 2, y: bounds.y - handleSize / 2 }, // Top-right
-      { x: bounds.x - handleSize / 2, y: bounds.y + bounds.height - handleSize / 2 }, // Bottom-left
-      { x: bounds.x + bounds.width - handleSize / 2, y: bounds.y + bounds.height - handleSize / 2 } // Bottom-right
+      {
+        x: bounds.x + bounds.width - handleSize / 2,
+        y: bounds.y - handleSize / 2
+      }, // Top-right
+      {
+        x: bounds.x - handleSize / 2,
+        y: bounds.y + bounds.height - handleSize / 2
+      }, // Bottom-left
+      {
+        x: bounds.x + bounds.width - handleSize / 2,
+        y: bounds.y + bounds.height - handleSize / 2
+      } // Bottom-right
     ];
 
-    handles.forEach(handle => {
+    handles.forEach((handle) => {
       ctx.fillRect(handle.x, handle.y, handleSize, handleSize);
       ctx.strokeRect(handle.x, handle.y, handleSize, handleSize);
     });
@@ -331,7 +280,9 @@ export class DataHelper {
   }
 
   static exportToJSON(data: unknown, filename: string): void {
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: 'application/json'
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;

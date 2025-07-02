@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useMediaQuery } from '../../utils/useMediaQuery';
+import { useMedia } from 'react-use';
 import { EditorTheme } from '../../types/editor-types';
 import type { Resolution } from '../../types/editor-types';
 import { EditorToolbar } from '../toolbar/component';
@@ -27,7 +27,7 @@ export const EditorApp: React.FC = () => {
   const [resolution, setResolution] = useState<Resolution | undefined>(
     undefined
   );
-  const isMobile = useMediaQuery('(max-width: 768px)');
+  const isMobile = useMedia('(max-width: 768px)');
   const [mobileTab, setMobileTab] = useState<'palette' | 'canvas' | 'control'>(
     'canvas'
   );
