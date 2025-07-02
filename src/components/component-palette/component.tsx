@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { EditorTheme } from '../../types/editor-types';
 import { useComponentTemplates } from '../../behaviors/useComponentTemplates';
 import { MarketplaceComponent } from '../../types/component-base';
+import type { BaseComponent } from '../../types/component-base';
+import { useAppDispatch } from '../../store';
+import { addComponent } from '../../store';
+import { ComponentHelper } from '../../utils/helpers';
 
 interface ComponentPaletteProps {
   theme: EditorTheme;
@@ -24,25 +28,53 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({
   'aria-label': ariaLabel,
   templateUrl
 }) => {
-  const { templates: componentTemplates, categories, loading, error, reload } = useComponentTemplates(templateUrl);
+  const {
+    templates: componentTemplates,
+    categories,
+    loading,
+    error,
+    reload
+  } = useComponentTemplates(templateUrl);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredComponents = componentTemplates.filter(component => {
-    const matchesCategory = selectedCategory === 'All' || component.category === selectedCategory;
-    const matchesSearch = component.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredComponents = componentTemplates.filter((component) => {
+    const matchesCategory =
+      selectedCategory === 'All' || component.category === selectedCategory;
+    const matchesSearch =
+      component.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       component.description.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
-  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, component: MarketplaceComponent) => {
-    e.dataTransfer.setData('application/json', JSON.stringify(component.template));
+  const handleDragStart = (
+    e: React.DragEvent<HTMLDivElement>,
+    component: MarketplaceComponent
+  ) => {
+    e.dataTransfer.setData(
+      'application/json',
+      JSON.stringify(component.template)
+    );
     e.dataTransfer.effectAllowed = 'copy';
   };
 
+  const dispatch = useAppDispatch();
+
   const handleComponentClick = (component: MarketplaceComponent) => {
-    // For touch devices, clicking will add the component to the canvas
-    console.log('Add component to canvas:', component);
+    const newComponent = {
+      id: ComponentHelper.generateId(),
+      type: component.type,
+      name: component.name,
+      bounds: {
+        x: 0,
+        y: 0,
+        width: component.defaultSize.width,
+        height: component.defaultSize.height
+      },
+      properties: { ...component.properties }
+    } as BaseComponent;
+
+    dispatch(addComponent(newComponent));
   };
 
   const categoryButtonStyle = (isActive: boolean) => ({
@@ -50,11 +82,13 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({
     border: 'none',
     borderRadius: '6px',
     background: isActive
-      ? (theme === 'dark' ? '#3b82f6' : '#3b82f6')
-      : (theme === 'dark' ? '#4b5563' : '#f3f4f6'),
-    color: isActive
-      ? '#ffffff'
-      : (theme === 'dark' ? '#d1d5db' : '#374151'),
+      ? theme === 'dark'
+        ? '#3b82f6'
+        : '#3b82f6'
+      : theme === 'dark'
+        ? '#4b5563'
+        : '#f3f4f6',
+    color: isActive ? '#ffffff' : theme === 'dark' ? '#d1d5db' : '#374151',
     cursor: 'pointer',
     fontSize: '14px',
     transition: 'all 0.2s ease',
@@ -118,8 +152,11 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({
             outline: 'none',
             transition: 'border-color 0.2s ease'
           }}
-          onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-          onBlur={(e) => e.target.style.borderColor = theme === 'dark' ? '#6b7280' : '#d1d5db'}
+          onFocus={(e) => (e.target.style.borderColor = '#3b82f6')}
+          onBlur={(e) =>
+            (e.target.style.borderColor =
+              theme === 'dark' ? '#6b7280' : '#d1d5db')
+          }
         />
       </div>
 
@@ -148,13 +185,18 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({
             color: theme === 'dark' ? '#fca5a5' : '#dc2626'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              marginBottom: '8px'
+            }}
+          >
             <span style={{ fontSize: '16px' }}>⚠️</span>
             <strong>Failed to load templates</strong>
           </div>
-          <p style={{ margin: '0 0 12px 0', fontSize: '14px' }}>
-            {error}
-          </p>
+          <p style={{ margin: '0 0 12px 0', fontSize: '14px' }}>{error}</p>
           <button
             onClick={reload}
             style={{
@@ -191,19 +233,21 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({
               paddingBottom: '4px'
             }}
           >
-            {categories.map(category => (
+            {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
                 style={categoryButtonStyle(selectedCategory === category)}
                 onMouseEnter={(e) => {
                   if (selectedCategory !== category) {
-                    e.currentTarget.style.background = theme === 'dark' ? '#6b7280' : '#e5e7eb';
+                    e.currentTarget.style.background =
+                      theme === 'dark' ? '#6b7280' : '#e5e7eb';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (selectedCategory !== category) {
-                    e.currentTarget.style.background = theme === 'dark' ? '#4b5563' : '#f3f4f6';
+                    e.currentTarget.style.background =
+                      theme === 'dark' ? '#4b5563' : '#f3f4f6';
                   }
                 }}
               >
@@ -238,8 +282,10 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({
               </p>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {filteredComponents.map(component => (
+            <div
+              style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
+            >
+              {filteredComponents.map((component) => (
                 <div
                   key={component.id}
                   draggable
@@ -248,7 +294,8 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({
                   style={componentItemStyle}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-1px)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+                    e.currentTarget.style.boxShadow =
+                      '0 4px 12px rgba(0,0,0,0.1)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'translateY(0)';
@@ -264,7 +311,13 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({
                     }
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px'
+                    }}
+                  >
                     <div
                       style={{
                         fontSize: '24px',
