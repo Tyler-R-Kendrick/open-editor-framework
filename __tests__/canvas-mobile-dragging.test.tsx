@@ -7,7 +7,7 @@ import { BaseComponent } from '../src/types/component-base';
 
 // Helper function to create touch events
 const createTouchEvent = (type: string, touches: Array<{ clientX: number; clientY: number }>) => {
-  const touchEvent = new Event(type, { bubbles: true, cancelable: true });
+  const touchEvent = new window.Event(type, { bubbles: true, cancelable: true });
   Object.defineProperty(touchEvent, 'touches', {
     value: touches.map((touch, index) => ({
       identifier: index,
@@ -287,7 +287,7 @@ describe('EditorCanvas Desktop Dragging (for comparison)', () => {
       </Provider>
     );
 
-    const canvas = screen.getByLabelText('Interactive design canvas');
+    screen.getByLabelText('Interactive design canvas');
     const overlay = container.querySelector('div[aria-hidden="true"]') as HTMLElement;
 
     // Simulate mouse drag on overlay (this should work with react-aria/dnd)

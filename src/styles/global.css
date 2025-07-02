@@ -1,4 +1,5 @@
 @import './tokens.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,9 +11,11 @@
   *::after {
     box-sizing: border-box;
   }
+
   html {
     /* Prevent text size adjust on iOS */
-    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+
     /* Enable smooth scrolling */
     scroll-behavior: smooth;
   }
@@ -20,17 +23,20 @@
   body {
     /* Prevent rubber band scrolling on iOS */
     overflow: hidden;
+
     /* Improve touch scrolling performance on iOS */
     -webkit-overflow-scrolling: touch;
+
     /* Disable text selection highlighting on touch devices */
     -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
+    user-select: none;
+    user-select: none;
+    user-select: none;
+    user-select: none;
+
     /* Ensure proper background color for contrast */
-    background-color: #ffffff;
+    background-color: #fff;
     color: #1e293b;
   }
 
@@ -46,7 +52,7 @@
   [tabindex]:focus {
     box-shadow:
       0 0 0 2px #3b82f6,
-      0 0 0 4px rgba(59, 130, 246, 0.2);
+      0 0 0 4px rgb(59 130 246 / 20%);
   }
 
   /* Improve touch target sizes for accessibility */
@@ -125,11 +131,11 @@
   /* High contrast mode support */
   @media (prefers-contrast: high) {
     .border-light {
-      border-color: #000000;
+      border-color: #000;
     }
 
     .text-muted {
-      color: #000000;
+      color: #000;
     }
   }
 
