@@ -12,18 +12,11 @@ import {
   useSensor,
   useSensors
 } from '@dnd-kit/core';
-import {
-  CSS
-} from '@dnd-kit/utilities';
+import { CSS } from '@dnd-kit/utilities';
 import Refresh from '@spectrum-icons/workflow/Refresh';
 import ZoomIn from '@spectrum-icons/workflow/ZoomIn';
 import ZoomOut from '@spectrum-icons/workflow/ZoomOut';
-import React, {
-  useCallback,
-  useEffect,
-  useRef,
-  useState
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActionCreators } from 'redux-undo';
 import { setComponents, updateComponent } from '../../store';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
@@ -60,19 +53,14 @@ const DraggableComponent: React.FC<DraggableComponentProps> = ({
   canvasState,
   isSelected
 }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    isDragging
-  } = useDraggable({
-    id: component.id,
-    data: {
-      type: 'component',
-      component
-    }
-  });
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: component.id,
+      data: {
+        type: 'component',
+        component
+      }
+    });
 
   const style = {
     position: 'absolute' as const,
@@ -321,8 +309,8 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8, // 8px movement required to start drag
-      },
+        distance: 8 // 8px movement required to start drag
+      }
     }),
     useSensor(KeyboardSensor)
   );
@@ -355,7 +343,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
 
     // Calculate new position based on drag delta
     const componentId = active.id as string;
-    const component = components.find(c => c.id === componentId);
+    const component = components.find((c) => c.id === componentId);
 
     if (!component) return;
 
@@ -726,7 +714,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
 
         const distance = Math.sqrt(
           Math.pow(touch2.clientX - touch1.clientX, 2) +
-          Math.pow(touch2.clientY - touch1.clientY, 2)
+            Math.pow(touch2.clientY - touch1.clientY, 2)
         );
 
         setLastTouch({
@@ -756,7 +744,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
 
         const distance = Math.sqrt(
           Math.pow(touch2.clientX - touch1.clientX, 2) +
-          Math.pow(touch2.clientY - touch1.clientY, 2)
+            Math.pow(touch2.clientY - touch1.clientY, 2)
         );
 
         const scale = distance / lastTouch.startDistance!;
