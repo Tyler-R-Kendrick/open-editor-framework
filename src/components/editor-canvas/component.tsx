@@ -448,6 +448,36 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
     (e: React.TouchEvent<HTMLCanvasElement>) => {
       touchStartTimeRef.current = Date.now();
 
+      if (e.touches.length === 1) {
+        const canvas = canvasRef.current;
+        if (canvas) {
+          const rect = canvas.getBoundingClientRect();
+          const x =
+            (e.touches[0].clientX - rect.left - canvasState.pan.x) /
+            canvasState.zoom;
+          const y =
+            (e.touches[0].clientY - rect.top - canvasState.pan.y) /
+            canvasState.zoom;
+
+          const clickedComponent = components.find(
+            (component) =>
+              x >= component.bounds.x &&
+              x <= component.bounds.x + component.bounds.width &&
+              y >= component.bounds.y &&
+              y <= component.bounds.y + component.bounds.height
+          );
+
+          if (clickedComponent) {
+            setCanvasState((prev) => ({
+              ...prev,
+              selectedComponents: [clickedComponent.id]
+            }));
+          } else {
+            setCanvasState((prev) => ({ ...prev, selectedComponents: [] }));
+          }
+        }
+      }
+
       // Handle multi-touch gestures
       if (e.touches.length === 2) {
         const touch1 = e.touches[0];
@@ -472,7 +502,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
         }
       }, 500);
     },
-    [canvasState.zoom]
+    [canvasState.zoom, canvasState.pan, components]
   );
 
   const handleTouchMove = useCallback(

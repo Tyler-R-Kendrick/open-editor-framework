@@ -61,6 +61,7 @@ mobile-friendly drag and drop with accessible behavior consistent with the
 Spectrum design system. A transparent draggable overlay is rendered over a
 component only when it is selected so that selection isn't blocked by the
 overlay.
+Tap a component to select it, then drag the overlay to move it on the canvas.
 
 ## Structure
 
