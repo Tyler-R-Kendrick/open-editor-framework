@@ -1,4 +1,3 @@
-import { Refresh, ZoomIn, ZoomOut } from '@adobe/react-spectrum-icons';
 import {
   closestCenter,
   DndContext,
@@ -16,6 +15,9 @@ import {
 import {
   CSS
 } from '@dnd-kit/utilities';
+import Refresh from '@spectrum-icons/workflow/Refresh';
+import ZoomIn from '@spectrum-icons/workflow/ZoomIn';
+import ZoomOut from '@spectrum-icons/workflow/ZoomOut';
 import React, {
   useCallback,
   useEffect,
@@ -41,9 +43,15 @@ interface EditorCanvasProps {
   'aria-label'?: string;
 }
 
+interface CanvasState {
+  zoom: number;
+  pan: { x: number; y: number };
+  selectedComponents: string[];
+}
+
 interface DraggableComponentProps {
   component: BaseComponent;
-  canvasState: any;
+  canvasState: CanvasState;
   isSelected: boolean;
 }
 
@@ -109,13 +117,13 @@ const DraggableComponent: React.FC<DraggableComponentProps> = ({
 
 interface DroppableCanvasProps {
   children: React.ReactNode;
-  containerRef: React.RefObject<HTMLDivElement>;
-  canvasRef: React.RefObject<HTMLCanvasElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  canvasRef: React.RefObject<HTMLCanvasElement | null>;
   theme: EditorTheme;
   resolution?: Resolution;
-  canvasState: any;
-  setCanvasState: React.Dispatch<React.SetStateAction<any>>;
-  components: BaseComponent[];
+  canvasState: CanvasState;
+  setCanvasState: React.Dispatch<React.SetStateAction<CanvasState>>;
+  _components: BaseComponent[];
   handleMouseDown: (e: React.MouseEvent<HTMLCanvasElement>) => void;
   handleMouseMove: (e: React.MouseEvent<HTMLCanvasElement>) => void;
   handleMouseUp: () => void;
@@ -132,7 +140,7 @@ const DroppableCanvas: React.FC<DroppableCanvasProps> = ({
   resolution,
   canvasState,
   setCanvasState,
-  components,
+  _components,
   handleMouseDown,
   handleMouseMove,
   handleMouseUp,
@@ -204,7 +212,7 @@ const DroppableCanvas: React.FC<DroppableCanvasProps> = ({
       >
         <button
           onClick={() =>
-            setCanvasState((prev: any) => ({
+            setCanvasState((prev) => ({
               ...prev,
               zoom: Math.max(0.1, prev.zoom - 0.1)
             }))
@@ -234,7 +242,7 @@ const DroppableCanvas: React.FC<DroppableCanvasProps> = ({
         </span>
         <button
           onClick={() =>
-            setCanvasState((prev: any) => ({
+            setCanvasState((prev) => ({
               ...prev,
               zoom: Math.min(5, prev.zoom + 0.1)
             }))
@@ -254,7 +262,7 @@ const DroppableCanvas: React.FC<DroppableCanvasProps> = ({
         </button>
         <button
           onClick={() =>
-            setCanvasState((prev: any) => ({
+            setCanvasState((prev) => ({
               ...prev,
               zoom: 1,
               pan: { x: 0, y: 0 }
@@ -289,8 +297,7 @@ const DroppableCanvas: React.FC<DroppableCanvasProps> = ({
  */
 export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   theme,
-  resolution,
-  'aria-label': ariaLabel
+  resolution
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -306,7 +313,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
 
   const dispatch = useAppDispatch();
   const components = useAppSelector((state) => state.canvas.present.components);
-  const [isDragging, setIsDragging] = useState(false);
+  const [_isDragging, setIsDragging] = useState(false);
   const [lastTouch, setLastTouch] = useState<PinchState | null>(null);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
@@ -813,7 +820,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
         resolution={resolution}
         canvasState={canvasState}
         setCanvasState={setCanvasState}
-        components={components}
+        _components={components}
         handleMouseDown={handleMouseDown}
         handleMouseMove={handleMouseMove}
         handleMouseUp={handleMouseUp}
