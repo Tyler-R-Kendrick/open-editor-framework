@@ -1,25 +1,282 @@
-import { useDrag } from '@react-aria/dnd';
-import Refresh from '@spectrum-icons/workflow/Refresh';
-import ZoomIn from '@spectrum-icons/workflow/ZoomIn';
-import ZoomOut from '@spectrum-icons/workflow/ZoomOut';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Refresh, ZoomIn, ZoomOut } from '@adobe/react-spectrum-icons';
+import {
+  closestCenter,
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  KeyboardSensor,
+  PointerSensor,
+  UniqueIdentifier,
+  useDraggable,
+  useDroppable,
+  useSensor,
+  useSensors
+} from '@dnd-kit/core';
+import {
+  CSS
+} from '@dnd-kit/utilities';
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState
+} from 'react';
 import { ActionCreators } from 'redux-undo';
-import { setComponents, updateComponent, useAppDispatch, useAppSelector } from '../../store';
+import { setComponents, updateComponent } from '../../store';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { BaseComponent } from '../../types/component-base';
-import { CanvasState, EditorTheme } from '../../types/editor-types';
+import { EditorTheme } from '../../types/editor-types';
+
+import type { Resolution } from '../../types/editor-types';
 
 interface PinchState {
   startDistance: number;
   startZoom: number;
 }
 
-import type { Resolution } from '../../types/editor-types';
-
 interface EditorCanvasProps {
   theme: EditorTheme;
   resolution?: Resolution;
   'aria-label'?: string;
 }
+
+interface DraggableComponentProps {
+  component: BaseComponent;
+  canvasState: any;
+  isSelected: boolean;
+}
+
+const DraggableComponent: React.FC<DraggableComponentProps> = ({
+  component,
+  canvasState,
+  isSelected
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    isDragging
+  } = useDraggable({
+    id: component.id,
+    data: {
+      type: 'component',
+      component
+    }
+  });
+
+  const style = {
+    position: 'absolute' as const,
+    left: component.bounds.x * canvasState.zoom + canvasState.pan.x,
+    top: component.bounds.y * canvasState.zoom + canvasState.pan.y,
+    width: component.bounds.width * canvasState.zoom,
+    height: component.bounds.height * canvasState.zoom,
+    transform: CSS.Transform.toString(transform),
+    opacity: isDragging ? 0.5 : 1,
+    cursor: isDragging ? 'grabbing' : 'grab',
+    zIndex: isDragging ? 1000 : isSelected ? 999 : 1,
+    border: isSelected ? '2px solid #3b82f6' : '2px solid transparent',
+    borderRadius: '4px',
+    touchAction: 'none'
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
+      aria-label={`Draggable ${component.type} component`}
+      data-testid={`draggable-component-${component.id}`}
+    >
+      {/* Drag handle overlay - this ensures the whole component is draggable */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'transparent',
+          zIndex: 1
+        }}
+        aria-hidden="true"
+      />
+    </div>
+  );
+};
+
+interface DroppableCanvasProps {
+  children: React.ReactNode;
+  containerRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLCanvasElement>;
+  theme: EditorTheme;
+  resolution?: Resolution;
+  canvasState: any;
+  setCanvasState: React.Dispatch<React.SetStateAction<any>>;
+  components: BaseComponent[];
+  handleMouseDown: (e: React.MouseEvent<HTMLCanvasElement>) => void;
+  handleMouseMove: (e: React.MouseEvent<HTMLCanvasElement>) => void;
+  handleMouseUp: () => void;
+  handleTouchStart: (e: React.TouchEvent<HTMLCanvasElement>) => void;
+  handleTouchMove: (e: React.TouchEvent<HTMLCanvasElement>) => void;
+  handleTouchEnd: () => void;
+}
+
+const DroppableCanvas: React.FC<DroppableCanvasProps> = ({
+  children,
+  containerRef,
+  canvasRef,
+  theme,
+  resolution,
+  canvasState,
+  setCanvasState,
+  components,
+  handleMouseDown,
+  handleMouseMove,
+  handleMouseUp,
+  handleTouchStart,
+  handleTouchMove,
+  handleTouchEnd
+}) => {
+  const { setNodeRef } = useDroppable({
+    id: 'canvas-drop-zone',
+    data: {
+      type: 'canvas'
+    }
+  });
+
+  return (
+    <div
+      ref={(node) => {
+        setNodeRef(node);
+        if (containerRef.current !== node) {
+          containerRef.current = node;
+        }
+      }}
+      className="canvas-container"
+      style={{
+        width: resolution ? `${resolution.width}px` : '100%',
+        height: resolution ? `${resolution.height}px` : '100%',
+        margin: resolution ? '0 auto' : undefined,
+        position: 'relative',
+        overflow: 'hidden',
+        background: theme === 'dark' ? '#1e293b' : '#f8fafc'
+      }}
+      role="img"
+      aria-label="Design Canvas"
+      data-testid="canvas-container"
+    >
+      <canvas
+        ref={canvasRef}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        style={{
+          display: 'block',
+          touchAction: 'pan-x pan-y pinch-zoom',
+          userSelect: 'none'
+        }}
+        aria-label="Interactive design canvas"
+        data-testid="canvas"
+      />
+
+      {children}
+
+      {/* Canvas controls overlay */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: '16px',
+          right: '16px',
+          display: 'flex',
+          gap: '8px',
+          background: theme === 'dark' ? '#374151' : 'white',
+          borderRadius: '8px',
+          padding: '8px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+        }}
+        data-testid="canvas-controls"
+      >
+        <button
+          onClick={() =>
+            setCanvasState((prev: any) => ({
+              ...prev,
+              zoom: Math.max(0.1, prev.zoom - 0.1)
+            }))
+          }
+          style={{
+            padding: '8px 12px',
+            border: 'none',
+            borderRadius: '4px',
+            background: theme === 'dark' ? '#4b5563' : '#f3f4f6',
+            color: theme === 'dark' ? '#f8fafc' : '#1e293b',
+            cursor: 'pointer'
+          }}
+          aria-label="Zoom out"
+          data-testid="zoom-out-button"
+        >
+          <ZoomOut aria-hidden="true" size="S" />
+        </button>
+        <span
+          style={{
+            padding: '8px 12px',
+            color: theme === 'dark' ? '#f8fafc' : '#1e293b',
+            fontSize: '14px'
+          }}
+          data-testid="zoom-level"
+        >
+          {Math.round(canvasState.zoom * 100)}%
+        </span>
+        <button
+          onClick={() =>
+            setCanvasState((prev: any) => ({
+              ...prev,
+              zoom: Math.min(5, prev.zoom + 0.1)
+            }))
+          }
+          style={{
+            padding: '8px 12px',
+            border: 'none',
+            borderRadius: '4px',
+            background: theme === 'dark' ? '#4b5563' : '#f3f4f6',
+            color: theme === 'dark' ? '#f8fafc' : '#1e293b',
+            cursor: 'pointer'
+          }}
+          aria-label="Zoom in"
+          data-testid="zoom-in-button"
+        >
+          <ZoomIn aria-hidden="true" size="S" />
+        </button>
+        <button
+          onClick={() =>
+            setCanvasState((prev: any) => ({
+              ...prev,
+              zoom: 1,
+              pan: { x: 0, y: 0 }
+            }))
+          }
+          style={{
+            padding: '8px 12px',
+            border: 'none',
+            borderRadius: '4px',
+            background: theme === 'dark' ? '#4b5563' : '#f3f4f6',
+            color: theme === 'dark' ? '#f8fafc' : '#1e293b',
+            cursor: 'pointer'
+          }}
+          aria-label="Reset zoom and pan"
+          data-testid="reset-view-button"
+        >
+          <Refresh aria-hidden="true" size="S" />
+        </button>
+      </div>
+    </div>
+  );
+};
 
 /**
  * HTML5 Canvas-based editor panel with touch and accessibility support
@@ -41,179 +298,94 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   const touchStartTimeRef = useRef(0);
   const longPressTimerRef = useRef<number | null>(null);
 
-  const [canvasState, setCanvasState] = useState<CanvasState>({
+  const [canvasState, setCanvasState] = useState({
     zoom: 1,
     pan: { x: 0, y: 0 },
-    selectedComponents: [],
-    clipboard: []
+    selectedComponents: [] as string[]
   });
 
   const dispatch = useAppDispatch();
   const components = useAppSelector((state) => state.canvas.present.components);
   const [isDragging, setIsDragging] = useState(false);
   const [lastTouch, setLastTouch] = useState<PinchState | null>(null);
+  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
-  const dragOffsetRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
-  const activeDragIdRef = useRef<string | null>(null);
-  const cancelDragRef = useRef(false);
+  // Configure drag sensors with better touch support
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 8px movement required to start drag
+      },
+    }),
+    useSensor(KeyboardSensor)
+  );
 
-  const DraggableOverlay: React.FC<{ component: BaseComponent }> = ({
-    component
-  }) => {
-    const [isTouchDragging, setIsTouchDragging] = useState(false);
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id);
+    setIsDragging(true);
 
-    const handleDragStart = (clientX: number, clientY: number) => {
-      const container = containerRef.current;
-      if (!container) return;
-      const rect = container.getBoundingClientRect();
-      const x = (clientX - rect.left - canvasState.pan.x) / canvasState.zoom;
-      const y = (clientY - rect.top - canvasState.pan.y) / canvasState.zoom;
+    // Clear any pending long press timer
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
 
-      // Check if we're clicking on this specific component
-      if (
-        x < component.bounds.x ||
-        x > component.bounds.x + component.bounds.width ||
-        y < component.bounds.y ||
-        y > component.bounds.y + component.bounds.height
-      ) {
-        return; // Not clicking on this component
-      }
+    // Select the component being dragged
+    const componentId = event.active.id as string;
+    setCanvasState((prev) => ({
+      ...prev,
+      selectedComponents: [componentId]
+    }));
+  };
 
-      cancelDragRef.current = false;
-      activeDragIdRef.current = component.id;
-      dragOffsetRef.current = {
-        x: x - component.bounds.x,
-        y: y - component.bounds.y
-      };
-      setIsDragging(true);
-      setCanvasState((prev) => ({
-        ...prev,
-        selectedComponents: [component.id]
-      }));
-    };
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over, delta } = event;
 
-    const handleDragMove = (clientX: number, clientY: number) => {
-      if (cancelDragRef.current || activeDragIdRef.current !== component.id)
-        return;
-      const container = containerRef.current;
-      if (!container) return;
-      const rect = container.getBoundingClientRect();
-      let x = (clientX - rect.left - canvasState.pan.x) / canvasState.zoom;
-      let y = (clientY - rect.top - canvasState.pan.y) / canvasState.zoom;
-      x -= dragOffsetRef.current.x;
-      y -= dragOffsetRef.current.y;
+    setActiveId(null);
+    setIsDragging(false);
 
-      // Constrain to canvas bounds
-      if (resolution) {
-        x = Math.max(
-          0,
-          Math.min(x, resolution.width - component.bounds.width)
-        );
-        y = Math.max(
-          0,
-          Math.min(y, resolution.height - component.bounds.height)
-        );
-      }
+    if (!over || !delta) return;
 
-      dispatch(
-        updateComponent(
-          new BaseComponent({
-            ...component,
-            bounds: { ...component.bounds, x, y }
-          })
-        )
+    // Calculate new position based on drag delta
+    const componentId = active.id as string;
+    const component = components.find(c => c.id === componentId);
+
+    if (!component) return;
+
+    // Convert pixel delta to canvas coordinates
+    const deltaX = delta.x / canvasState.zoom;
+    const deltaY = delta.y / canvasState.zoom;
+
+    const newX = component.bounds.x + deltaX;
+    const newY = component.bounds.y + deltaY;
+
+    // Constrain to canvas bounds
+    let constrainedX = newX;
+    let constrainedY = newY;
+
+    if (resolution) {
+      constrainedX = Math.max(
+        0,
+        Math.min(newX, resolution.width - component.bounds.width)
       );
-    };
+      constrainedY = Math.max(
+        0,
+        Math.min(newY, resolution.height - component.bounds.height)
+      );
+    }
 
-    const handleDragEnd = () => {
-      if (cancelDragRef.current || activeDragIdRef.current !== component.id)
-        return;
-      activeDragIdRef.current = null;
-      setIsDragging(false);
-      setIsTouchDragging(false);
-    };
-
-    // Use react-aria/dnd for desktop mouse interactions
-    const { dragProps } = useDrag({
-      getItems: () => [{ id: component.id, type: 'component' }],
-      onDragStart: (e) => handleDragStart(e.x, e.y),
-      onDragMove: (e) => handleDragMove(e.x, e.y),
-      onDragEnd: handleDragEnd
-    });
-
-    // Touch event handlers for mobile support
-    const handleTouchStart = (e: React.TouchEvent) => {
-      // Stop event from reaching canvas handlers
-      e.preventDefault();
-      e.stopPropagation();
-
-      // Clear any canvas long press timer that might interfere
-      if (longPressTimerRef.current) {
-        clearTimeout(longPressTimerRef.current);
-        longPressTimerRef.current = null;
-      }
-
-      if (e.touches.length === 1) {
-        const touch = e.touches[0];
-        setIsTouchDragging(true);
-        handleDragStart(touch.clientX, touch.clientY);
-      }
-    };
-
-    const handleTouchMove = (e: React.TouchEvent) => {
-      // Stop event from reaching canvas handlers
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (isTouchDragging && e.touches.length === 1) {
-        const touch = e.touches[0];
-        handleDragMove(touch.clientX, touch.clientY);
-      }
-    };
-
-    const handleTouchEnd = (e: React.TouchEvent) => {
-      // Stop event from reaching canvas handlers
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (isTouchDragging) {
-        setIsTouchDragging(false);
-        handleDragEnd();
-      }
-    };
-
-    const handleTouchCancel = (e: React.TouchEvent) => {
-      // Handle touch cancel events (when touch is interrupted)
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (isTouchDragging) {
-        setIsTouchDragging(false);
-        handleDragEnd();
-      }
-    };
-
-    return (
-      <div
-        {...dragProps}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onTouchCancel={handleTouchCancel}
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          left: component.bounds.x * canvasState.zoom + canvasState.pan.x,
-          top: component.bounds.y * canvasState.zoom + canvasState.pan.y,
-          width: component.bounds.width * canvasState.zoom,
-          height: component.bounds.height * canvasState.zoom,
-          touchAction: 'none',
-          background: 'transparent',
-          cursor: isDragging ? 'grabbing' : 'grab',
-          zIndex: 1000,
-          pointerEvents: 'auto'
-        }}
-      />
+    // Update component position
+    dispatch(
+      updateComponent(
+        new BaseComponent({
+          ...component,
+          bounds: {
+            ...component.bounds,
+            x: constrainedX,
+            y: constrainedY
+          }
+        })
+      )
     );
   };
 
@@ -493,7 +665,6 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
             ? [...prev.selectedComponents, clickedComponent.id]
             : [clickedComponent.id]
         }));
-        setIsDragging(true);
       } else {
         setCanvasState((prev) => ({ ...prev, selectedComponents: [] }));
       }
@@ -503,16 +674,13 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
 
   const handleMouseMove = useCallback(
     (_e: React.MouseEvent<HTMLCanvasElement>) => {
-      if (!isDragging) return;
-
-      // Handle dragging logic here
-      // This would update component positions based on mouse movement
+      // Mouse move handled by DnD context
     },
-    [isDragging]
+    []
   );
 
   const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
+    // Mouse up handled by DnD context
   }, []);
 
   const handleTouchStart = useCallback(
@@ -538,32 +706,14 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
               y <= component.bounds.y + component.bounds.height
           );
 
-          if (clickedComponent) {
-            // Let overlay handle the touch event for dragging
-            // Canvas should not interfere with component dragging
-            // Don't set long press timer for component touches
-            return;
-          } else {
+          if (!clickedComponent) {
             setCanvasState((prev) => ({ ...prev, selectedComponents: [] }));
-            // Only set long press timer for canvas background touches
-            longPressTimerRef.current = window.setTimeout(() => {
-              // Handle long press (context menu, etc.)
-              if ('vibrate' in navigator) {
-                navigator.vibrate(50);
-              }
-            }, 500);
           }
         }
       }
 
       // Handle multi-touch gestures
       if (e.touches.length === 2) {
-        // Clear any existing long press timer for multi-touch
-        if (longPressTimerRef.current) {
-          clearTimeout(longPressTimerRef.current);
-          longPressTimerRef.current = null;
-        }
-
         const touch1 = e.touches[0];
         const touch2 = e.touches[1];
 
@@ -583,13 +733,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
 
   const handleTouchMove = useCallback(
     (e: React.TouchEvent<HTMLCanvasElement>) => {
-      // Clear long press timer on any touch movement
-      if (longPressTimerRef.current) {
-        clearTimeout(longPressTimerRef.current);
-        longPressTimerRef.current = null;
-      }
-
-      // Only prevent default for multi-touch gestures, not single touch
+      // Only prevent default for multi-touch gestures
       if (e.touches.length > 1) {
         e.preventDefault();
       }
@@ -615,9 +759,6 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
         );
 
         setCanvasState((prev) => ({ ...prev, zoom: newZoom }));
-      } else if (e.touches.length === 1) {
-        // Don't handle single-touch pan to avoid interfering with component dragging
-        // Component dragging should take priority over canvas pan
       }
     },
     [lastTouch]
@@ -659,123 +800,57 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   }, [handleKeyDown, handleUndo, handleRedo]);
 
   return (
-    <div
-      ref={containerRef}
-      className="canvas-container"
-      style={{
-        width: resolution ? `${resolution.width}px` : '100%',
-        height: resolution ? `${resolution.height}px` : '100%',
-        margin: resolution ? '0 auto' : undefined,
-        position: 'relative',
-        overflow: 'hidden',
-        background: theme === 'dark' ? '#1e293b' : '#f8fafc',
-        cursor: isDragging ? 'grabbing' : 'grab'
-      }}
-      role="img"
-      aria-label={ariaLabel || 'Design Canvas'}
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
     >
-      <canvas
-        ref={canvasRef}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        style={{
-          display: 'block',
-          touchAction: 'pan-x pan-y pinch-zoom',
-          userSelect: 'none'
-        }}
-        aria-label="Interactive design canvas"
-      />
-
-      {components.map((component) => (
-        <DraggableOverlay key={component.id} component={component} />
-      ))}
-
-      {/* Canvas controls overlay */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: '16px',
-          right: '16px',
-          display: 'flex',
-          gap: '8px',
-          background: theme === 'dark' ? '#374151' : 'white',
-          borderRadius: '8px',
-          padding: '8px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-        }}
+      <DroppableCanvas
+        containerRef={containerRef}
+        canvasRef={canvasRef}
+        theme={theme}
+        resolution={resolution}
+        canvasState={canvasState}
+        setCanvasState={setCanvasState}
+        components={components}
+        handleMouseDown={handleMouseDown}
+        handleMouseMove={handleMouseMove}
+        handleMouseUp={handleMouseUp}
+        handleTouchStart={handleTouchStart}
+        handleTouchMove={handleTouchMove}
+        handleTouchEnd={handleTouchEnd}
       >
-        <button
-          onClick={() =>
-            setCanvasState((prev) => ({
-              ...prev,
-              zoom: Math.max(0.1, prev.zoom - 0.1)
-            }))
-          }
-          style={{
-            padding: '8px 12px',
-            border: 'none',
-            borderRadius: '4px',
-            background: theme === 'dark' ? '#4b5563' : '#f3f4f6',
-            color: theme === 'dark' ? '#f8fafc' : '#1e293b',
-            cursor: 'pointer'
-          }}
-          aria-label="Zoom out"
-        >
-          <ZoomOut aria-hidden="true" size="S" />
-        </button>
-        <span
-          style={{
-            padding: '8px 12px',
-            color: theme === 'dark' ? '#f8fafc' : '#1e293b',
-            fontSize: '14px'
-          }}
-        >
-          {Math.round(canvasState.zoom * 100)}%
-        </span>
-        <button
-          onClick={() =>
-            setCanvasState((prev) => ({
-              ...prev,
-              zoom: Math.min(5, prev.zoom + 0.1)
-            }))
-          }
-          style={{
-            padding: '8px 12px',
-            border: 'none',
-            borderRadius: '4px',
-            background: theme === 'dark' ? '#4b5563' : '#f3f4f6',
-            color: theme === 'dark' ? '#f8fafc' : '#1e293b',
-            cursor: 'pointer'
-          }}
-          aria-label="Zoom in"
-        >
-          <ZoomIn aria-hidden="true" size="S" />
-        </button>
-        <button
-          onClick={() =>
-            setCanvasState((prev) => ({
-              ...prev,
-              zoom: 1,
-              pan: { x: 0, y: 0 }
-            }))
-          }
-          style={{
-            padding: '8px 12px',
-            border: 'none',
-            borderRadius: '4px',
-            background: theme === 'dark' ? '#4b5563' : '#f3f4f6',
-            color: theme === 'dark' ? '#f8fafc' : '#1e293b',
-            cursor: 'pointer'
-          }}
-          aria-label="Reset zoom and pan"
-        >
-          <Refresh aria-hidden="true" size="S" />
-        </button>
-      </div>
-    </div>
+        {components.map((component) => (
+          <DraggableComponent
+            key={component.id}
+            component={component}
+            canvasState={canvasState}
+            isSelected={canvasState.selectedComponents.includes(component.id)}
+          />
+        ))}
+      </DroppableCanvas>
+
+      <DragOverlay>
+        {activeId ? (
+          <div
+            style={{
+              width: '100px',
+              height: '60px',
+              backgroundColor: '#3b82f6',
+              opacity: 0.8,
+              borderRadius: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '12px'
+            }}
+          >
+            Dragging...
+          </div>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
   );
 };
