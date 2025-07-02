@@ -30,10 +30,6 @@
     /* Disable text selection highlighting on touch devices */
     -webkit-touch-callout: none;
     user-select: none;
-    user-select: none;
-    user-select: none;
-    user-select: none;
-    user-select: none;
 
     /* Ensure proper background color for contrast */
     background-color: #fff;

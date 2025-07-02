@@ -60,7 +60,6 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   const DraggableOverlay: React.FC<{ component: BaseComponent }> = ({
     component
   }) => {
-    const [touchStartPos, setTouchStartPos] = useState<{ x: number; y: number } | null>(null);
     const [isTouchDragging, setIsTouchDragging] = useState(false);
 
     const handleDragStart = (clientX: number, clientY: number) => {
@@ -69,17 +68,17 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       const rect = container.getBoundingClientRect();
       const x = (clientX - rect.left - canvasState.pan.x) / canvasState.zoom;
       const y = (clientY - rect.top - canvasState.pan.y) / canvasState.zoom;
-      const hits = components.filter(
-        (c) =>
-          x >= c.bounds.x &&
-          x <= c.bounds.x + c.bounds.width &&
-          y >= c.bounds.y &&
-          y <= c.bounds.y + c.bounds.height
-      );
-      if (hits.length > 1) {
-        cancelDragRef.current = true;
-        return;
+
+      // Check if we're clicking on this specific component
+      if (
+        x < component.bounds.x ||
+        x > component.bounds.x + component.bounds.width ||
+        y < component.bounds.y ||
+        y > component.bounds.y + component.bounds.height
+      ) {
+        return; // Not clicking on this component
       }
+
       cancelDragRef.current = false;
       activeDragIdRef.current = component.id;
       dragOffsetRef.current = {
@@ -103,6 +102,8 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       let y = (clientY - rect.top - canvasState.pan.y) / canvasState.zoom;
       x -= dragOffsetRef.current.x;
       y -= dragOffsetRef.current.y;
+
+      // Constrain to canvas bounds
       if (resolution) {
         x = Math.max(
           0,
@@ -113,6 +114,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
           Math.min(y, resolution.height - component.bounds.height)
         );
       }
+
       dispatch(
         updateComponent(
           new BaseComponent({
@@ -129,9 +131,9 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       activeDragIdRef.current = null;
       setIsDragging(false);
       setIsTouchDragging(false);
-      setTouchStartPos(null);
     };
 
+    // Use react-aria/dnd for desktop mouse interactions
     const { dragProps } = useDrag({
       getItems: () => [{ id: component.id, type: 'component' }],
       onDragStart: (e) => handleDragStart(e.x, e.y),
@@ -141,26 +143,35 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
 
     // Touch event handlers for mobile support
     const handleTouchStart = (e: React.TouchEvent) => {
+      // Stop event from reaching canvas handlers
       e.preventDefault();
+      e.stopPropagation();
+
       if (e.touches.length === 1) {
         const touch = e.touches[0];
-        setTouchStartPos({ x: touch.clientX, y: touch.clientY });
-        handleDragStart(touch.clientX, touch.clientY);
         setIsTouchDragging(true);
+        handleDragStart(touch.clientX, touch.clientY);
       }
     };
 
     const handleTouchMove = (e: React.TouchEvent) => {
+      // Stop event from reaching canvas handlers
       e.preventDefault();
-      if (isTouchDragging && e.touches.length === 1 && touchStartPos) {
+      e.stopPropagation();
+
+      if (isTouchDragging && e.touches.length === 1) {
         const touch = e.touches[0];
         handleDragMove(touch.clientX, touch.clientY);
       }
     };
 
     const handleTouchEnd = (e: React.TouchEvent) => {
+      // Stop event from reaching canvas handlers
       e.preventDefault();
+      e.stopPropagation();
+
       if (isTouchDragging) {
+        setIsTouchDragging(false);
         handleDragEnd();
       }
     };
@@ -179,7 +190,10 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
           width: component.bounds.width * canvasState.zoom,
           height: component.bounds.height * canvasState.zoom,
           touchAction: 'none',
-          background: 'transparent'
+          background: 'transparent',
+          cursor: isDragging ? 'grabbing' : 'grab',
+          zIndex: 1000,
+          pointerEvents: 'auto'
         }}
       />
     );
@@ -507,10 +521,9 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
           );
 
           if (clickedComponent) {
-            setCanvasState((prev) => ({
-              ...prev,
-              selectedComponents: [clickedComponent.id]
-            }));
+            // Let overlay handle the touch event for dragging
+            // Canvas should not interfere with component dragging
+            return;
           } else {
             setCanvasState((prev) => ({ ...prev, selectedComponents: [] }));
           }
@@ -546,7 +559,10 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
 
   const handleTouchMove = useCallback(
     (e: React.TouchEvent<HTMLCanvasElement>) => {
-      e.preventDefault();
+      // Only prevent default for multi-touch gestures, not single touch
+      if (e.touches.length > 1) {
+        e.preventDefault();
+      }
 
       if (
         e.touches.length === 2 &&
@@ -570,11 +586,8 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
 
         setCanvasState((prev) => ({ ...prev, zoom: newZoom }));
       } else if (e.touches.length === 1) {
-        // Handle single-touch pan
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-
-        canvas.getBoundingClientRect();
+        // Don't handle single-touch pan to avoid interfering with component dragging
+        // Component dragging should take priority over canvas pan
       }
     },
     [lastTouch]
@@ -641,7 +654,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
         onTouchEnd={handleTouchEnd}
         style={{
           display: 'block',
-          touchAction: 'none',
+          touchAction: 'pan-x pan-y pinch-zoom',
           userSelect: 'none'
         }}
         aria-label="Interactive design canvas"
