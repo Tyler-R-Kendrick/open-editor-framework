@@ -15,6 +15,7 @@
     "format": "prettier --write .",
     "test": "jest",
     "test:e2e": "playwright test",
+    "postinstall": "playwright install",
     "test:coverage": "jest --coverage",
     "type-check": "tsc --noEmit",
     "build:tokens": "style-dictionary build --config style-dictionary.config.js",

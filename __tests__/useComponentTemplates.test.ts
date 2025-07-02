@@ -32,4 +32,12 @@ describe('useComponentTemplates', () => {
 
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
   });
+
+  it('falls back to default templates on error', async () => {
+    (fetch as jest.Mock).mockRejectedValue(new Error('network'));
+    const { result } = renderHook(() => useComponentTemplates('/bad.json'));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.templates.length).toBeGreaterThan(0);
+    expect(result.current.error).not.toBeNull();
+  });
 });

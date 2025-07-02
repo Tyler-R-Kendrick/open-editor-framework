@@ -1,0 +1,59 @@
+export const defaultComponentTemplates = {
+  templates: [
+    {
+      id: 'label',
+      name: 'Label',
+      icon: '🔤',
+      description: 'Simple text label',
+      category: 'Basic',
+      template: {
+        type: 'text',
+        defaultSize: { width: 160, height: 30 },
+        properties: {
+          text: 'Label',
+          fontSize: 16,
+          fontFamily: 'Arial',
+          color: '#111827'
+        }
+      }
+    },
+    {
+      id: 'button',
+      name: 'Button',
+      icon: '🔘',
+      description: 'Interactive button component',
+      category: 'Basic',
+      template: {
+        type: 'button',
+        defaultSize: { width: 120, height: 36 },
+        properties: {
+          text: 'Button',
+          fontSize: 14,
+          fontFamily: 'Arial',
+          color: '#ffffff',
+          backgroundColor: '#3b82f6',
+          borderRadius: 4
+        }
+      }
+    },
+    {
+      id: 'container',
+      name: 'Container',
+      icon: '📦',
+      description: 'Layout container',
+      category: 'Layout',
+      template: {
+        type: 'container',
+        defaultSize: { width: 200, height: 200 },
+        properties: {
+          backgroundColor: '#f3f4f6',
+          borderColor: '#d1d5db',
+          borderWidth: 1,
+          borderRadius: 4
+        }
+      }
+    }
+  ],
+  categories: ['All', 'Basic', 'Layout']
+} as const;
+export type DefaultComponentTemplates = typeof defaultComponentTemplates;
