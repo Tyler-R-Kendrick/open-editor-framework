@@ -1,11 +1,23 @@
 import { useState, useEffect, useCallback } from 'react';
-import {
-  MarketplaceComponent,
-  MarketplaceComponentOptions
-} from '../types/component-base';
+import { MarketplaceComponent, type ComponentProperties } from '../types/component-base';
+import { defaultComponentTemplates } from '../samples/defaultComponentTemplates';
+import type { Size } from '../types/editor-types';
+
+export interface ComponentTemplateEntry {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+  category: string;
+  template: {
+    type: string;
+    defaultSize: Size;
+    properties?: Record<string, unknown>;
+  };
+}
 
 export interface ComponentTemplatesData {
-  templates: MarketplaceComponentOptions[];
+  templates: ComponentTemplateEntry[];
   categories: string[];
 }
 
@@ -62,21 +74,47 @@ export const useComponentTemplates = (
 
       // Validate each template has required fields
       for (const template of data.templates) {
-        if (!template.id || !template.name || !template.type) {
+        if (!template.id || !template.name || !template.template?.type) {
           throw new Error(
             `Invalid template structure: template missing required fields (id, name, type)`
           );
         }
       }
 
-      const mapped = data.templates.map((t) => new MarketplaceComponent(t));
+      const mapped = data.templates.map(
+        (t) =>
+          new MarketplaceComponent({
+            id: t.id,
+            name: t.name,
+            type: t.template.type,
+            properties: t.template.properties as ComponentProperties,
+            defaultSize: t.template.defaultSize,
+            icon: t.icon,
+            category: t.category,
+            description: t.description
+          })
+      );
       setTemplates(mapped);
       setCategories(data.categories);
     } catch (err) {
       console.warn('Failed to load external component templates:', err);
       setError(err instanceof Error ? err.message : 'Unknown error occurred');
-      setTemplates([]);
-      setCategories([]);
+      const fallback = defaultComponentTemplates;
+      const mapped = fallback.templates.map(
+        (t) =>
+          new MarketplaceComponent({
+            id: t.id,
+            name: t.name,
+            type: t.template.type,
+            properties: t.template.properties as ComponentProperties,
+            defaultSize: t.template.defaultSize,
+            icon: t.icon,
+            category: t.category,
+            description: t.description
+          })
+      );
+      setTemplates(mapped);
+      setCategories([...fallback.categories]);
     } finally {
       setLoading(false);
     }

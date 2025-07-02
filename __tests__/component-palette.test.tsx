@@ -17,3 +17,10 @@ test('renders component palette container', async () => {
   const palette = await screen.findByLabelText(/component palette/i);
   expect(palette).toBeInTheDocument();
 });
+
+test('shows default components when fetch fails', async () => {
+  (fetch as jest.Mock).mockRejectedValue(new Error('network'));
+  render(<ComponentPalette theme="light" />);
+  const items = await screen.findAllByText(/Label/i);
+  expect(items.length).toBeGreaterThan(0);
+});
