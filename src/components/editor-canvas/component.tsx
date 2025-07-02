@@ -1,11 +1,12 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { useDrag } from '@react-aria/dnd';
 import { EditorTheme, CanvasState } from '../../types/editor-types';
 import ZoomOut from '@spectrum-icons/workflow/ZoomOut';
 import ZoomIn from '@spectrum-icons/workflow/ZoomIn';
 import Refresh from '@spectrum-icons/workflow/Refresh';
 import { BaseComponent } from '../../types/component-base';
 import { useAppDispatch, useAppSelector } from '../../store';
-import { setComponents } from '../../store';
+import { setComponents, updateComponent } from '../../store';
 import { ActionCreators } from 'redux-undo';
 
 interface PinchState {
@@ -52,6 +53,98 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   const components = useAppSelector((state) => state.canvas.present.components);
   const [isDragging, setIsDragging] = useState(false);
   const [lastTouch, setLastTouch] = useState<PinchState | null>(null);
+
+  const dragOffsetRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const activeDragIdRef = useRef<string | null>(null);
+  const cancelDragRef = useRef(false);
+
+  const DraggableOverlay: React.FC<{ component: BaseComponent }> = ({
+    component
+  }) => {
+    const { dragProps } = useDrag({
+      getItems: () => [{ id: component.id, type: 'component' }],
+      onDragStart: (e) => {
+        const container = containerRef.current;
+        if (!container) return;
+        const rect = container.getBoundingClientRect();
+        const x = (e.x - rect.left - canvasState.pan.x) / canvasState.zoom;
+        const y = (e.y - rect.top - canvasState.pan.y) / canvasState.zoom;
+        const hits = components.filter(
+          (c) =>
+            x >= c.bounds.x &&
+            x <= c.bounds.x + c.bounds.width &&
+            y >= c.bounds.y &&
+            y <= c.bounds.y + c.bounds.height
+        );
+        if (hits.length > 1) {
+          cancelDragRef.current = true;
+          return;
+        }
+        cancelDragRef.current = false;
+        activeDragIdRef.current = component.id;
+        dragOffsetRef.current = {
+          x: x - component.bounds.x,
+          y: y - component.bounds.y
+        };
+        setIsDragging(true);
+        setCanvasState((prev) => ({
+          ...prev,
+          selectedComponents: [component.id]
+        }));
+      },
+      onDragMove: (e) => {
+        if (cancelDragRef.current || activeDragIdRef.current !== component.id)
+          return;
+        const container = containerRef.current;
+        if (!container) return;
+        const rect = container.getBoundingClientRect();
+        let x = (e.x - rect.left - canvasState.pan.x) / canvasState.zoom;
+        let y = (e.y - rect.top - canvasState.pan.y) / canvasState.zoom;
+        x -= dragOffsetRef.current.x;
+        y -= dragOffsetRef.current.y;
+        if (resolution) {
+          x = Math.max(
+            0,
+            Math.min(x, resolution.width - component.bounds.width)
+          );
+          y = Math.max(
+            0,
+            Math.min(y, resolution.height - component.bounds.height)
+          );
+        }
+        dispatch(
+          updateComponent(
+            new BaseComponent({
+              ...component,
+              bounds: { ...component.bounds, x, y }
+            })
+          )
+        );
+      },
+      onDragEnd: () => {
+        if (cancelDragRef.current || activeDragIdRef.current !== component.id)
+          return;
+        activeDragIdRef.current = null;
+        setIsDragging(false);
+      }
+    });
+
+    return (
+      <div
+        {...dragProps}
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          left: component.bounds.x * canvasState.zoom + canvasState.pan.x,
+          top: component.bounds.y * canvasState.zoom + canvasState.pan.y,
+          width: component.bounds.width * canvasState.zoom,
+          height: component.bounds.height * canvasState.zoom,
+          touchAction: 'none',
+          background: 'transparent'
+        }}
+      />
+    );
+  };
 
   const handleUndo = useCallback(() => {
     dispatch(ActionCreators.undo());
@@ -355,6 +448,36 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
     (e: React.TouchEvent<HTMLCanvasElement>) => {
       touchStartTimeRef.current = Date.now();
 
+      if (e.touches.length === 1) {
+        const canvas = canvasRef.current;
+        if (canvas) {
+          const rect = canvas.getBoundingClientRect();
+          const x =
+            (e.touches[0].clientX - rect.left - canvasState.pan.x) /
+            canvasState.zoom;
+          const y =
+            (e.touches[0].clientY - rect.top - canvasState.pan.y) /
+            canvasState.zoom;
+
+          const clickedComponent = components.find(
+            (component) =>
+              x >= component.bounds.x &&
+              x <= component.bounds.x + component.bounds.width &&
+              y >= component.bounds.y &&
+              y <= component.bounds.y + component.bounds.height
+          );
+
+          if (clickedComponent) {
+            setCanvasState((prev) => ({
+              ...prev,
+              selectedComponents: [clickedComponent.id]
+            }));
+          } else {
+            setCanvasState((prev) => ({ ...prev, selectedComponents: [] }));
+          }
+        }
+      }
+
       // Handle multi-touch gestures
       if (e.touches.length === 2) {
         const touch1 = e.touches[0];
@@ -379,7 +502,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
         }
       }, 500);
     },
-    [canvasState.zoom]
+    [canvasState.zoom, canvasState.pan, components]
   );
 
   const handleTouchMove = useCallback(
@@ -484,6 +607,10 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
         }}
         aria-label="Interactive design canvas"
       />
+
+      {components.map((component) => (
+        <DraggableOverlay key={component.id} component={component} />
+      ))}
 
       {/* Canvas controls overlay */}
       <div
