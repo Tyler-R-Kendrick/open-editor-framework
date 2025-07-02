@@ -151,6 +151,12 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
         const touch = e.touches[0];
         setIsTouchDragging(true);
         handleDragStart(touch.clientX, touch.clientY);
+
+        // Clear any existing long press timers to prevent interference
+        if (longPressTimerRef.current) {
+          clearTimeout(longPressTimerRef.current);
+          longPressTimerRef.current = null;
+        }
       }
     };
 
@@ -523,9 +529,17 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
           if (clickedComponent) {
             // Let overlay handle the touch event for dragging
             // Canvas should not interfere with component dragging
+            // Don't set long press timer when touching components
             return;
           } else {
             setCanvasState((prev) => ({ ...prev, selectedComponents: [] }));
+            // Only set long press timer for empty canvas areas
+            longPressTimerRef.current = window.setTimeout(() => {
+              // Handle long press (context menu, etc.)
+              if ('vibrate' in navigator) {
+                navigator.vibrate(50);
+              }
+            }, 500);
           }
         }
       }
@@ -545,20 +559,18 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
           startZoom: canvasState.zoom
         });
       }
-
-      // Long press detection
-      longPressTimerRef.current = window.setTimeout(() => {
-        // Handle long press (context menu, etc.)
-        if ('vibrate' in navigator) {
-          navigator.vibrate(50);
-        }
-      }, 500);
     },
     [canvasState.zoom, canvasState.pan, components]
   );
 
   const handleTouchMove = useCallback(
     (e: React.TouchEvent<HTMLCanvasElement>) => {
+      // Clear long press timer on any movement to prevent interference
+      if (longPressTimerRef.current) {
+        clearTimeout(longPressTimerRef.current);
+        longPressTimerRef.current = null;
+      }
+
       // Only prevent default for multi-touch gestures, not single touch
       if (e.touches.length > 1) {
         e.preventDefault();
