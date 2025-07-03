@@ -46,12 +46,14 @@ interface DraggableComponentProps {
   component: BaseComponent;
   canvasState: CanvasState;
   isSelected: boolean;
+  onSelect: (id: string) => void;
 }
 
 const DraggableComponent: React.FC<DraggableComponentProps> = ({
   component,
   canvasState,
-  isSelected
+  isSelected,
+  onSelect
 }) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
@@ -81,8 +83,11 @@ const DraggableComponent: React.FC<DraggableComponentProps> = ({
     <div
       ref={setNodeRef}
       style={style}
+      onMouseDown={() => onSelect(component.id)}
       {...listeners}
       {...attributes}
+      role="button"
+      tabIndex={0}
       aria-label={`Draggable ${component.type} component`}
       data-testid={`draggable-component-${component.id}`}
     >
@@ -836,6 +841,12 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
             component={component}
             canvasState={canvasState}
             isSelected={canvasState.selectedComponents.includes(component.id)}
+            onSelect={(id) =>
+              setCanvasState((prev) => ({
+                ...prev,
+                selectedComponents: [id]
+              }))
+            }
           />
         ))}
       </DroppableCanvas>
