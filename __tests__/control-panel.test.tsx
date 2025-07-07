@@ -22,7 +22,7 @@ test('updates when selection-change event fired', async () => {
     type: 'text',
     name: 'Text',
     bounds: { x: 0, y: 0, width: 50, height: 20 },
-    properties: { text: 'Label' }
+    properties: { text: 'Label', extra: 'Alpha' }
   });
   store.dispatch(addComponent(comp));
 
@@ -41,4 +41,8 @@ test('updates when selection-change event fired', async () => {
   });
 
   expect(await screen.findByDisplayValue('Label')).toBeInTheDocument();
+  expect(screen.getByDisplayValue('Alpha')).toBeInTheDocument();
+  expect(screen.getByTestId('selected-component-name').textContent).toBe(
+    'Text'
+  );
 });

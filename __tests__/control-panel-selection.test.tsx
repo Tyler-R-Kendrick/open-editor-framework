@@ -13,7 +13,7 @@ it('shows fields when selecting a newly added component', () => {
     type: 'text',
     name: 'Text',
     bounds: { x: 10, y: 10, width: 40, height: 20 },
-    properties: { text: 'Hello' }
+    properties: { text: 'Hello', extra: 'Alpha' }
   });
   store.dispatch(addComponent(comp));
 
@@ -30,4 +30,8 @@ it('shows fields when selecting a newly added component', () => {
   fireEvent.mouseDown(canvas, { clientX: 15, clientY: 15 });
 
   expect(screen.getByDisplayValue('Hello')).toBeInTheDocument();
+  expect(screen.getByDisplayValue('Alpha')).toBeInTheDocument();
+  expect(screen.getByTestId('selected-component-name').textContent).toBe(
+    'Text'
+  );
 });

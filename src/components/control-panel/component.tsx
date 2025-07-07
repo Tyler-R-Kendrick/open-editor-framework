@@ -40,6 +40,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   const [selectedComponentId, setSelectedComponentId] = useState<string | null>(
     null
   );
+  const [selectedComponentName, setSelectedComponentName] =
+    useState<string>('');
   const [properties, setProperties] = useState<PropertyField[]>([]);
 
   // Merge provided config with defaults
@@ -57,9 +59,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
 
   const sections: PropertySection[] = useMemo(() => {
     const known = new Set(baseSections.flatMap((s) => s.fields));
-    const extras = properties
-      .map((p) => p.key)
-      .filter((k) => !known.has(k));
+    const extras = properties.map((p) => p.key).filter((k) => !known.has(k));
     return extras.length > 0
       ? [...baseSections, { title: 'Other', fields: extras }]
       : baseSections;
@@ -68,8 +68,10 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   const loadComponentProperties = (component: BaseComponent | undefined) => {
     if (!component) {
       setProperties([]);
+      setSelectedComponentName('');
       return;
     }
+    setSelectedComponentName(component.name);
     const fields: PropertyField[] = Object.entries(component.properties).map(
       ([key, value]) => {
         let type: string = 'text';
@@ -105,6 +107,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
       loadComponentProperties(
         components.find((c) => c.id === selectedComponentId)
       );
+    } else {
+      loadComponentProperties(undefined);
     }
   }, [components, selectedComponentId]);
 
@@ -169,13 +173,14 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
         </h2>
         {selectedComponentId ? (
           <p
+            data-testid="selected-component-name"
             style={{
               margin: 0,
               fontSize: '14px',
               color: theme === 'dark' ? '#9ca3af' : '#6b7280'
             }}
           >
-            Component ID: {selectedComponentId}
+            {selectedComponentName}
           </p>
         ) : (
           <p
