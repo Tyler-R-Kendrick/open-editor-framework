@@ -1,7 +1,16 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { EditorTheme } from '../../types/editor-types';
-import { ComponentPropertyValue } from '../../types/component-base';
-import { PropertyField, ControlPanelConfig, FieldRendererMap, PropertySection } from './types';
+import {
+  BaseComponent,
+  ComponentPropertyValue
+} from '../../types/component-base';
+import { useAppDispatch, useAppSelector, updateComponent } from '../../store';
+import {
+  PropertyField,
+  ControlPanelConfig,
+  FieldRendererMap,
+  PropertySection
+} from './types';
 import { defaultFieldRenderers } from './field-renderers';
 import { defaultSections } from './config';
 
@@ -26,7 +35,13 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   'aria-label': ariaLabel,
   config = {}
 }) => {
-  const [selectedComponentId] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+  const components = useAppSelector((state) => state.canvas.present.components);
+  const [selectedComponentId, setSelectedComponentId] = useState<string | null>(
+    null
+  );
+  const [selectedComponentName, setSelectedComponentName] =
+    useState<string>('');
   const [properties, setProperties] = useState<PropertyField[]>([]);
 
   // Merge provided config with defaults
@@ -37,16 +52,78 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
     };
   }, [config.fieldRenderers]);
 
-  const sections: PropertySection[] = useMemo(() =>
-    config.sections || defaultSections,
+  const baseSections = useMemo(
+    () => config.sections || defaultSections,
     [config.sections]
   );
 
+  const sections: PropertySection[] = useMemo(() => {
+    const known = new Set(baseSections.flatMap((s) => s.fields));
+    const extras = properties.map((p) => p.key).filter((k) => !known.has(k));
+    return extras.length > 0
+      ? [...baseSections, { title: 'Other', fields: extras }]
+      : baseSections;
+  }, [baseSections, properties]);
+
+  const loadComponentProperties = (component: BaseComponent | undefined) => {
+    if (!component) {
+      setProperties([]);
+      setSelectedComponentName('');
+      return;
+    }
+    setSelectedComponentName(component.name);
+    const fields: PropertyField[] = Object.entries(component.properties).map(
+      ([key, value]) => {
+        let type: string = 'text';
+        if (typeof value === 'number') type = 'number';
+        else if (typeof value === 'boolean') type = 'checkbox';
+        else if (key.toLowerCase().includes('color')) type = 'color';
+        return {
+          key,
+          label: key
+            .replace(/([A-Z])/g, ' $1')
+            .replace(/^./, (s) => s.toUpperCase()),
+          type,
+          value
+        };
+      }
+    );
+    setProperties(fields);
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleSelection = (e: any) => {
+      const id = e.detail.selectedComponents[0] ?? null;
+      setSelectedComponentId(id);
+    };
+    window.addEventListener('selection-change', handleSelection as any);
+    return () =>
+      window.removeEventListener('selection-change', handleSelection as any);
+  }, []);
+
+  useEffect(() => {
+    if (selectedComponentId) {
+      loadComponentProperties(
+        components.find((c) => c.id === selectedComponentId)
+      );
+    } else {
+      loadComponentProperties(undefined);
+    }
+  }, [components, selectedComponentId]);
+
   const handlePropertyChange = (key: string, value: ComponentPropertyValue) => {
-    setProperties(prev => prev.map(prop =>
-      prop.key === key ? { ...prop, value } : prop
-    ));
-    console.log(`Property changed: ${key} = ${value}`);
+    setProperties((prev) =>
+      prev.map((prop) => (prop.key === key ? { ...prop, value } : prop))
+    );
+    if (!selectedComponentId) return;
+    const component = components.find((c) => c.id === selectedComponentId);
+    if (!component) return;
+    const updated = new BaseComponent({
+      ...component,
+      properties: { ...component.properties, [key]: value }
+    });
+    dispatch(updateComponent(updated));
   };
 
   const renderPropertyField = (property: PropertyField) => {
@@ -96,13 +173,14 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
         </h2>
         {selectedComponentId ? (
           <p
+            data-testid="selected-component-name"
             style={{
               margin: 0,
               fontSize: '14px',
               color: theme === 'dark' ? '#9ca3af' : '#6b7280'
             }}
           >
-            Component ID: {selectedComponentId}
+            {selectedComponentName}
           </p>
         ) : (
           <p
@@ -126,9 +204,13 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             padding: '16px'
           }}
         >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            {sections.map(section => {
-              const sectionFields = properties.filter(p => section.fields.includes(p.key));
+          <div
+            style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
+          >
+            {sections.map((section) => {
+              const sectionFields = properties.filter((p) =>
+                section.fields.includes(p.key)
+              );
 
               if (sectionFields.length === 0) {
                 return null;
@@ -148,8 +230,14 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                   >
                     {section.title}
                   </h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    {sectionFields.map(property => (
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '16px'
+                    }}
+                  >
+                    {sectionFields.map((property) => (
                       <div key={property.key}>
                         <label
                           style={{
@@ -225,7 +313,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 transition: 'all 0.2s ease'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = theme === 'dark' ? '#6b7280' : '#f3f4f6';
+                e.currentTarget.style.background =
+                  theme === 'dark' ? '#6b7280' : '#f3f4f6';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent';
