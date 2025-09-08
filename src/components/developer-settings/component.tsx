@@ -37,6 +37,18 @@ export default function DeveloperSettings({
         outputRef.current.scrollTop = outputRef.current.scrollHeight;
       }
     };
+    ws.onerror = (event) => {
+      if (outputRef.current) {
+        outputRef.current.textContent += `\n[WebSocket error: connection problem]`;
+        outputRef.current.scrollTop = outputRef.current.scrollHeight;
+      }
+    };
+    ws.onclose = (event) => {
+      if (outputRef.current) {
+        outputRef.current.textContent += `\n[WebSocket closed]`;
+        outputRef.current.scrollTop = outputRef.current.scrollHeight;
+      }
+    };
     return () => ws.close();
   }, [wsUrl]);
 
