@@ -22,6 +22,8 @@ export interface FieldRendererProps {
   property: PropertyField;
   theme: EditorTheme;
   onChange: (key: string, value: ComponentPropertyValue) => void;
+  onCommit?: (key: string, value: ComponentPropertyValue) => void;
+  error?: string;
 }
 
 export type FieldRenderer = React.ComponentType<FieldRendererProps>;
@@ -32,7 +34,8 @@ export interface FieldRendererMap {
 }
 
 // Built-in field types for convenience and type safety
-export type BuiltInFieldType = 'text' | 'number' | 'color' | 'select' | 'checkbox' | 'range';
+export type BuiltInFieldType =
+  'text' | 'number' | 'color' | 'select' | 'checkbox' | 'range';
 
 // Specific map for built-in field types
 export interface BuiltInFieldRendererMap {

@@ -2,10 +2,12 @@ import {
   closestCenter,
   DndContext,
   DragEndEvent,
+  DragMoveEvent,
   DragOverlay,
   DragStartEvent,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   UniqueIdentifier,
   useDraggable,
   useDroppable,
@@ -16,12 +18,31 @@ import { CSS } from '@dnd-kit/utilities';
 import Refresh from '@spectrum-icons/workflow/Refresh';
 import ZoomIn from '@spectrum-icons/workflow/ZoomIn';
 import ZoomOut from '@spectrum-icons/workflow/ZoomOut';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 import { ActionCreators } from 'redux-undo';
+import {
+  AnalyticsEvents,
+  ExperimentFlags,
+  resolveAlignmentVariant,
+  resolveLongPressMs,
+  track
+} from '../../analytics';
+import { useFeatureFlag } from '../../hooks/useFeatureFlag';
 import { setComponents, updateComponent } from '../../store';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { BaseComponent } from '../../types/component-base';
 import { EditorTheme } from '../../types/editor-types';
+import {
+  computeAlignmentGuides,
+  snapBounds,
+  type AlignmentGuide
+} from '../../utils/snap';
 
 import type { Resolution } from '../../types/editor-types';
 
@@ -309,13 +330,33 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   const [_isDragging, setIsDragging] = useState(false);
   const [lastTouch, setLastTouch] = useState<PinchState | null>(null);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+  const [alignmentGuides, setAlignmentGuides] = useState<AlignmentGuide[]>([]);
+  const dragStartedAtRef = useRef<number>(0);
+  const dragPointerTypeRef = useRef<string>('mouse');
 
-  // Configure drag sensors with better touch support
+  const alignmentFlag = useFeatureFlag(ExperimentFlags.ALIGNMENT_GUIDES);
+  const alignmentMode = useMemo(
+    () => resolveAlignmentVariant(alignmentFlag),
+    [alignmentFlag]
+  );
+  const longPressFlag = useFeatureFlag(ExperimentFlags.LONG_PRESS_THRESHOLD);
+  const longPressMs = useMemo(
+    () => resolveLongPressMs(longPressFlag),
+    [longPressFlag]
+  );
+
+  // Configure drag sensors with optional long-press (E4)
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 8 // 8px movement required to start drag
       }
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint:
+        longPressMs === null
+          ? { distance: 8 }
+          : { delay: longPressMs, tolerance: 8 }
     }),
     useSensor(KeyboardSensor)
   );
@@ -323,6 +364,16 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id);
     setIsDragging(true);
+    dragStartedAtRef.current = Date.now();
+    const activator = event.activatorEvent as
+      { pointerType?: string; touches?: unknown } | undefined;
+    if (activator?.pointerType) {
+      dragPointerTypeRef.current = String(activator.pointerType);
+    } else if (activator && 'touches' in activator) {
+      dragPointerTypeRef.current = 'touch';
+    } else {
+      dragPointerTypeRef.current = 'mouse';
+    }
 
     // Clear any pending long press timer
     if (longPressTimerRef.current) {
@@ -338,57 +389,96 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
     }));
   };
 
+  const resolveDragBounds = useCallback(
+    (component: BaseComponent, delta: { x: number; y: number }) => {
+      const deltaX = delta.x / canvasState.zoom;
+      const deltaY = delta.y / canvasState.zoom;
+      let next = {
+        ...component.bounds,
+        x: component.bounds.x + deltaX,
+        y: component.bounds.y + deltaY
+      };
+
+      if (resolution) {
+        next = {
+          ...next,
+          x: Math.max(
+            0,
+            Math.min(next.x, resolution.width - component.bounds.width)
+          ),
+          y: Math.max(
+            0,
+            Math.min(next.y, resolution.height - component.bounds.height)
+          )
+        };
+      }
+
+      const siblings = components
+        .filter((c) => c.id !== component.id)
+        .map((c) => c.bounds);
+      return snapBounds(next, siblings, { mode: alignmentMode });
+    },
+    [alignmentMode, canvasState.zoom, components, resolution]
+  );
+
+  const handleDragMove = (event: DragMoveEvent) => {
+    if (alignmentMode === 'control' || !event.delta) {
+      setAlignmentGuides([]);
+      return;
+    }
+    const component = components.find((c) => c.id === event.active.id);
+    if (!component) return;
+    const next = resolveDragBounds(component, event.delta);
+    const siblings = components
+      .filter((c) => c.id !== component.id)
+      .map((c) => c.bounds);
+    setAlignmentGuides(
+      computeAlignmentGuides(next, siblings, { mode: alignmentMode })
+    );
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, delta } = event;
 
     setActiveId(null);
     setIsDragging(false);
+    setAlignmentGuides([]);
 
     if (!delta) return;
 
-    // Calculate new position based on drag delta
     const componentId = active.id as string;
     const component = components.find((c) => c.id === componentId);
-
     if (!component) return;
 
-    // Convert pixel delta to canvas coordinates
-    const deltaX = delta.x / canvasState.zoom;
-    const deltaY = delta.y / canvasState.zoom;
+    const snapped = resolveDragBounds(component, delta);
+    const snapUsed =
+      snapped.x !== component.bounds.x + delta.x / canvasState.zoom ||
+      snapped.y !== component.bounds.y + delta.y / canvasState.zoom;
 
-    const newX = component.bounds.x + deltaX;
-    const newY = component.bounds.y + deltaY;
-
-    // Constrain to canvas bounds
-    let constrainedX = newX;
-    let constrainedY = newY;
-
-    if (resolution) {
-      constrainedX = Math.max(
-        0,
-        Math.min(newX, resolution.width - component.bounds.width)
-      );
-      constrainedY = Math.max(
-        0,
-        Math.min(newY, resolution.height - component.bounds.height)
-      );
-    }
-
-    // Update component position
     const updated = new BaseComponent({
       ...component,
-      bounds: {
-        ...component.bounds,
-        x: constrainedX,
-        y: constrainedY
-      }
+      bounds: snapped
     });
     dispatch(updateComponent(updated));
+
+    const distance = Math.hypot(
+      snapped.x - component.bounds.x,
+      snapped.y - component.bounds.y
+    );
+    track(AnalyticsEvents.COMPONENT_MOVED, {
+      component_id: componentId,
+      component_type: component.type,
+      drag_duration_ms: Date.now() - dragStartedAtRef.current,
+      distance: Math.round(distance),
+      pointer_type: dragPointerTypeRef.current,
+      snap_used: snapUsed && alignmentMode === 'guides-snap'
+    });
+
     window.dispatchEvent(
       new window.CustomEvent('component-move', {
         detail: {
           component: updated,
-          position: { x: constrainedX, y: constrainedY }
+          position: { x: snapped.x, y: snapped.y }
         }
       })
     );
@@ -604,8 +694,42 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       renderComponent(component);
     });
 
+    // E1: alignment guides while dragging
+    if (alignmentGuides.length > 0) {
+      ctx.save();
+      ctx.strokeStyle = '#3b82f6';
+      ctx.lineWidth = 1 / canvasState.zoom;
+      ctx.setLineDash([4 / canvasState.zoom, 4 / canvasState.zoom]);
+      for (const guide of alignmentGuides) {
+        ctx.beginPath();
+        if (guide.orientation === 'vertical') {
+          ctx.moveTo(guide.position, -canvasState.pan.y / canvasState.zoom);
+          ctx.lineTo(
+            guide.position,
+            (height - canvasState.pan.y) / canvasState.zoom
+          );
+        } else {
+          ctx.moveTo(-canvasState.pan.x / canvasState.zoom, guide.position);
+          ctx.lineTo(
+            (width - canvasState.pan.x) / canvasState.zoom,
+            guide.position
+          );
+        }
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+      ctx.restore();
+    }
+
     ctx.restore();
-  }, [canvasState.pan, canvasState.zoom, components, renderComponent, theme]);
+  }, [
+    alignmentGuides,
+    canvasState.pan,
+    canvasState.zoom,
+    components,
+    renderComponent,
+    theme
+  ]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -638,8 +762,10 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
             e.preventDefault();
             if (e.shiftKey) {
               handleRedo();
+              track(AnalyticsEvents.REDO_PERFORMED, { source: 'keyboard' });
             } else {
               handleUndo();
+              track(AnalyticsEvents.UNDO_PERFORMED, { source: 'keyboard' });
             }
           }
           break;
@@ -800,24 +926,18 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
 
   // Keyboard event listeners
   useEffect(() => {
-    const undoHandler = () => handleUndo();
-    const redoHandler = () => handleRedo();
-
     window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('editor-undo', undoHandler);
-    window.addEventListener('editor-redo', redoHandler);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('editor-undo', undoHandler);
-      window.removeEventListener('editor-redo', redoHandler);
     };
-  }, [handleKeyDown, handleUndo, handleRedo]);
+  }, [handleKeyDown]);
 
   return (
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragStart={handleDragStart}
+      onDragMove={handleDragMove}
       onDragEnd={handleDragEnd}
     >
       <DroppableCanvas

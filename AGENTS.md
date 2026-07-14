@@ -26,6 +26,8 @@ These instructions outline patterns and practices to follow when working with th
   - `*.stories.tsx` – optional Storybook stories
 - `src/styles` – global CSS and generated token styles
 - `__tests__` – Jest tests using React Testing Library
+- `docs/experiments/` – experiment plan, write-ups, and templates
+- `src/analytics/` – PostHog client, event names, and feature-flag resolvers
 
 ## Coding Guidelines
 
@@ -37,6 +39,70 @@ These instructions outline patterns and practices to follow when working with th
   keyboard, screen reader, and touch. Use language keys and locale-aware
   formatting for all user-facing strings.
 - Keep unit tests alongside other tests in `__tests__/` and strive for good coverage.
+
+## Experimentation and training checks
+
+Treat experiments like production features with extra discipline. Agents must
+keep the following checks and balances in sync with `docs/experiments/`.
+
+### Statelessness
+
+- Prefer **pure, deterministic helpers** for quality scoring and flag resolution
+  (`src/utils/outputQuality.ts`, `src/analytics/featureFlags.ts`,
+  `src/utils/snap.ts`, `src/utils/propertyValidation.ts`). No I/O, no shared
+  mutable module state, no PostHog calls inside those helpers.
+- Analytics `track()` / `captureException()` are the only side-effect boundary;
+  keep event property shapes stable and documented in experiment write-ups.
+- Unit tests for quality helpers and flag resolvers must be **stateless**:
+  same inputs → same outputs; no reliance on wall-clock time, network, or
+  leftover Redux/store state unless the test explicitly resets it.
+
+### Regression gates (required before merge)
+
+Run these in order for experiment or editor-output changes:
+
+1. `npm run lint`
+2. `npm run type-check`
+3. `npm run test` (unit + integration under `__tests__/`)
+4. When rendering or layout can change: `npm run test:e2e`, including the
+   visual corpus in `tests/visual-corpus.e2e.ts`
+5. Accessibility non-regression: keyboard paths, ARIA labels, and touch/drag
+   flows covered by existing canvas/toolbar tests must still pass; no variant
+   may ship if it breaks WCAG keyboard or screen-reader flows
+
+Offline quality suites that must stay green:
+
+- Share encode→decode round trips (`__tests__/share.test.ts`)
+- Structural validity (`__tests__/output-quality.test.ts`)
+- Property fuzz / validation (`__tests__/property-fuzz.test.ts`,
+  `__tests__/property-validation.test.ts`)
+- Snap / alignment (`__tests__/snap.test.ts`)
+- Feature-flag resolvers (`__tests__/feature-flags.test.ts`)
+
+### Feature flags and A/B discipline
+
+- Gate all E1–E5 variants behind the keys in `ExperimentFlags`
+  (`src/analytics/featureFlags.ts`). Default / inactive flag values must
+  preserve current UX.
+- Keep flags **inactive** until ≥ 1 week of baseline telemetry exists on the
+  Editor quality dashboard.
+- Run **at most one** live A/B experiment at a time; prefer 50/50 (or even
+  multivariate splits) with a single primary metric plus documented
+  guardrails.
+- Every experiment needs a write-up under `docs/experiments/` using
+  `TEMPLATE.md` (hypothesis, variants, metrics, results — including negatives).
+- Do not activate PostHog experiments or flags from agent runs unless the task
+  explicitly asks to launch; create **drafts** only by default.
+- Multivariate flags used by experiments must include a literal `control`
+  variant key (PostHog analysis baseline).
+
+### Test-driven experiment changes
+
+1. Outline the behavior in the experiment write-up / plan.
+2. Add or extend **failing** unit/integration tests for resolvers, offline
+   metrics, and UI gated by the flag.
+3. Implement the minimal variant code behind the flag until tests pass.
+4. Re-run the regression gates above before committing.
 
 ## Pull Requests
 

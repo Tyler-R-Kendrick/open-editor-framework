@@ -13,6 +13,14 @@ import {
 } from './types';
 import { defaultFieldRenderers } from './field-renderers';
 import { defaultSections } from './config';
+import {
+  AnalyticsEvents,
+  ExperimentFlags,
+  resolvePropertyEditMode,
+  track
+} from '../../analytics';
+import { useFeatureFlag } from '../../hooks/useFeatureFlag';
+import { validatePropertyValue } from '../../utils/propertyValidation';
 
 interface ControlPanelProps {
   theme: EditorTheme;
@@ -37,12 +45,15 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const components = useAppSelector((state) => state.canvas.present.components);
+  const propertyFlag = useFeatureFlag(ExperimentFlags.PROPERTY_LIVE_PREVIEW);
+  const editMode = resolvePropertyEditMode(propertyFlag);
   const [selectedComponentId, setSelectedComponentId] = useState<string | null>(
     null
   );
   const [selectedComponentName, setSelectedComponentName] =
     useState<string>('');
   const [properties, setProperties] = useState<PropertyField[]>([]);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   // Merge provided config with defaults
   const fieldRenderers: FieldRendererMap = useMemo(() => {
@@ -112,18 +123,73 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
     }
   }, [components, selectedComponentId]);
 
+  const commitProperty = (
+    key: string,
+    value: ComponentPropertyValue,
+    options: { validate: boolean }
+  ) => {
+    if (!selectedComponentId) return;
+    const component = components.find((c) => c.id === selectedComponentId);
+    if (!component) return;
+
+    let nextValue = value;
+    if (options.validate) {
+      const result = validatePropertyValue(key, value, {
+        type: properties.find((p) => p.key === key)?.type as
+          | 'text'
+          | 'number'
+          | 'color'
+          | 'checkbox'
+          | 'select'
+          | 'range'
+          | undefined,
+        min: properties.find((p) => p.key === key)?.min,
+        max: properties.find((p) => p.key === key)?.max
+      });
+      if (!result.valid) {
+        setFieldErrors((prev) => ({
+          ...prev,
+          [key]: result.error ?? 'Invalid value'
+        }));
+        return;
+      }
+      setFieldErrors((prev) => {
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      });
+      nextValue = result.value as ComponentPropertyValue;
+    }
+
+    const updated = new BaseComponent({
+      ...component,
+      properties: { ...component.properties, [key]: nextValue }
+    });
+    dispatch(updateComponent(updated));
+    track(AnalyticsEvents.COMPONENT_PROPERTY_CHANGED, {
+      component_id: selectedComponentId,
+      property_key: key,
+      panel: 'control-panel',
+      edit_mode: editMode
+    });
+  };
+
   const handlePropertyChange = (key: string, value: ComponentPropertyValue) => {
     setProperties((prev) =>
       prev.map((prop) => (prop.key === key ? { ...prop, value } : prop))
     );
-    if (!selectedComponentId) return;
-    const component = components.find((c) => c.id === selectedComponentId);
-    if (!component) return;
-    const updated = new BaseComponent({
-      ...component,
-      properties: { ...component.properties, [key]: value }
-    });
-    dispatch(updateComponent(updated));
+    if (editMode === 'blur') {
+      return;
+    }
+    commitProperty(key, value, { validate: editMode === 'live-validated' });
+  };
+
+  const handlePropertyCommit = (key: string, value: ComponentPropertyValue) => {
+    setProperties((prev) =>
+      prev.map((prop) => (prop.key === key ? { ...prop, value } : prop))
+    );
+    if (editMode !== 'blur') return;
+    commitProperty(key, value, { validate: false });
   };
 
   const renderPropertyField = (property: PropertyField) => {
@@ -139,6 +205,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
         property={property}
         theme={theme}
         onChange={handlePropertyChange}
+        onCommit={handlePropertyCommit}
+        error={fieldErrors[property.key]}
       />
     );
   };

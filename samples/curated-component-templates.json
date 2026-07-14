@@ -1,0 +1,96 @@
+{
+  "templates": [
+    {
+      "id": "label",
+      "name": "Label",
+      "icon": "🔤",
+      "description": "Readable body text with sensible defaults",
+      "category": "Basic",
+      "template": {
+        "type": "text",
+        "defaultSize": { "width": 220, "height": 36 },
+        "properties": {
+          "text": "Product headline",
+          "fontSize": 18,
+          "fontFamily": "Georgia, serif",
+          "color": "#0f172a",
+          "backgroundColor": "transparent"
+        }
+      }
+    },
+    {
+      "id": "button",
+      "name": "Button",
+      "icon": "🔘",
+      "description": "Primary call-to-action with accessible contrast",
+      "category": "Basic",
+      "template": {
+        "type": "button",
+        "defaultSize": { "width": 160, "height": 44 },
+        "properties": {
+          "text": "Get started",
+          "fontSize": 15,
+          "fontFamily": "system-ui, sans-serif",
+          "color": "#ffffff",
+          "backgroundColor": "#0f766e",
+          "borderRadius": 8,
+          "borderWidth": 0
+        }
+      }
+    },
+    {
+      "id": "container",
+      "name": "Container",
+      "icon": "📦",
+      "description": "Section container sized for content blocks",
+      "category": "Layout",
+      "template": {
+        "type": "container",
+        "defaultSize": { "width": 320, "height": 240 },
+        "properties": {
+          "backgroundColor": "#f8fafc",
+          "borderColor": "#cbd5e1",
+          "borderWidth": 1,
+          "borderRadius": 12
+        }
+      }
+    },
+    {
+      "id": "heading",
+      "name": "Heading",
+      "icon": "📰",
+      "description": "Large title for page sections",
+      "category": "Typography",
+      "template": {
+        "type": "text",
+        "defaultSize": { "width": 360, "height": 56 },
+        "properties": {
+          "text": "Design your next layout",
+          "fontSize": 28,
+          "fontFamily": "Georgia, serif",
+          "fontWeight": "bold",
+          "color": "#0f172a"
+        }
+      }
+    },
+    {
+      "id": "card",
+      "name": "Card",
+      "icon": "🎴",
+      "description": "Content card with padding and soft border",
+      "category": "Layout",
+      "template": {
+        "type": "container",
+        "defaultSize": { "width": 280, "height": 180 },
+        "properties": {
+          "backgroundColor": "#ffffff",
+          "borderColor": "#e2e8f0",
+          "borderWidth": 1,
+          "borderRadius": 16,
+          "padding": 16
+        }
+      }
+    }
+  ],
+  "categories": ["All", "Basic", "Typography", "Layout"]
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "id": "label-1",
+    "type": "text",
+    "name": "Label",
+    "bounds": { "x": 40, "y": 40, "width": 220, "height": 36 },
+    "properties": {
+      "text": "Hello output quality",
+      "fontSize": 18,
+      "fontFamily": "Arial",
+      "color": "#0f172a",
+      "backgroundColor": "#ffffff",
+      "borderColor": "#e2e8f0",
+      "borderWidth": 1
+    }
+  },
+  {
+    "id": "button-1",
+    "type": "button",
+    "name": "Button",
+    "bounds": { "x": 40, "y": 100, "width": 140, "height": 40 },
+    "properties": {
+      "text": "Continue",
+      "fontSize": 14,
+      "color": "#ffffff",
+      "backgroundColor": "#0f766e",
+      "borderRadius": 8
+    }
+  }
+]

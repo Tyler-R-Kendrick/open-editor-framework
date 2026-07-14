@@ -6,6 +6,14 @@ import type { BaseComponent } from '../../types/component-base';
 import { useAppDispatch } from '../../store';
 import { addComponent } from '../../store';
 import { ComponentHelper } from '../../utils/helpers';
+import {
+  AnalyticsEvents,
+  ExperimentFlags,
+  TEMPLATE_URLS,
+  resolveTemplateVariant,
+  track
+} from '../../analytics';
+import { useFeatureFlag } from '../../hooks/useFeatureFlag';
 
 interface ComponentPaletteProps {
   theme: EditorTheme;
@@ -28,13 +36,17 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({
   'aria-label': ariaLabel,
   templateUrl
 }) => {
+  const templateFlag = useFeatureFlag(ExperimentFlags.CURATED_TEMPLATES);
+  const templateVariant = resolveTemplateVariant(templateFlag);
+  const resolvedTemplateUrl = templateUrl ?? TEMPLATE_URLS[templateVariant];
+
   const {
     templates: componentTemplates,
     categories,
     loading,
     error,
     reload
-  } = useComponentTemplates(templateUrl);
+  } = useComponentTemplates(resolvedTemplateUrl);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -75,6 +87,12 @@ export const ComponentPalette: React.FC<ComponentPaletteProps> = ({
     } as BaseComponent;
 
     dispatch(addComponent(newComponent));
+    track(AnalyticsEvents.COMPONENT_ADDED, {
+      component_type: component.type,
+      component_id: newComponent.id,
+      source: 'tap',
+      template_variant: templateVariant
+    });
   };
 
   const categoryButtonStyle = (isActive: boolean) => ({

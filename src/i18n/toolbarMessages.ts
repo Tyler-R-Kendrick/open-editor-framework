@@ -13,7 +13,15 @@ export const toolbarMessages = {
     dark: 'Dark',
     light: 'Light',
     resolution: 'Resolution',
-    infinite: 'Infinite Canvas'
+    infinite: 'Infinite Canvas',
+    sharePreviewTitle: 'Preview share link',
+    sharePreviewBody: 'Review the canvas output before copying the link',
+    sharePreviewCancel: 'Cancel',
+    sharePreviewConfirm: 'Copy link',
+    sharePreviewCanvas: 'Canvas output preview',
+    sharePreviewEmpty: 'Empty canvas',
+    sharePreviewValidStructure: 'Structure looks valid',
+    sharePreviewInvalidStructure: 'Structure issues found: {count}'
   },
   'es-ES': {
     toolbar: 'Barra de herramientas',
@@ -29,7 +37,15 @@ export const toolbarMessages = {
     dark: 'Oscuro',
     light: 'Claro',
     resolution: 'Resoluci\u00f3n',
-    infinite: 'Lienzo infinito'
+    infinite: 'Lienzo infinito',
+    sharePreviewTitle: 'Vista previa del enlace',
+    sharePreviewBody: 'Revise el lienzo antes de copiar el enlace',
+    sharePreviewCancel: 'Cancelar',
+    sharePreviewConfirm: 'Copiar enlace',
+    sharePreviewCanvas: 'Vista previa del lienzo',
+    sharePreviewEmpty: 'Lienzo vac\u00edo',
+    sharePreviewValidStructure: 'La estructura parece v\u00e1lida',
+    sharePreviewInvalidStructure: 'Problemas de estructura: {count}'
   }
 };
 export default toolbarMessages;

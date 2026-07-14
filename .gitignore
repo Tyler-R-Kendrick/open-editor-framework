@@ -9,6 +9,11 @@ dist/
 node_modules/
 package-lock.json
 
+# Local environment secrets
+.env
+.env.local
+.env.*.local
+
 # User-specific files
 *.rsuser
 *.suo

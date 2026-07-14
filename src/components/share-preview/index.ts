@@ -1,0 +1,1 @@
+export { ShareOutputPreview } from './component';
