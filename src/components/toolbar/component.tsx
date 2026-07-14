@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { EditorTheme, Resolution } from '../../types/editor-types';
 import { Flex, ButtonGroup, Button } from '@adobe/react-spectrum';
 import Add from '@spectrum-icons/workflow/Add';
@@ -21,6 +21,9 @@ import {
   track
 } from '../../analytics';
 import { useFeatureFlag } from '../../hooks/useFeatureFlag';
+import { ShareOutputPreview } from '../share-preview';
+import { validateComponentTree } from '../../utils/outputQuality';
+import type { BaseComponent } from '../../types/component-base';
 
 interface EditorToolbarProps {
   theme: EditorTheme;
@@ -50,7 +53,13 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
   const sharePreviewFlag = useFeatureFlag(ExperimentFlags.SHARE_PREVIEW);
   const sharePreviewEnabled = resolveSharePreviewEnabled(sharePreviewFlag);
   const [sharePreviewUrl, setSharePreviewUrl] = useState<string | null>(null);
-  const [shareComponentCount, setShareComponentCount] = useState(0);
+  const [sharePreviewComponents, setSharePreviewComponents] = useState<
+    BaseComponent[]
+  >([]);
+  const shareStructuralReport = useMemo(
+    () => validateComponentTree(sharePreviewComponents),
+    [sharePreviewComponents]
+  );
 
   const resolutions: { label: string; value?: Resolution }[] = [
     { label: formatMessage('infinite'), value: undefined },
@@ -119,14 +128,26 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
     const encoded = encodeComponents(components);
     const url = new URL(window.location.href);
     url.searchParams.set('state', encoded);
+    const structural = validateComponentTree(components);
     return {
       url: url.toString(),
       payloadSize: encoded.length,
-      componentCount: components.length
+      componentCount: components.length,
+      components,
+      structuralValid: structural.valid,
+      structuralIssueCount: structural.issues.length
     };
   };
 
-  const copyShareUrl = async (url: string, payloadSize: number) => {
+  const copyShareUrl = async (
+    url: string,
+    payloadSize: number,
+    extras: {
+      structuralValid: boolean;
+      structuralIssueCount: number;
+      componentCount: number;
+    }
+  ) => {
     try {
       await navigator.clipboard.writeText(url);
     } catch (_err) {
@@ -134,7 +155,10 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
     }
     track(AnalyticsEvents.SHARE_LINK_CREATED, {
       payload_size: payloadSize,
-      preview_shown: sharePreviewEnabled
+      preview_shown: sharePreviewEnabled,
+      structural_valid: extras.structuralValid,
+      structural_issue_count: extras.structuralIssueCount,
+      component_count: extras.componentCount
     });
     window.dispatchEvent(
       new window.CustomEvent('editor-share', {
@@ -144,21 +168,35 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
   };
 
   const handleShare = async () => {
-    const { url, payloadSize, componentCount } = buildShareUrl();
+    const share = buildShareUrl();
     if (sharePreviewEnabled) {
-      setSharePreviewUrl(url);
-      setShareComponentCount(componentCount);
+      setSharePreviewUrl(share.url);
+      setSharePreviewComponents(share.components);
       return;
     }
-    await copyShareUrl(url, payloadSize);
+    await copyShareUrl(share.url, share.payloadSize, {
+      structuralValid: share.structuralValid,
+      structuralIssueCount: share.structuralIssueCount,
+      componentCount: share.componentCount
+    });
   };
 
   const confirmSharePreview = async () => {
     if (!sharePreviewUrl) return;
     const payloadSize =
       new URL(sharePreviewUrl).searchParams.get('state')?.length ?? 0;
-    await copyShareUrl(sharePreviewUrl, payloadSize);
+    await copyShareUrl(sharePreviewUrl, payloadSize, {
+      structuralValid: shareStructuralReport.valid,
+      structuralIssueCount: shareStructuralReport.issues.length,
+      componentCount: sharePreviewComponents.length
+    });
     setSharePreviewUrl(null);
+    setSharePreviewComponents([]);
+  };
+
+  const cancelSharePreview = () => {
+    setSharePreviewUrl(null);
+    setSharePreviewComponents([]);
   };
 
   const toggleTheme = () => {
@@ -315,7 +353,30 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
               {formatMessage('sharePreviewTitle')}
             </h2>
             <p style={{ margin: '0 0 12px', fontSize: '14px' }}>
-              {formatMessage('sharePreviewBody')} ({shareComponentCount})
+              {formatMessage('sharePreviewBody')} (
+              {sharePreviewComponents.length})
+            </p>
+            <div style={{ marginBottom: '12px' }}>
+              <ShareOutputPreview
+                components={sharePreviewComponents}
+                theme={theme}
+                aria-label={formatMessage('sharePreviewCanvas')}
+              />
+            </div>
+            <p
+              role="status"
+              data-testid="share-structural-validity"
+              style={{
+                margin: '0 0 12px',
+                fontSize: '13px',
+                color: shareStructuralReport.valid ? '#047857' : '#b91c1c'
+              }}
+            >
+              {shareStructuralReport.valid
+                ? formatMessage('sharePreviewValidStructure')
+                : formatMessage('sharePreviewInvalidStructure', {
+                    count: String(shareStructuralReport.issues.length)
+                  })}
             </p>
             <p
               style={{
@@ -336,7 +397,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
             >
               <button
                 type="button"
-                onClick={() => setSharePreviewUrl(null)}
+                onClick={cancelSharePreview}
                 style={{
                   padding: '8px 12px',
                   borderRadius: '6px',

@@ -17,7 +17,10 @@ export const toolbarMessages = {
     sharePreviewTitle: 'Preview share link',
     sharePreviewBody: 'Review the canvas output before copying the link',
     sharePreviewCancel: 'Cancel',
-    sharePreviewConfirm: 'Copy link'
+    sharePreviewConfirm: 'Copy link',
+    sharePreviewCanvas: 'Canvas output preview',
+    sharePreviewValidStructure: 'Structure looks valid',
+    sharePreviewInvalidStructure: 'Structure issues found: {count}'
   },
   'es-ES': {
     toolbar: 'Barra de herramientas',
@@ -37,7 +40,10 @@ export const toolbarMessages = {
     sharePreviewTitle: 'Vista previa del enlace',
     sharePreviewBody: 'Revise el lienzo antes de copiar el enlace',
     sharePreviewCancel: 'Cancelar',
-    sharePreviewConfirm: 'Copiar enlace'
+    sharePreviewConfirm: 'Copiar enlace',
+    sharePreviewCanvas: 'Vista previa del lienzo',
+    sharePreviewValidStructure: 'La estructura parece v\u00e1lida',
+    sharePreviewInvalidStructure: 'Problemas de estructura: {count}'
   }
 };
 export default toolbarMessages;

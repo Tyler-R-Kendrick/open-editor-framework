@@ -55,6 +55,7 @@ describe('experiment feature flags', () => {
     expect(resolveLongPressMs(false)).toBeNull();
     expect(resolveLongPressMs('150')).toBe(150);
     expect(resolveLongPressMs('300')).toBe(300);
+    expect(resolveLongPressMs('control')).toBe(300);
     expect(resolveLongPressMs('450')).toBe(450);
     expect(resolveLongPressMs(true)).toBe(300);
   });

@@ -59,6 +59,8 @@ export function resolveLongPressMs(
   if (value === undefined || value === false) return null;
   if (value === '150') return 150;
   if (value === '450') return 450;
+  // `control` and `300` are the current 300ms baseline.
+  if (value === 'control' || value === '300' || value === true) return 300;
   return 300;
 }
 

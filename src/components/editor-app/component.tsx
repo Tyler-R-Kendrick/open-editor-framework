@@ -17,6 +17,7 @@ import { decodeComponents } from '../../utils/share';
 import type { BaseComponent } from '../../types/component-base';
 import { useSearchParams } from 'react-router-dom';
 import { AnalyticsEvents, track } from '../../analytics';
+import { validateComponentTree } from '../../utils/outputQuality';
 
 /**
  * Main editor application using a simple flex layout
@@ -61,13 +62,18 @@ export const EditorApp: React.FC = () => {
     const state = searchParams.get('state');
     if (state) {
       const components = decodeComponents(state);
-      const valid = Array.isArray(components);
+      const decoded = Array.isArray(components);
+      const structural = decoded
+        ? validateComponentTree(components)
+        : { valid: false, issues: [], componentCount: 0 };
       track(AnalyticsEvents.SHARE_LINK_OPENED, {
         payload_size: state.length,
-        valid,
-        component_count: valid ? components.length : 0
+        valid: decoded,
+        structural_valid: decoded && structural.valid,
+        structural_issue_count: structural.issues.length,
+        component_count: decoded ? components.length : 0
       });
-      if (valid) {
+      if (decoded) {
         store.dispatch(setComponents(components as BaseComponent[]));
       }
     }

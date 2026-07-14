@@ -4,6 +4,7 @@
 **Date:** 2026-07-14
 **Owner:** Unassigned
 **PostHog feature flag:** [exp-long-press-threshold](https://us.posthog.com/project/476084/feature_flags/760083)
+**PostHog experiment:** [E4 Mobile long-press drag threshold](https://us.posthog.com/project/476084/experiments/383560)
 
 ## Hypothesis
 
@@ -12,11 +13,11 @@ success ≥ 15% versus the 300 ms control.
 
 ## Variants
 
-| Variant | Description | Split |
-| ------- | ----------- | ----- |
-| 150     | 150 ms      | 34%   |
-| 300     | 300 ms      | 33%   |
-| 450     | 450 ms      | 33%   |
+| Variant | Description    | Split |
+| ------- | -------------- | ----- |
+| control | 300 ms baseline | 34%   |
+| 150     | 150 ms         | 33%   |
+| 450     | 450 ms         | 33%   |
 
 ## Metrics
 

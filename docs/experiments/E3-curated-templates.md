@@ -4,6 +4,7 @@
 **Date:** 2026-07-14
 **Owner:** Unassigned
 **PostHog feature flag:** [exp-curated-templates](https://us.posthog.com/project/476084/feature_flags/760086)
+**PostHog experiment:** [E3 Curated default component templates](https://us.posthog.com/project/476084/experiments/383557)
 
 ## Hypothesis
 

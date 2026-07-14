@@ -1,6 +1,6 @@
 # Experiment Plan: Improving Editor Output Quality
 
-**Status:** Implemented (Phase 0 + variant code); experiments draft/inactive
+**Status:** Implemented (Phase 0 + E1–E5 variants + offline suites + draft experiments)
 **Date:** 2026-07-13 (plan) / 2026-07-14 (implementation)
 **Owner:** Unassigned
 
@@ -162,12 +162,24 @@ Shipped in this branch:
 | Phase 0 analytics (`posthog-js`, gated via env)                                               | Done                  |
 | Custom events + feature-flag plumbing                                                         | Done                  |
 | E1–E5 variant code behind inactive flags                                                      | Done                  |
-| Offline tests (share round-trip, property fuzz, visual corpus)                                | Done                  |
+| E5 canvas share output preview + structural validity                                          | Done                  |
+| Offline tests (share round-trip, property fuzz, structural, visual corpus, regression)        | Done                  |
 | Experiment write-ups `E1`–`E5`                                                                | Done                  |
+| Agent instructions (`AGENTS.md`) for experiment checks (stateless, regression, flags)         | Done                  |
 | PostHog flags + [baseline dashboard](https://us.posthog.com/project/476084/dashboard/1843634) | Done (flags inactive) |
+| PostHog experiment drafts E1–E5                                                               | Done (draft, inactive)|
+
+Draft experiments (do not launch until baseline ≥ 1 week; one at a time):
+
+- [E1](https://us.posthog.com/project/476084/experiments/383559)
+- [E2](https://us.posthog.com/project/476084/experiments/383556)
+- [E3](https://us.posthog.com/project/476084/experiments/383557)
+- [E4](https://us.posthog.com/project/476084/experiments/383560)
+- [E5](https://us.posthog.com/project/476084/experiments/383558)
 
 Next step: deploy with `VITE_PUBLIC_POSTHOG_*` set, collect ≥ 1 week of
-baseline data, then activate **one** flag/experiment at a time.
+baseline data, attach primary metrics once events are ingested, then activate
+**one** experiment at a time.
 
 ## 7. Reference reading
 

@@ -4,6 +4,7 @@
 **Date:** 2026-07-14
 **Owner:** Unassigned
 **PostHog feature flag:** [exp-property-live-preview](https://us.posthog.com/project/476084/feature_flags/760085)
+**PostHog experiment:** [E2 Property validation with live preview](https://us.posthog.com/project/476084/experiments/383556)
 
 ## Hypothesis
 

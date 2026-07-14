@@ -4,6 +4,7 @@
 **Date:** 2026-07-14
 **Owner:** Unassigned
 **PostHog feature flag:** [exp-alignment-guides](https://us.posthog.com/project/476084/feature_flags/760082)
+**PostHog experiment:** [E1 Alignment guides and snap-to-grid](https://us.posthog.com/project/476084/experiments/383559)
 
 ## Hypothesis
 

@@ -4,6 +4,7 @@
 **Date:** 2026-07-14
 **Owner:** Unassigned
 **PostHog feature flag:** [exp-share-preview](https://us.posthog.com/project/476084/feature_flags/760084)
+**PostHog experiment:** [E5 Share-link output preview](https://us.posthog.com/project/476084/experiments/383558)
 
 ## Hypothesis
 
