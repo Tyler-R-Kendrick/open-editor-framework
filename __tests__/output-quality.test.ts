@@ -37,6 +37,25 @@ describe('output quality structural checks', () => {
     expect(report.issues.some((i) => i.code === 'orphan_parent')).toBe(true);
   });
 
+  it('uses not_array when the root value is not an array', () => {
+    const report = validateComponentTree({ id: 'x' });
+    expect(report.valid).toBe(false);
+    expect(report.issues[0].code).toBe('not_array');
+  });
+
+  it('skips orphan checks for components without a string id', () => {
+    const report = validateComponentTree([
+      {
+        type: 'text',
+        name: 'NoId',
+        bounds: { x: 0, y: 0, width: 10, height: 10 },
+        parent: 'missing'
+      }
+    ]);
+    expect(report.issues.some((i) => i.code === 'missing_id')).toBe(true);
+    expect(report.issues.some((i) => i.code === 'orphan_parent')).toBe(false);
+  });
+
   it('flags degenerate bounds', () => {
     const report = validateComponentTree([
       {

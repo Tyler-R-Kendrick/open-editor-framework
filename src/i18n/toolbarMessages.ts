@@ -19,6 +19,7 @@ export const toolbarMessages = {
     sharePreviewCancel: 'Cancel',
     sharePreviewConfirm: 'Copy link',
     sharePreviewCanvas: 'Canvas output preview',
+    sharePreviewEmpty: 'Empty canvas',
     sharePreviewValidStructure: 'Structure looks valid',
     sharePreviewInvalidStructure: 'Structure issues found: {count}'
   },
@@ -42,6 +43,7 @@ export const toolbarMessages = {
     sharePreviewCancel: 'Cancelar',
     sharePreviewConfirm: 'Copiar enlace',
     sharePreviewCanvas: 'Vista previa del lienzo',
+    sharePreviewEmpty: 'Lienzo vac\u00edo',
     sharePreviewValidStructure: 'La estructura parece v\u00e1lida',
     sharePreviewInvalidStructure: 'Problemas de estructura: {count}'
   }

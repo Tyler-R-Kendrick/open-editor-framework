@@ -46,6 +46,7 @@ describe('share output preview (E5)', () => {
         components={components}
         theme="light"
         aria-label="Canvas output preview"
+        emptyLabel="Empty canvas"
       />
     );
     expect(screen.getByTestId('share-output-preview')).toBeInTheDocument();

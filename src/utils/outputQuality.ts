@@ -3,6 +3,7 @@ import type { BaseComponent } from '../types/component-base';
 
 export interface StructuralIssue {
   code:
+    | 'not_array'
     | 'missing_id'
     | 'missing_bounds'
     | 'degenerate_bounds'
@@ -37,16 +38,14 @@ function hasValidBounds(bounds: unknown): bounds is Bounds {
  * Validates structural correctness of an editor component tree.
  * Stateless: pure function of the input tree with no side effects.
  */
-export function validateComponentTree(
-  components: unknown
-): StructuralReport {
+export function validateComponentTree(components: unknown): StructuralReport {
   const issues: StructuralIssue[] = [];
   if (!Array.isArray(components)) {
     return {
       valid: false,
       issues: [
         {
-          code: 'missing_id',
+          code: 'not_array',
           message: 'Component tree must be an array'
         }
       ],
@@ -93,8 +92,11 @@ export function validateComponentTree(
 
   for (const raw of components) {
     const component = raw as Partial<BaseComponent>;
+    if (!component?.id || typeof component.id !== 'string') {
+      continue;
+    }
     if (
-      component?.parent &&
+      component.parent &&
       typeof component.parent === 'string' &&
       !ids.has(component.parent)
     ) {
@@ -109,7 +111,7 @@ export function validateComponentTree(
   return {
     valid: issues.length === 0,
     issues,
-    componentCount: Array.isArray(components) ? components.length : 0
+    componentCount: components.length
   };
 }
 

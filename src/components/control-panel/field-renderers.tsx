@@ -14,6 +14,12 @@ export const getBaseInputStyle = (theme: 'light' | 'dark') => ({
   transition: 'border-color 0.2s ease'
 });
 
+const getDefaultBorderColor = (theme: 'light' | 'dark') =>
+  theme === 'dark' ? '#6b7280' : '#d1d5db';
+
+const getErrorBorderColor = (theme: 'light' | 'dark') =>
+  theme === 'dark' ? '#f87171' : '#dc2626';
+
 function FieldError({
   error,
   theme
@@ -52,16 +58,14 @@ export const TextFieldRenderer: FieldRenderer = ({
         value={String(property.value ?? '')}
         onChange={(e) => onChange(property.key, e.target.value)}
         onBlur={(e) => {
-          e.target.style.borderColor = theme === 'dark' ? '#6b7280' : '#d1d5db';
+          e.target.style.borderColor = getDefaultBorderColor(theme);
           onCommit?.(property.key, e.target.value);
         }}
         style={{
           ...baseInputStyle,
           borderColor: error
-            ? theme === 'dark'
-              ? '#f87171'
-              : '#dc2626'
-            : baseInputStyle.border
+            ? getErrorBorderColor(theme)
+            : getDefaultBorderColor(theme)
         }}
         onFocus={(e) => (e.target.style.borderColor = '#3b82f6')}
         aria-invalid={Boolean(error)}
@@ -87,10 +91,15 @@ export const NumberFieldRenderer: FieldRenderer = ({
         value={Number(property.value ?? 0)}
         onChange={(e) => onChange(property.key, parseInt(e.target.value, 10))}
         onBlur={(e) => {
-          e.target.style.borderColor = theme === 'dark' ? '#6b7280' : '#d1d5db';
+          e.target.style.borderColor = getDefaultBorderColor(theme);
           onCommit?.(property.key, parseInt(e.target.value, 10));
         }}
-        style={baseInputStyle}
+        style={{
+          ...baseInputStyle,
+          borderColor: error
+            ? getErrorBorderColor(theme)
+            : getDefaultBorderColor(theme)
+        }}
         onFocus={(e) => (e.target.style.borderColor = '#3b82f6')}
         aria-invalid={Boolean(error)}
       />

@@ -7,7 +7,10 @@ interface ShareOutputPreviewProps {
   theme: EditorTheme;
   width?: number;
   height?: number;
-  'aria-label'?: string;
+  /** Accessible name for the canvas preview image. Required for a11y. */
+  'aria-label': string;
+  /** Localized label drawn when the canvas has no components. */
+  emptyLabel: string;
 }
 
 /**
@@ -18,7 +21,8 @@ export const ShareOutputPreview: React.FC<ShareOutputPreviewProps> = ({
   theme,
   width = 440,
   height = 240,
-  'aria-label': ariaLabel
+  'aria-label': ariaLabel,
+  emptyLabel
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -41,7 +45,7 @@ export const ShareOutputPreview: React.FC<ShareOutputPreviewProps> = ({
     if (components.length === 0) {
       ctx.fillStyle = theme === 'dark' ? '#9ca3af' : '#64748b';
       ctx.font = '14px system-ui, sans-serif';
-      ctx.fillText('Empty canvas', 16, 28);
+      ctx.fillText(emptyLabel, 16, 28);
       return;
     }
 
@@ -87,15 +91,20 @@ export const ShareOutputPreview: React.FC<ShareOutputPreviewProps> = ({
       );
       ctx.fillStyle = String(component.properties.color ?? '#0f172a');
       ctx.font = `${Math.max(10, Math.min(16, h * 0.45))}px system-ui, sans-serif`;
-      ctx.fillText(label.slice(0, 28), x + 6, y + Math.min(h - 4, h / 2 + 4), w - 12);
+      ctx.fillText(
+        label.slice(0, 28),
+        x + 6,
+        y + Math.min(h - 4, h / 2 + 4),
+        w - 12
+      );
     }
-  }, [components, height, theme, width]);
+  }, [components, emptyLabel, height, theme, width]);
 
   return (
     <canvas
       ref={canvasRef}
       role="img"
-      aria-label={ariaLabel || 'Share output preview'}
+      aria-label={ariaLabel}
       data-testid="share-output-preview"
       style={{
         width,

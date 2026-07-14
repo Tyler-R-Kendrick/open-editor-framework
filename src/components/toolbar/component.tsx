@@ -361,6 +361,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                 components={sharePreviewComponents}
                 theme={theme}
                 aria-label={formatMessage('sharePreviewCanvas')}
+                emptyLabel={formatMessage('sharePreviewEmpty')}
               />
             </div>
             <p

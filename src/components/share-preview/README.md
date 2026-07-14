@@ -18,12 +18,13 @@ import { ShareOutputPreview } from '../share-preview';
   components={components}
   theme={theme}
   aria-label="Canvas output preview"
+  emptyLabel="Empty canvas"
 />;
 ```
 
 ## Accessibility
 
 - Exposed as an image landmark via `role="img"`
-- Callers must supply a meaningful `aria-label`
+- Callers must supply a meaningful `aria-label` and localized `emptyLabel`
 - Preview is informational; share confirm/cancel remain keyboard-reachable
   buttons in the toolbar dialog
