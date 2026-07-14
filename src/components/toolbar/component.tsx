@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { EditorTheme, Resolution } from '../../types/editor-types';
 import { Flex, ButtonGroup, Button } from '@adobe/react-spectrum';
 import Add from '@spectrum-icons/workflow/Add';
@@ -14,6 +14,13 @@ import messages from '../../i18n/toolbarMessages';
 import { useAppDispatch, store } from '../../store';
 import { ActionCreators } from 'redux-undo';
 import { encodeComponents } from '../../utils/share';
+import {
+  AnalyticsEvents,
+  ExperimentFlags,
+  resolveSharePreviewEnabled,
+  track
+} from '../../analytics';
+import { useFeatureFlag } from '../../hooks/useFeatureFlag';
 
 interface EditorToolbarProps {
   theme: EditorTheme;
@@ -40,6 +47,10 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
 }) => {
   const formatMessage = useMessageFormatter(messages);
   const dispatch = useAppDispatch();
+  const sharePreviewFlag = useFeatureFlag(ExperimentFlags.SHARE_PREVIEW);
+  const sharePreviewEnabled = resolveSharePreviewEnabled(sharePreviewFlag);
+  const [sharePreviewUrl, setSharePreviewUrl] = useState<string | null>(null);
+  const [shareComponentCount, setShareComponentCount] = useState(0);
 
   const resolutions: { label: string; value?: Resolution }[] = [
     { label: formatMessage('infinite'), value: undefined },
@@ -50,11 +61,13 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
 
   const handleUndo = () => {
     dispatch(ActionCreators.undo());
+    track(AnalyticsEvents.UNDO_PERFORMED, { source: 'toolbar' });
     window.dispatchEvent(new window.CustomEvent('editor-undo'));
   };
 
   const handleRedo = () => {
     dispatch(ActionCreators.redo());
+    track(AnalyticsEvents.REDO_PERFORMED, { source: 'toolbar' });
     window.dispatchEvent(new window.CustomEvent('editor-redo'));
   };
 
@@ -66,6 +79,10 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
 
   const handleSave = () => {
     const state = store.getState().canvas.present;
+    track(AnalyticsEvents.CANVAS_EXPORTED, {
+      component_count: state.components.length,
+      format: 'json-event'
+    });
     window.dispatchEvent(
       new window.CustomEvent('editor-save', { detail: { canvas: state } })
     );
@@ -97,21 +114,51 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
     input.click();
   };
 
-  const handleShare = async () => {
+  const buildShareUrl = () => {
     const components = store.getState().canvas.present.components;
     const encoded = encodeComponents(components);
     const url = new URL(window.location.href);
     url.searchParams.set('state', encoded);
+    return {
+      url: url.toString(),
+      payloadSize: encoded.length,
+      componentCount: components.length
+    };
+  };
+
+  const copyShareUrl = async (url: string, payloadSize: number) => {
     try {
-      await navigator.clipboard.writeText(url.toString());
+      await navigator.clipboard.writeText(url);
     } catch (_err) {
-      window.prompt('Share this link:', url.toString());
+      window.prompt('Share this link:', url);
     }
+    track(AnalyticsEvents.SHARE_LINK_CREATED, {
+      payload_size: payloadSize,
+      preview_shown: sharePreviewEnabled
+    });
     window.dispatchEvent(
       new window.CustomEvent('editor-share', {
-        detail: { url: url.toString() }
+        detail: { url }
       })
     );
+  };
+
+  const handleShare = async () => {
+    const { url, payloadSize, componentCount } = buildShareUrl();
+    if (sharePreviewEnabled) {
+      setSharePreviewUrl(url);
+      setShareComponentCount(componentCount);
+      return;
+    }
+    await copyShareUrl(url, payloadSize);
+  };
+
+  const confirmSharePreview = async () => {
+    if (!sharePreviewUrl) return;
+    const payloadSize =
+      new URL(sharePreviewUrl).searchParams.get('state')?.length ?? 0;
+    await copyShareUrl(sharePreviewUrl, payloadSize);
+    setSharePreviewUrl(null);
   };
 
   const toggleTheme = () => {
@@ -236,6 +283,88 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
           </select>
         )}
       </Flex>
+
+      {sharePreviewUrl && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={formatMessage('sharePreviewTitle')}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.45)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2000,
+            padding: '16px'
+          }}
+        >
+          <div
+            style={{
+              background: theme === 'dark' ? '#1f2937' : '#ffffff',
+              color: theme === 'dark' ? '#f8fafc' : '#0f172a',
+              borderRadius: '12px',
+              maxWidth: '480px',
+              width: '100%',
+              padding: '20px',
+              boxShadow: '0 16px 40px rgba(15, 23, 42, 0.25)'
+            }}
+          >
+            <h2 style={{ margin: '0 0 8px', fontSize: '18px' }}>
+              {formatMessage('sharePreviewTitle')}
+            </h2>
+            <p style={{ margin: '0 0 12px', fontSize: '14px' }}>
+              {formatMessage('sharePreviewBody')} ({shareComponentCount})
+            </p>
+            <p
+              style={{
+                wordBreak: 'break-all',
+                fontSize: '12px',
+                opacity: 0.8,
+                marginBottom: '16px'
+              }}
+            >
+              {sharePreviewUrl}
+            </p>
+            <div
+              style={{
+                display: 'flex',
+                gap: '8px',
+                justifyContent: 'flex-end'
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setSharePreviewUrl(null)}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  border: '1px solid #cbd5e1',
+                  background: 'transparent',
+                  cursor: 'pointer'
+                }}
+              >
+                {formatMessage('sharePreviewCancel')}
+              </button>
+              <button
+                type="button"
+                onClick={confirmSharePreview}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  background: '#0f766e',
+                  color: '#ffffff',
+                  cursor: 'pointer'
+                }}
+              >
+                {formatMessage('sharePreviewConfirm')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

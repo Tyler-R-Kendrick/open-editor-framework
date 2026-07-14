@@ -1,0 +1,36 @@
+[
+  {
+    "id": "container-1",
+    "type": "container",
+    "name": "Container",
+    "bounds": { "x": 24, "y": 24, "width": 320, "height": 220 },
+    "properties": {
+      "backgroundColor": "#f8fafc",
+      "borderColor": "#cbd5e1",
+      "borderWidth": 1,
+      "borderRadius": 12
+    }
+  },
+  {
+    "id": "title-1",
+    "type": "text",
+    "name": "Title",
+    "bounds": { "x": 48, "y": 48, "width": 260, "height": 40 },
+    "properties": {
+      "text": "Aligned siblings",
+      "fontSize": 22,
+      "color": "#0f172a"
+    }
+  },
+  {
+    "id": "subtitle-1",
+    "type": "text",
+    "name": "Subtitle",
+    "bounds": { "x": 48, "y": 100, "width": 260, "height": 32 },
+    "properties": {
+      "text": "Visual regression fixture",
+      "fontSize": 14,
+      "color": "#334155"
+    }
+  }
+]

@@ -13,7 +13,11 @@ export const toolbarMessages = {
     dark: 'Dark',
     light: 'Light',
     resolution: 'Resolution',
-    infinite: 'Infinite Canvas'
+    infinite: 'Infinite Canvas',
+    sharePreviewTitle: 'Preview share link',
+    sharePreviewBody: 'Review the canvas output before copying the link',
+    sharePreviewCancel: 'Cancel',
+    sharePreviewConfirm: 'Copy link'
   },
   'es-ES': {
     toolbar: 'Barra de herramientas',
@@ -29,7 +33,11 @@ export const toolbarMessages = {
     dark: 'Oscuro',
     light: 'Claro',
     resolution: 'Resoluci\u00f3n',
-    infinite: 'Lienzo infinito'
+    infinite: 'Lienzo infinito',
+    sharePreviewTitle: 'Vista previa del enlace',
+    sharePreviewBody: 'Revise el lienzo antes de copiar el enlace',
+    sharePreviewCancel: 'Cancelar',
+    sharePreviewConfirm: 'Copiar enlace'
   }
 };
 export default toolbarMessages;

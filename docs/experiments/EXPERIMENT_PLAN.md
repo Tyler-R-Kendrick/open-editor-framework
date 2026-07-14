@@ -1,7 +1,7 @@
 # Experiment Plan: Improving Editor Output Quality
 
-**Status:** Proposed
-**Date:** 2026-07-13
+**Status:** Implemented (Phase 0 + variant code); experiments draft/inactive
+**Date:** 2026-07-13 (plan) / 2026-07-14 (implementation)
 **Owner:** Unassigned
 
 ## 1. Audit of currently documented experiments and research
@@ -152,6 +152,22 @@ These do not need traffic and can start immediately:
   replays plus the offline experiments in section 5.
 - Document every experiment — including negative and inconclusive results —
   in this folder using `TEMPLATE.md`.
+
+## 8. Implementation status (2026-07-14)
+
+Shipped in this branch:
+
+| Area                                                                                          | Status                |
+| --------------------------------------------------------------------------------------------- | --------------------- |
+| Phase 0 analytics (`posthog-js`, gated via env)                                               | Done                  |
+| Custom events + feature-flag plumbing                                                         | Done                  |
+| E1–E5 variant code behind inactive flags                                                      | Done                  |
+| Offline tests (share round-trip, property fuzz, visual corpus)                                | Done                  |
+| Experiment write-ups `E1`–`E5`                                                                | Done                  |
+| PostHog flags + [baseline dashboard](https://us.posthog.com/project/476084/dashboard/1843634) | Done (flags inactive) |
+
+Next step: deploy with `VITE_PUBLIC_POSTHOG_*` set, collect ≥ 1 week of
+baseline data, then activate **one** flag/experiment at a time.
 
 ## 7. Reference reading
 

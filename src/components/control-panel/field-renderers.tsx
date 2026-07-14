@@ -14,106 +14,222 @@ export const getBaseInputStyle = (theme: 'light' | 'dark') => ({
   transition: 'border-color 0.2s ease'
 });
 
-export const TextFieldRenderer: FieldRenderer = ({ property, theme, onChange }) => {
-  const baseInputStyle = getBaseInputStyle(theme);
-
+function FieldError({
+  error,
+  theme
+}: {
+  error?: string;
+  theme: 'light' | 'dark';
+}) {
+  if (!error) return null;
   return (
-    <input
-      type="text"
-      value={String(property.value ?? '')}
-      onChange={(e) => onChange(property.key, e.target.value)}
-      style={baseInputStyle}
-      onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-      onBlur={(e) => e.target.style.borderColor = theme === 'dark' ? '#6b7280' : '#d1d5db'}
-    />
+    <div
+      role="alert"
+      style={{
+        marginTop: '4px',
+        fontSize: '12px',
+        color: theme === 'dark' ? '#fca5a5' : '#dc2626'
+      }}
+    >
+      {error}
+    </div>
   );
-};
+}
 
-export const NumberFieldRenderer: FieldRenderer = ({ property, theme, onChange }) => {
+export const TextFieldRenderer: FieldRenderer = ({
+  property,
+  theme,
+  onChange,
+  onCommit,
+  error
+}) => {
   const baseInputStyle = getBaseInputStyle(theme);
 
   return (
-    <input
-      type="number"
-      value={Number(property.value ?? 0)}
-      onChange={(e) => onChange(property.key, parseInt(e.target.value))}
-      style={baseInputStyle}
-      onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-      onBlur={(e) => e.target.style.borderColor = theme === 'dark' ? '#6b7280' : '#d1d5db'}
-    />
-  );
-};
-
-export const ColorFieldRenderer: FieldRenderer = ({ property, theme, onChange }) => {
-  const baseInputStyle = getBaseInputStyle(theme);
-
-  return (
-    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-      <input
-        type="color"
-        value={String(property.value ?? '#000000')}
-        onChange={(e) => onChange(property.key, e.target.value)}
-        style={{
-          width: '40px',
-          height: '40px',
-          border: 'none',
-          borderRadius: '6px',
-          cursor: 'pointer'
-        }}
-      />
+    <div>
       <input
         type="text"
-        value={String(property.value ?? '#000000')}
+        value={String(property.value ?? '')}
         onChange={(e) => onChange(property.key, e.target.value)}
-        style={{ ...baseInputStyle, flex: 1 }}
-        onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-        onBlur={(e) => e.target.style.borderColor = theme === 'dark' ? '#6b7280' : '#d1d5db'}
+        onBlur={(e) => {
+          e.target.style.borderColor = theme === 'dark' ? '#6b7280' : '#d1d5db';
+          onCommit?.(property.key, e.target.value);
+        }}
+        style={{
+          ...baseInputStyle,
+          borderColor: error
+            ? theme === 'dark'
+              ? '#f87171'
+              : '#dc2626'
+            : baseInputStyle.border
+        }}
+        onFocus={(e) => (e.target.style.borderColor = '#3b82f6')}
+        aria-invalid={Boolean(error)}
       />
+      <FieldError error={error} theme={theme} />
     </div>
   );
 };
 
-export const SelectFieldRenderer: FieldRenderer = ({ property, theme, onChange }) => {
+export const NumberFieldRenderer: FieldRenderer = ({
+  property,
+  theme,
+  onChange,
+  onCommit,
+  error
+}) => {
   const baseInputStyle = getBaseInputStyle(theme);
 
   return (
-    <select
-      value={String(property.value ?? '')}
-      onChange={(e) => onChange(property.key, e.target.value)}
-      style={baseInputStyle}
-      onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-      onBlur={(e) => e.target.style.borderColor = theme === 'dark' ? '#6b7280' : '#d1d5db'}
-    >
-      {property.options?.map(option => (
-        <option key={option} value={option}>
-          {option}
-        </option>
-      ))}
-    </select>
-  );
-};
-
-export const CheckboxFieldRenderer: FieldRenderer = ({ property, theme, onChange }) => {
-  return (
-    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+    <div>
       <input
-        type="checkbox"
-        checked={Boolean(property.value)}
-        onChange={(e) => onChange(property.key, e.target.checked)}
-        style={{
-          width: '16px',
-          height: '16px',
-          accentColor: '#3b82f6'
+        type="number"
+        value={Number(property.value ?? 0)}
+        onChange={(e) => onChange(property.key, parseInt(e.target.value, 10))}
+        onBlur={(e) => {
+          e.target.style.borderColor = theme === 'dark' ? '#6b7280' : '#d1d5db';
+          onCommit?.(property.key, parseInt(e.target.value, 10));
         }}
+        style={baseInputStyle}
+        onFocus={(e) => (e.target.style.borderColor = '#3b82f6')}
+        aria-invalid={Boolean(error)}
       />
-      <span style={{ fontSize: '14px', color: theme === 'dark' ? '#d1d5db' : '#374151' }}>
-        {property.value ? 'Enabled' : 'Disabled'}
-      </span>
-    </label>
+      <FieldError error={error} theme={theme} />
+    </div>
   );
 };
 
-export const RangeFieldRenderer: FieldRenderer = ({ property, theme, onChange }) => {
+export const ColorFieldRenderer: FieldRenderer = ({
+  property,
+  theme,
+  onChange,
+  onCommit,
+  error
+}) => {
+  const baseInputStyle = getBaseInputStyle(theme);
+
+  return (
+    <div>
+      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+        <input
+          type="color"
+          value={String(property.value ?? '#000000')}
+          onChange={(e) => onChange(property.key, e.target.value)}
+          onBlur={(e) => onCommit?.(property.key, e.target.value)}
+          style={{
+            width: '40px',
+            height: '40px',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer'
+          }}
+        />
+        <input
+          type="text"
+          value={String(property.value ?? '#000000')}
+          onChange={(e) => onChange(property.key, e.target.value)}
+          onBlur={(e) => {
+            e.target.style.borderColor =
+              theme === 'dark' ? '#6b7280' : '#d1d5db';
+            onCommit?.(property.key, e.target.value);
+          }}
+          style={{ ...baseInputStyle, flex: 1 }}
+          onFocus={(e) => (e.target.style.borderColor = '#3b82f6')}
+          aria-invalid={Boolean(error)}
+        />
+      </div>
+      <FieldError error={error} theme={theme} />
+    </div>
+  );
+};
+
+export const SelectFieldRenderer: FieldRenderer = ({
+  property,
+  theme,
+  onChange,
+  onCommit,
+  error
+}) => {
+  const baseInputStyle = getBaseInputStyle(theme);
+
+  return (
+    <div>
+      <select
+        value={String(property.value ?? '')}
+        onChange={(e) => {
+          onChange(property.key, e.target.value);
+          onCommit?.(property.key, e.target.value);
+        }}
+        style={baseInputStyle}
+        onFocus={(e) => (e.target.style.borderColor = '#3b82f6')}
+        onBlur={(e) =>
+          (e.target.style.borderColor =
+            theme === 'dark' ? '#6b7280' : '#d1d5db')
+        }
+        aria-invalid={Boolean(error)}
+      >
+        {property.options?.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+      <FieldError error={error} theme={theme} />
+    </div>
+  );
+};
+
+export const CheckboxFieldRenderer: FieldRenderer = ({
+  property,
+  theme,
+  onChange,
+  onCommit,
+  error
+}) => {
+  return (
+    <div>
+      <label
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          cursor: 'pointer'
+        }}
+      >
+        <input
+          type="checkbox"
+          checked={Boolean(property.value)}
+          onChange={(e) => {
+            onChange(property.key, e.target.checked);
+            onCommit?.(property.key, e.target.checked);
+          }}
+          style={{
+            width: '16px',
+            height: '16px',
+            accentColor: '#3b82f6'
+          }}
+        />
+        <span
+          style={{
+            fontSize: '14px',
+            color: theme === 'dark' ? '#d1d5db' : '#374151'
+          }}
+        >
+          {property.value ? 'Enabled' : 'Disabled'}
+        </span>
+      </label>
+      <FieldError error={error} theme={theme} />
+    </div>
+  );
+};
+
+export const RangeFieldRenderer: FieldRenderer = ({
+  property,
+  theme,
+  onChange,
+  onCommit,
+  error
+}) => {
   return (
     <div>
       <input
@@ -122,7 +238,19 @@ export const RangeFieldRenderer: FieldRenderer = ({ property, theme, onChange })
         max={property.max}
         step={property.step}
         value={Number(property.value ?? 0)}
-        onChange={(e) => onChange(property.key, parseInt(e.target.value))}
+        onChange={(e) => onChange(property.key, parseInt(e.target.value, 10))}
+        onMouseUp={(e) =>
+          onCommit?.(
+            property.key,
+            parseInt((e.target as HTMLInputElement).value, 10)
+          )
+        }
+        onTouchEnd={(e) =>
+          onCommit?.(
+            property.key,
+            parseInt((e.target as HTMLInputElement).value, 10)
+          )
+        }
         style={{
           width: '100%',
           height: '6px',
@@ -132,19 +260,27 @@ export const RangeFieldRenderer: FieldRenderer = ({ property, theme, onChange })
           accentColor: '#3b82f6'
         }}
       />
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        marginTop: '4px',
-        fontSize: '12px',
-        color: theme === 'dark' ? '#9ca3af' : '#6b7280'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginTop: '4px',
+          fontSize: '12px',
+          color: theme === 'dark' ? '#9ca3af' : '#6b7280'
+        }}
+      >
         <span>{property.min}</span>
-        <span style={{ fontWeight: '500', color: theme === 'dark' ? '#f8fafc' : '#1e293b' }}>
+        <span
+          style={{
+            fontWeight: '500',
+            color: theme === 'dark' ? '#f8fafc' : '#1e293b'
+          }}
+        >
           {Number(property.value ?? 0)}
         </span>
         <span>{property.max}</span>
       </div>
+      <FieldError error={error} theme={theme} />
     </div>
   );
 };
@@ -155,5 +291,5 @@ export const defaultFieldRenderers: BuiltInFieldRendererMap = {
   color: ColorFieldRenderer,
   select: SelectFieldRenderer,
   checkbox: CheckboxFieldRenderer,
-  range: RangeFieldRenderer,
+  range: RangeFieldRenderer
 };

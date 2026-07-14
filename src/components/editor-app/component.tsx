@@ -16,6 +16,7 @@ import { I18nProvider } from '@react-aria/i18n';
 import { decodeComponents } from '../../utils/share';
 import type { BaseComponent } from '../../types/component-base';
 import { useSearchParams } from 'react-router-dom';
+import { AnalyticsEvents, track } from '../../analytics';
 
 /**
  * Main editor application using a simple flex layout
@@ -60,7 +61,13 @@ export const EditorApp: React.FC = () => {
     const state = searchParams.get('state');
     if (state) {
       const components = decodeComponents(state);
-      if (Array.isArray(components)) {
+      const valid = Array.isArray(components);
+      track(AnalyticsEvents.SHARE_LINK_OPENED, {
+        payload_size: state.length,
+        valid,
+        component_count: valid ? components.length : 0
+      });
+      if (valid) {
         store.dispatch(setComponents(components as BaseComponent[]));
       }
     }
